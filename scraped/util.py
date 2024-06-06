@@ -177,6 +177,8 @@ def _download_site(
     process.start()
 
 
+# TODO: Return object that can be used to (a) know where the data is being saved,
+#  and (b) status on progress
 def download_site(
     url: str,
     url_to_filepath: Optional[Union[str, Callable[[str], str]]] = url_to_localpath,
