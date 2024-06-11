@@ -90,7 +90,7 @@ class RecursiveDownloader(scrapy.Spider):
         filter_urls: Optional[Callable[[str], bool]] = None,
         mk_missing_dirs: bool = True,
         verbosity: int = 0,
-        url_to_filepath: Optional[Union[str, Callable[[str], str]]] = url_to_localpath,
+        url_to_filepath: Optional[Union[str, Callable[[str], str]]] = None,
         **extra_kwargs,
     ):
         self.start_urls = [start_url]
@@ -104,6 +104,8 @@ class RecursiveDownloader(scrapy.Spider):
             'DEPTH_STATS': True,
             'DEPTH_PRIORITY': 1,
             **extra_kwargs,
+            'LOG_FORMAT': '%(levelname)s: %(message)s',
+            'LOG_FILE': None,  # Disable logging to file
         }
         super().__init__()
 
@@ -139,7 +141,7 @@ class RecursiveDownloader(scrapy.Spider):
 
 def _download_site(
     url: str,
-    url_to_filepath: Optional[Union[str, Callable[[str], str]]] = url_to_localpath,
+    url_to_filepath: Optional[Union[str, Callable[[str], str]]] = None,
     *,
     depth: int = 1,
     filter_urls: Optional[Callable[[str], bool]] = None,
@@ -162,7 +164,13 @@ def _download_site(
 
     """
 
-    process = CrawlerProcess()
+    process = CrawlerProcess(
+        {
+            'LOG_LEVEL': ['ERROR', 'INFO', 'DEBUG'][verbosity],
+            'LOG_FORMAT': '%(levelname)s: %(message)s',
+            'LOG_FILE': None,  # Disable logging to file
+        }
+    )
     process.crawl(
         RecursiveDownloader,
         start_url=url,
@@ -219,6 +227,40 @@ def download_site(
     p = multiprocessing.Process(target=_crawl)
     p.start()
     p.join()
+
+
+def markdown_of_site(
+    url: str,
+    *,
+    depth: int = 1,
+    filter_urls: Optional[Callable[[str], bool]] = None,
+    verbosity: int = 0,
+    rootdir: str = DFLT_ROOTDIR,
+    **extra_kwargs,
+):
+    from pdfdol import html_to_markdown
+
+    # make a temporary directory, ensuring it is empty
+    from tempfile import TemporaryDirectory
+
+    with TemporaryDirectory() as tmpdir:
+        # download the site to the temporary directory
+
+        _url_to_localpath = partial(url_to_localpath, rootdir=tmpdir)
+        download_site(
+            url,
+            url_to_filepath=_url_to_localpath,
+            depth=depth,
+            filter_urls=filter_urls,
+            verbosity=verbosity,
+            rootdir=tmpdir,
+            **extra_kwargs,
+        )
+        # convert the site to markdown
+
+        markdown = html_to_markdown(str(tmpdir))
+
+    return markdown
 
 
 import requests
