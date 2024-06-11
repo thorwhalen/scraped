@@ -4,12 +4,16 @@ import os
 from functools import partial
 from typing import Optional, Callable, Union
 import multiprocessing
+import re
+from pathlib import Path
+from typing import Iterable, Mapping, Union
+from urllib.parse import urlparse, urljoin
 
 import scrapy
 from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
-from urllib.parse import urlparse, urljoin
 
+import html2text
 from config2py import get_app_data_folder
 from graze.base import _url_to_localpath
 
@@ -183,6 +187,105 @@ def _download_site(
         **extra_kwargs,
     )
     process.start()
+
+
+def is_html_content(content: Union[str, bytes]) -> bool:
+    """
+    Check if the given content is HTML.
+
+    :param content: The content to check, either a string or bytes.
+    :return: True if the content is HTML, otherwise False.
+
+    >>> html_string = "<html><head><title>Test</title></head><body><p>Hello, World!</p></body></html>"
+    >>> non_html_string = "This is just a plain text."
+    >>> is_html_content(html_string)
+    True
+    >>> is_html_content(non_html_string)
+    False
+    """
+    if isinstance(content, bytes):
+        content = content.decode('utf-8', errors='ignore')
+
+    # A simple regex to check for common HTML tags
+    html_tags = re.compile(
+        (
+            r'<(html|head|body|title|meta|link|script|style|div|span|p|a|img|table|tr'
+            r'|td|ul|ol|li|h1|h2|h3|h4|h5|h6|br|hr|!--)'  # Opening tags
+        ),
+        re.IGNORECASE,
+    )
+
+    if html_tags.search(content):
+        return True
+    return False
+
+
+def html_to_markdown(
+    htmls: Union[str, Iterable[str], Mapping[str, str]],
+    save_filepath: str = None,
+    *,
+    key_filt=None,
+    content_filt=is_html_content,
+    prefixes=None,
+    **html2text_options,
+):
+    """
+    Convert one or several HTML files into a single Markdown file or return the
+    Markdown string(s).
+
+    :param htmls: A single file path, an iterable of file paths, or a mapping of
+        names to file paths.
+    :param save_filepath: The file path where the combined Markdown will be saved.
+        If None, returns the Markdown string.
+    :param prefixes: A list of prefixes to be woven with to each Markdown string
+        (there must be the same number of prefixes as HTML files).
+    :param html2text_options: Options to pass to the html2text.HTML2Text()
+        converter.
+    :return: Combined Markdown string if save_filepath is None, otherwise the
+        save_filepath.
+    """
+
+    def read_html_file(filepath):
+        return Path(filepath).read_bytes()
+
+    if isinstance(htmls, Mapping):
+        html_contents = filter(content_filt, htmls.values())
+    else:
+        if isinstance(htmls, str):
+            if htmls.endswith(".html"):
+                htmls = [htmls]
+            elif Path(htmls).is_dir():
+                # Recursively find all HTML files in the directory
+                htmls = filter(key_filt, Path(htmls).iterdir())
+            else:
+                htmls = [htmls]
+        if not isinstance(htmls, Iterable):
+            raise TypeError(
+                f"htmls must be an iterable of file paths or a mapping, not {htmls}"
+            )
+        html_contents = map(read_html_file, htmls)
+
+    # Initialize the html2text converter with options
+    converter = html2text.HTML2Text()
+    for key, value in html2text_options.items():
+        setattr(converter, key, value)
+
+    # Convert HTML contents to Markdown
+    markdown_contents = [
+        converter.handle(html_content.decode()) for html_content in html_contents
+    ]
+    if prefixes:
+        markdown_contents = (
+            f"{prefix}\n{markdown}"
+            for prefix, markdown in zip(prefixes, markdown_contents)
+        )
+    combined_markdown = "\n\n".join(markdown_contents)
+
+    if save_filepath:
+        Path(save_filepath).write_text(combined_markdown)
+        return save_filepath
+    else:
+        return combined_markdown
 
 
 # TODO: Return object that can be used to (a) know where the data is being saved,
