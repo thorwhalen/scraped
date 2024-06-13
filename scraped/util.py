@@ -222,9 +222,8 @@ def is_html_content(content: Union[str, bytes]) -> bool:
 
 def html_to_markdown(
     htmls: Union[str, Iterable[str], Mapping[str, str]],
-    save_filepath: str = None,
+    save_filepath: Optional[str] = None,
     *,
-    key_filt=None,
     content_filt=is_html_content,
     prefixes=None,
     **html2text_options,
@@ -255,8 +254,13 @@ def html_to_markdown(
             if htmls.endswith(".html"):
                 htmls = [htmls]
             elif Path(htmls).is_dir():
+                # TODO: Handle this better, and in such a way that directories can be
+                #   captured and produce their own markdown content, which will then
+                #   be combined with the rest of the markdown content.
+
+                # For now though:
                 # Recursively find all HTML files in the directory
-                htmls = filter(key_filt, Path(htmls).iterdir())
+                htmls = filter(Path.is_file, Path(htmls).rglob("*"))
             else:
                 htmls = [htmls]
         if not isinstance(htmls, Iterable):
@@ -271,9 +275,18 @@ def html_to_markdown(
         setattr(converter, key, value)
 
     # Convert HTML contents to Markdown
-    markdown_contents = [
-        converter.handle(html_content.decode()) for html_content in html_contents
-    ]
+    def _markdown_contents(html_contents):
+        for html_content in html_contents:
+            try:
+                yield converter.handle(html_content.decode())
+            except UnicodeDecodeError:
+                print(f"Failed to decode HTML content: {html_content[:30]=}")
+                # TODO: Give more control to the user to decide what to do in this case
+                # skip it
+                pass
+
+    markdown_contents = list(_markdown_contents(html_contents))
+
     if prefixes:
         markdown_contents = (
             f"{prefix}\n{markdown}"
@@ -337,19 +350,23 @@ def markdown_of_site(
     *,
     depth: int = 1,
     filter_urls: Optional[Callable[[str], bool]] = None,
+    save_filepath: Optional[str] = None,
     verbosity: int = 0,
-    rootdir: str = DFLT_ROOTDIR,
+    dir_to_save_page_slurps: str = None,
     **extra_kwargs,
 ):
-    from pdfdol import html_to_markdown
-
     # make a temporary directory, ensuring it is empty
     from tempfile import TemporaryDirectory
 
+    # TODO: Wasteful to make a tmpdir if dir_to_save_page_slurps is given. Instead,
+    #   would be nice to use a placeholder context manager that does nothing if the
+    #   directory is given.
     with TemporaryDirectory() as tmpdir:
         # download the site to the temporary directory
 
-        _url_to_localpath = partial(url_to_localpath, rootdir=tmpdir)
+        dir_to_save_page_slurps = dir_to_save_page_slurps or tmpdir
+
+        _url_to_localpath = partial(url_to_localpath, rootdir=dir_to_save_page_slurps)
         download_site(
             url,
             url_to_filepath=_url_to_localpath,
@@ -361,7 +378,7 @@ def markdown_of_site(
         )
         # convert the site to markdown
 
-        markdown = html_to_markdown(str(tmpdir))
+        markdown = html_to_markdown(str(tmpdir), save_filepath=save_filepath)
 
     return markdown
 
