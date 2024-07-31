@@ -15,14 +15,14 @@ from scrapy.linkextractors import LinkExtractor
 
 import html2text
 from config2py import get_app_data_folder
-from graze.base import url_to_localpath
+from graze.base import url_to_localpath as graze_url_to_localpath
 
 _DFLT_DATA_ROOTDIR = get_app_data_folder('scraped/data', ensure_exists=True)
 DFLT_ROOTDIR = os.environ.get('SCRAPED_DFLT_ROOTDIR', _DFLT_DATA_ROOTDIR)
 
 
 def url_to_localpath(url: str, rootdir: str = DFLT_ROOTDIR) -> str:
-    path = url_to_localpath(url)
+    path = graze_url_to_localpath(url)
     if rootdir:
         return os.path.join(rootdir, path)
     return path
@@ -387,7 +387,7 @@ import requests
 import os
 import mimetypes
 from urllib.parse import unquote
-from graze.base import url_to_localpath
+# from graze.base import url_to_localpath
 
 
 # This function is not used in the current implementation of the package,
