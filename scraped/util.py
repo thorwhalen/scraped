@@ -220,6 +220,7 @@ def is_html_content(content: Union[str, bytes]) -> bool:
     return False
 
 
+# TODO: Replace this by a version that uses dol.store_aggregate
 def html_to_markdown(
     htmls: Union[str, Iterable[str], Mapping[str, str]],
     save_filepath: Optional[str] = None,
