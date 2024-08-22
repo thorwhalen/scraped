@@ -295,7 +295,7 @@ def html_to_markdown(
     combined_markdown = "\n\n".join(markdown_contents)
 
     if save_filepath:
-        Path(save_filepath).write_text(combined_markdown)
+        Path(save_filepath).expanduser().absolute().write_text(combined_markdown)
         return save_filepath
     else:
         return combined_markdown
@@ -355,6 +355,41 @@ def markdown_of_site(
     dir_to_save_page_slurps: str = None,
     **extra_kwargs,
 ):
+    """
+    Download a site and convert it to markdown.
+
+    This can be quite useful when you want to perform some NLP analysis on a site, 
+    feed some information to an AI model, or simply want to read the site offline.
+    Markdown offers a happy medium between readability and simplicity, and is
+    supported by many tools and platforms.
+    
+    Args:
+    - url: The URL of the site to download.
+    - depth: The maximum depth to follow links.
+    - filter_urls: A function to filter URLs to download.
+    - save_filepath: The file path where the combined Markdown will be saved.
+    - verbosity: The verbosity level.
+    - dir_to_save_page_slurps: The directory to save the downloaded pages.
+    - extra_kwargs: Extra keyword arguments to pass to the Scrapy spider.
+
+    Returns:
+    - The Markdown string of the site (if save_filepath is None), otherwise the save_filepath.
+
+    >>> markdown_of_site(
+    ...     "https://i2mint.github.io/dol/",
+    ...     depth=2,
+    ...     save_filepath='~/dol_documentation.md'
+    ... )  # doctest: +SKIP
+    '~/dol_documentation.md'
+
+    If you don't specify a `save_filepath`, the function will return the Markdown 
+    string, which you can then analyze directly, and/or store as you wish.
+
+    >>> markdown_string = markdown_of_site("https://i2mint.github.io/dol/")  # doctest: +SKIP
+    >>> print(f"{type(markdown_string).__name__} of length {len(markdown_string)}")  # doctest: +SKIP
+    str of length 626439
+
+    """
     # make a temporary directory, ensuring it is empty
     from tempfile import TemporaryDirectory
 

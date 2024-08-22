@@ -1,7 +1,7 @@
 """Scraping tools"""
 
 from functools import partial
-from scraped.util import markdown_of_site
+from scraped.util import markdown_of_site, download_site
 
 markdown_of_site_depth_3 = partial(markdown_of_site, depth=3)
 
@@ -10,7 +10,7 @@ def scrape_multiple_sites(
     name_and_url: dict,
     save_dir: str = ".",
     *,
-    url_scrap_function: callable = markdown_of_site_depth_3,
+    url_scrape_function: callable = markdown_of_site_depth_3,
 ):
     """
     Scrape multiple URLs and save the results to a directory.
@@ -18,8 +18,8 @@ def scrape_multiple_sites(
     Args:
     - name_and_url: a dictionary mapping names to URLs
     - save_dir: the directory to save the results to
-    - url_scrap_function: the function to use to scrape the URLs
-    
+    - url_scrape_function: the function to use to scrape the URLs
+
     """
     from lkj import print_progress
     import scraped
@@ -34,7 +34,7 @@ def scrape_multiple_sites(
         for i, (name, url) in enumerate(name_and_url.items(), 1):
             try:
                 print_progress(f"Scraping {name} ({url})...")
-                md_content = url_scrap_function(url, depth=3)
+                md_content = url_scrape_function(url, depth=3)
                 with open(f"{save_dir}/{name}.md", "w") as f:
                     f.write(md_content)
             except Exception as e:
@@ -44,6 +44,19 @@ def scrape_multiple_sites(
 
     return dict(gen())
 
+def main():
+    """
+    Run the command-line interface of scraped.
+    """
+    import argh
 
+    argh.dispatch_commands(
+        [
+            markdown_of_site,
+            download_site,
+            scrape_multiple_sites,
+        ]
+    )
 
-    
+if __name__ == "__main__":
+    main()
