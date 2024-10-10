@@ -5,6 +5,7 @@ from functools import partial
 from typing import Optional, Callable, Union
 import multiprocessing
 import re
+from tempfile import TemporaryDirectory
 from pathlib import Path
 from typing import Iterable, Mapping, Union
 from urllib.parse import urlparse, urljoin
@@ -22,10 +23,21 @@ DFLT_ROOTDIR = os.environ.get('SCRAPED_DFLT_ROOTDIR', _DFLT_DATA_ROOTDIR)
 
 
 def url_to_localpath(url: str, rootdir: str = DFLT_ROOTDIR) -> str:
+    """Convert a URL to a local file path, considering slashes as marking directories"""
     path = graze_url_to_localpath(url)
     if rootdir:
         return os.path.join(rootdir, path)
     return path
+
+
+def url_to_filename(url: str) -> str:
+    """
+    Convert a URL to a filename (getting rid of http header and slashes)
+    """
+    # remove slash suffix if there
+    if url[-1] == '/':
+        url = url[:-1]
+    return url.replace('https://', '').replace('http://', '').replace('/', '__')
 
 
 # def explicit_url(response) -> str:
@@ -235,14 +247,16 @@ def html_to_markdown(
 
     :param htmls: A single file path, an iterable of file paths, or a mapping of
         names to file paths.
-    :param save_filepath: The file path where the combined Markdown will be saved.
+    :param save_filepath: The file path where the combined Markdown will be saved,
+        or the folder path where it should be saved (a name will be generated based
+        on the url).
         If None, returns the Markdown string.
     :param prefixes: A list of prefixes to be woven with to each Markdown string
         (there must be the same number of prefixes as HTML files).
     :param html2text_options: Options to pass to the html2text.HTML2Text()
         converter.
-    :return: Combined Markdown string if save_filepath is None, otherwise the
-        save_filepath.
+    :return: Combined Markdown string if save_filepath is None, otherwise returns the
+        path where the Markdown file was saved.
     """
 
     def read_html_file(filepath):
@@ -359,11 +373,11 @@ def markdown_of_site(
     """
     Download a site and convert it to markdown.
 
-    This can be quite useful when you want to perform some NLP analysis on a site, 
+    This can be quite useful when you want to perform some NLP analysis on a site,
     feed some information to an AI model, or simply want to read the site offline.
     Markdown offers a happy medium between readability and simplicity, and is
     supported by many tools and platforms.
-    
+
     Args:
     - url: The URL of the site to download.
     - depth: The maximum depth to follow links.
@@ -383,7 +397,7 @@ def markdown_of_site(
     ... )  # doctest: +SKIP
     '~/dol_documentation.md'
 
-    If you don't specify a `save_filepath`, the function will return the Markdown 
+    If you don't specify a `save_filepath`, the function will return the Markdown
     string, which you can then analyze directly, and/or store as you wish.
 
     >>> markdown_string = markdown_of_site("https://i2mint.github.io/dol/")  # doctest: +SKIP
@@ -391,9 +405,20 @@ def markdown_of_site(
     str of length 626439
 
     """
-    # make a temporary directory, ensuring it is empty
-    from tempfile import TemporaryDirectory
 
+    # process the save_filepath
+    if save_filepath:
+        # if it's a directory, extend it to contain the filename
+        if os.path.isdir(save_filepath):
+            save_filepath = os.path.join(save_filepath, url_to_filename(url) + '.md')
+        else:  # check that the directory containing the filepath exists
+            containing_dir = os.path.dirname(save_filepath)
+            if not os.path.exists(containing_dir):
+                raise FileNotFoundError(
+                    f"Directory (needed to save Markdown) not found: {containing_dir}"
+                )
+
+    # make a temporary directory, ensuring it is empty
     # TODO: Wasteful to make a tmpdir if dir_to_save_page_slurps is given. Instead,
     #   would be nice to use a placeholder context manager that does nothing if the
     #   directory is given.
@@ -423,6 +448,7 @@ import requests
 import os
 import mimetypes
 from urllib.parse import unquote
+
 # from graze.base import url_to_localpath
 
 
