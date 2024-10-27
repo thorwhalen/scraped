@@ -267,22 +267,24 @@ def html_to_markdown(
     else:
         if isinstance(htmls, str):
             if htmls.endswith(".html"):
-                htmls = [htmls]
-            elif Path(htmls).is_dir():
+                html_contents = [read_html_file(htmls)]
+            elif len(htmls) < 50 and Path(htmls).is_dir():
                 # TODO: Handle this better, and in such a way that directories can be
                 #   captured and produce their own markdown content, which will then
                 #   be combined with the rest of the markdown content.
 
                 # For now though:
                 # Recursively find all HTML files in the directory
-                htmls = filter(Path.is_file, Path(htmls).rglob("*"))
+                html_contents = map(
+                    read_html_file, filter(Path.is_file, Path(htmls).rglob("*"))
+                )
             else:
-                htmls = [htmls]
+                html_contents = [htmls]
         if not isinstance(htmls, Iterable):
             raise TypeError(
                 f"htmls must be an iterable of file paths or a mapping, not {htmls}"
             )
-        html_contents = map(read_html_file, htmls)
+        # html_contents = map(read_html_file, htmls)
 
     # Initialize the html2text converter with options
     converter = html2text.HTML2Text()
@@ -293,7 +295,9 @@ def html_to_markdown(
     def _markdown_contents(html_contents):
         for html_content in html_contents:
             try:
-                yield converter.handle(html_content.decode())
+                if isinstance(html_content, bytes):
+                    html_content = html_content.decode()
+                yield converter.handle(html_content)
             except UnicodeDecodeError:
                 print(f"Failed to decode HTML content: {html_content[:30]=}")
                 # TODO: Give more control to the user to decide what to do in this case
