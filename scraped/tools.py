@@ -152,8 +152,8 @@ from pathlib import Path
 import requests
 from operator import methodcaller, attrgetter
 
-path_to_bytes = Pipe(Path, methodcaller('read_bytes'))
-path_to_string = Pipe(Path, methodcaller('read_text'))
+acquire_content.path_to_bytes = Pipe(Path, methodcaller('read_bytes'))
+acquire_content.path_to_string = Pipe(Path, methodcaller('read_text'))
 
 
 @acquire_content
@@ -168,6 +168,8 @@ def url_to_bytes(url: URI, verbose: int = 2) -> bytes:
     except requests.exceptions.RequestException as e:
         if verbose >= 1:
             print(f"Failed to download from {url}: {e}")
+
+acquire_content.url_to_bytes = url_to_bytes
 
 
 def scrape_multiple_sites(
