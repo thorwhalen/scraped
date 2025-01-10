@@ -2,12 +2,11 @@
 
 import os
 from functools import partial
-from typing import Optional, Callable, Union
+from typing import Iterable, Mapping, Optional, Callable, Union
 import multiprocessing
 import re
 from tempfile import TemporaryDirectory
 from pathlib import Path
-from typing import Iterable, Mapping, Union
 from urllib.parse import urlparse, urljoin
 
 import scrapy
@@ -238,6 +237,7 @@ def html_to_markdown(
     save_filepath: Optional[str] = None,
     *,
     content_filt=is_html_content,
+    markdown_contents_aggregator: Callable = "\n\n".join,
     prefixes=None,
     **html2text_options,
 ):
@@ -251,12 +251,19 @@ def html_to_markdown(
         or the folder path where it should be saved (a name will be generated based
         on the url).
         If None, returns the Markdown string.
+    :param content_filt: A function to filter the content to be converted to Markdown.
+    :param markdown_contents_aggregator: A function to aggregate the Markdown strings.
     :param prefixes: A list of prefixes to be woven with to each Markdown string
         (there must be the same number of prefixes as HTML files).
     :param html2text_options: Options to pass to the html2text.HTML2Text()
         converter.
     :return: Combined Markdown string if save_filepath is None, otherwise returns the
         path where the Markdown file was saved.
+
+    Tips:
+
+    - If you want to just get a list of Markdown strings, set `save_filepath=None`
+        and `markdown_contents_aggregator=list`.
     """
 
     def read_html_file(filepath):
@@ -268,7 +275,7 @@ def html_to_markdown(
         if isinstance(htmls, str):
             if htmls.endswith(".html"):
                 html_contents = [read_html_file(htmls)]
-            elif len(htmls) < 50 and Path(htmls).is_dir():
+            elif len(htmls) < 1000 and Path(htmls).is_dir():
                 # TODO: Handle this better, and in such a way that directories can be
                 #   captured and produce their own markdown content, which will then
                 #   be combined with the rest of the markdown content.
@@ -311,7 +318,7 @@ def html_to_markdown(
             f"{prefix}\n{markdown}"
             for prefix, markdown in zip(prefixes, markdown_contents)
         )
-    combined_markdown = "\n\n".join(markdown_contents)
+    combined_markdown = markdown_contents_aggregator(markdown_contents)
 
     if save_filepath:
         Path(save_filepath).expanduser().absolute().write_text(combined_markdown)
@@ -417,6 +424,8 @@ def markdown_of_site(
             save_filepath = os.path.join(save_filepath, url_to_filename(url) + '.md')
         else:  # check that the directory containing the filepath exists
             containing_dir = os.path.dirname(save_filepath)
+            if containing_dir == '':
+                containing_dir = os.getcwd()
             if not os.path.exists(containing_dir):
                 raise FileNotFoundError(
                     f"Directory (needed to save Markdown) not found: {containing_dir}"
@@ -426,24 +435,28 @@ def markdown_of_site(
     # TODO: Wasteful to make a tmpdir if dir_to_save_page_slurps is given. Instead,
     #   would be nice to use a placeholder context manager that does nothing if the
     #   directory is given.
-    with TemporaryDirectory() as tmpdir:
-        # download the site to the temporary directory
-
-        dir_to_save_page_slurps = dir_to_save_page_slurps or tmpdir
-
-        _url_to_localpath = partial(url_to_localpath, rootdir=dir_to_save_page_slurps)
-        download_site(
-            url,
-            url_to_filepath=_url_to_localpath,
-            depth=depth,
-            filter_urls=filter_urls,
-            verbosity=verbosity,
-            rootdir=tmpdir,
-            **extra_kwargs,
+    if not dir_to_save_page_slurps:
+        dir_to_save_page_slurps = TemporaryDirectory(prefix='scraped_').name
+    else:
+        assert os.path.isdir(dir_to_save_page_slurps), (
+            f"dir_to_save_page_slurps must be a directory: {dir_to_save_page_slurps}"
         )
-        # convert the site to markdown
 
-        markdown = html_to_markdown(str(tmpdir), save_filepath=save_filepath)
+    # download the site to the temporary directory
+    _url_to_localpath = partial(url_to_localpath, rootdir=dir_to_save_page_slurps)
+
+    download_site(
+        url,
+        url_to_filepath=_url_to_localpath,
+        depth=depth,
+        filter_urls=filter_urls,
+        verbosity=verbosity,
+        rootdir=dir_to_save_page_slurps,
+        **extra_kwargs,
+    )
+
+    # convert the site to markdown
+    markdown = html_to_markdown(dir_to_save_page_slurps, save_filepath=save_filepath)
 
     return markdown
 
