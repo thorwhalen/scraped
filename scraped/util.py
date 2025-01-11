@@ -2,7 +2,7 @@
 
 import os
 from functools import partial
-from typing import Iterable, Mapping, Optional, Callable, Union
+from typing import Iterable, Mapping, Optional, Callable, Union, Tuple, List, Dict
 import multiprocessing
 import re
 from tempfile import TemporaryDirectory
@@ -377,6 +377,7 @@ def markdown_of_site(
     depth: int = 1,
     filter_urls: Optional[Callable[[str], bool]] = None,
     save_filepath: Optional[str] = None,
+    deduplicate_lines_min_block_size: Optional[int] = None,
     verbosity: int = 0,
     dir_to_save_page_slurps: str = None,
     **extra_kwargs,
@@ -394,6 +395,7 @@ def markdown_of_site(
     - depth: The maximum depth to follow links.
     - filter_urls: A function to filter URLs to download.
     - save_filepath: The file path where the combined Markdown will be saved.
+    - deduplicate_lines_min_block_size: The minimum block size to deduplicate lines.
     - verbosity: The verbosity level.
     - dir_to_save_page_slurps: The directory to save the downloaded pages.
     - extra_kwargs: Extra keyword arguments to pass to the Scrapy spider.
@@ -401,6 +403,12 @@ def markdown_of_site(
     Returns:
     - The Markdown string of the site (if save_filepath is None), otherwise the save_filepath.
 
+    Note: deduplicate_lines_min_block_size requires the hg package to be installed.
+        We advise you to install it using `pip install hg`, and use 
+        `hg.deduplicate_string_lines` directly on the output markdown string if you 
+        don't know what the minimum block size should be. This will avoid having to 
+        redowload the site if you want to change the minimum block size.
+        
     >>> markdown_of_site(
     ...     "https://i2mint.github.io/dol/",
     ...     depth=2,
@@ -438,9 +446,9 @@ def markdown_of_site(
     if not dir_to_save_page_slurps:
         dir_to_save_page_slurps = TemporaryDirectory(prefix='scraped_').name
     else:
-        assert os.path.isdir(dir_to_save_page_slurps), (
-            f"dir_to_save_page_slurps must be a directory: {dir_to_save_page_slurps}"
-        )
+        assert os.path.isdir(
+            dir_to_save_page_slurps
+        ), f"dir_to_save_page_slurps must be a directory: {dir_to_save_page_slurps}"
 
     # download the site to the temporary directory
     _url_to_localpath = partial(url_to_localpath, rootdir=dir_to_save_page_slurps)
@@ -458,7 +466,31 @@ def markdown_of_site(
     # convert the site to markdown
     markdown = html_to_markdown(dir_to_save_page_slurps, save_filepath=save_filepath)
 
+    if deduplicate_lines_min_block_size:
+        markdown, _ = deduplicate_lines(
+            markdown, min_block_size=deduplicate_lines_min_block_size
+        )
+
     return markdown
+
+
+def deduplicate_lines(
+    text: str, min_block_size: int = 5, key: Optional[Callable] = hash
+) -> Tuple[str, List[Dict]]:
+    """
+    Deduplicate text Deduplicate text lines.
+
+    Returns:
+       - final_text: deduplicated text (lines joined by newline)
+       - removed_blocks: metadata about removed blocks 
+
+    :param text:             The input string.
+    :param min_block_size:   The size for initial block match.
+    :param key:              Optional key function mapping each line to a comparable/hashable value.
+                             If None, lines are hashed as-is.
+    """
+    from hg import deduplicate_string_lines  # pip install hg
+    return deduplicate_string_lines(text, min_block_size=min_block_size, key=key)
 
 
 import requests
