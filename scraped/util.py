@@ -14,11 +14,18 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
 
 import html2text
-from config2py import get_app_data_folder
+from config2py import get_app_data_folder, process_path
 from graze.base import url_to_localpath as graze_url_to_localpath
 
 _DFLT_DATA_ROOTDIR = get_app_data_folder('scraped/data', ensure_exists=True)
 DFLT_ROOTDIR = os.environ.get('SCRAPED_DFLT_ROOTDIR', _DFLT_DATA_ROOTDIR)
+
+_fallback_store_dir = os.path.expanduser('~/Downloads')
+if not os.path.isdir(_fallback_store_dir):
+    _fallback_store_dir = process_path(
+        os.path.join(DFLT_ROOTDIR, 'Downloads'), ensure_dir_exists=True
+    )
+DFLT_STORE_DIR = os.environ.get('DFLT_DOL_DOWNLOAD_DIR', _fallback_store_dir)
 
 
 def url_to_localpath(url: str, rootdir: str = DFLT_ROOTDIR) -> str:
@@ -404,11 +411,11 @@ def markdown_of_site(
     - The Markdown string of the site (if save_filepath is None), otherwise the save_filepath.
 
     Note: deduplicate_lines_min_block_size requires the hg package to be installed.
-        We advise you to install it using `pip install hg`, and use 
-        `hg.deduplicate_string_lines` directly on the output markdown string if you 
-        don't know what the minimum block size should be. This will avoid having to 
+        We advise you to install it using `pip install hg`, and use
+        `hg.deduplicate_string_lines` directly on the output markdown string if you
+        don't know what the minimum block size should be. This will avoid having to
         redowload the site if you want to change the minimum block size.
-        
+
     >>> markdown_of_site(
     ...     "https://i2mint.github.io/dol/",
     ...     depth=2,
@@ -482,7 +489,7 @@ def deduplicate_lines(
 
     Returns:
        - final_text: deduplicated text (lines joined by newline)
-       - removed_blocks: metadata about removed blocks 
+       - removed_blocks: metadata about removed blocks
 
     :param text:             The input string.
     :param min_block_size:   The size for initial block match.
@@ -490,6 +497,7 @@ def deduplicate_lines(
                              If None, lines are hashed as-is.
     """
     from hg import deduplicate_string_lines  # pip install hg
+
     return deduplicate_string_lines(text, min_block_size=min_block_size, key=key)
 
 

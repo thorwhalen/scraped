@@ -1,7 +1,7 @@
 """Scraping tools"""
 
 from functools import partial
-from scraped.util import markdown_of_site, download_site
+from scraped.util import markdown_of_site, download_site, DFLT_STORE_DIR
 
 markdown_of_site_depth_3 = partial(markdown_of_site, depth=3)
 
@@ -11,7 +11,6 @@ import requests
 from typing import Dict, Union, MutableMapping, KT, VT, TypeVar, Callable, Any
 from functools import partial
 
-DFLT_STORE_DIR = os.environ.get('DFLT_DOL_DOWNLOAD_DIR', '~/Downloads')
 
 URI = TypeVar('URI')
 Dirpath = str
@@ -112,7 +111,9 @@ def _ensure_store_func(store: Union[Dirpath, MutableMapping, Callable]) -> Store
     >>> func('key', 'value')  # should store the value in the dictionary
     >>> assert store == {'key': 'value'}
 
-    >>> store = '~/Downloads'
+    Let's specify a (temporary) directory path as the store:
+    >>> import tempfile
+    >>> store = tempfile.gettempdir()
     >>> try:
     ...     func = _ensure_store_func(store)
     ... except ValueError:
@@ -120,9 +121,6 @@ def _ensure_store_func(store: Union[Dirpath, MutableMapping, Callable]) -> Store
 
     >>> _ensure_store_func(lambda k, v: print(f"Storing {k}: {v}"))  # doctest: +ELLIPSIS
     <function <lambda> at ...>
-
-    # Note: For Files store handling, you'll need a valid directory:
-    # >>> _ensure_store_func("/valid/directory/path")  # Requires dol.Files +SKIP
 
     """
     if callable(store):
