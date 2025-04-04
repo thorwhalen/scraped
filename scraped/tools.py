@@ -12,9 +12,9 @@ from typing import Dict, Union, MutableMapping, KT, VT, TypeVar, Callable, Any
 from functools import partial
 
 
-URI = TypeVar('URI')
+URI = TypeVar("URI")
 Dirpath = str
-ContentType = TypeVar('ContentType')
+ContentType = TypeVar("ContentType")
 StoreFunc = Callable[[KT, ContentType], None]
 
 
@@ -75,7 +75,7 @@ def acquire_content(
     # acquire_content(lambda url: requests.get(url).content, uris, store)  # Fetches URL content +SKIP
 
     See:
-    * [A tiny flexible data acquisition python function](https://medium.com/@thorwhalen1/a-tiny-flexible-data-acquisition-python-function-518289dcd1e6) and 
+    * [A tiny flexible data acquisition python function](https://medium.com/@thorwhalen1/a-tiny-flexible-data-acquisition-python-function-518289dcd1e6) and
     * [gist](https://gist.github.com/thorwhalen/e8fe6c0454ab2109d4713f886b38bbda)
 
     """
@@ -150,8 +150,8 @@ from pathlib import Path
 import requests
 from operator import methodcaller, attrgetter
 
-acquire_content.path_to_bytes = Pipe(Path, methodcaller('read_bytes'))
-acquire_content.path_to_string = Pipe(Path, methodcaller('read_text'))
+acquire_content.path_to_bytes = Pipe(Path, methodcaller("read_bytes"))
+acquire_content.path_to_string = Pipe(Path, methodcaller("read_text"))
 
 
 @acquire_content
@@ -166,6 +166,7 @@ def url_to_bytes(url: URI, verbose: int = 2) -> bytes:
     except requests.exceptions.RequestException as e:
         if verbose >= 1:
             print(f"Failed to download from {url}: {e}")
+
 
 acquire_content.url_to_bytes = url_to_bytes
 

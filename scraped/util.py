@@ -17,15 +17,15 @@ import html2text
 from config2py import get_app_data_folder, process_path
 from graze.base import url_to_localpath as graze_url_to_localpath
 
-_DFLT_DATA_ROOTDIR = get_app_data_folder('scraped/data', ensure_exists=True)
-DFLT_ROOTDIR = os.environ.get('SCRAPED_DFLT_ROOTDIR', _DFLT_DATA_ROOTDIR)
+_DFLT_DATA_ROOTDIR = get_app_data_folder("scraped/data", ensure_exists=True)
+DFLT_ROOTDIR = os.environ.get("SCRAPED_DFLT_ROOTDIR", _DFLT_DATA_ROOTDIR)
 
-_fallback_store_dir = os.path.expanduser('~/Downloads')
+_fallback_store_dir = os.path.expanduser("~/Downloads")
 if not os.path.isdir(_fallback_store_dir):
     _fallback_store_dir = process_path(
-        os.path.join(DFLT_ROOTDIR, 'Downloads'), ensure_dir_exists=True
+        os.path.join(DFLT_ROOTDIR, "Downloads"), ensure_dir_exists=True
     )
-DFLT_STORE_DIR = os.environ.get('DFLT_DOL_DOWNLOAD_DIR', _fallback_store_dir)
+DFLT_STORE_DIR = os.environ.get("DFLT_DOL_DOWNLOAD_DIR", _fallback_store_dir)
 
 
 def url_to_localpath(url: str, rootdir: str = DFLT_ROOTDIR) -> str:
@@ -41,9 +41,9 @@ def url_to_filename(url: str) -> str:
     Convert a URL to a filename (getting rid of http header and slashes)
     """
     # remove slash suffix if there
-    if url[-1] == '/':
+    if url[-1] == "/":
         url = url[:-1]
-    return url.replace('https://', '').replace('http://', '').replace('/', '__')
+    return url.replace("https://", "").replace("http://", "").replace("/", "__")
 
 
 # def explicit_url(response) -> str:
@@ -122,12 +122,12 @@ class RecursiveDownloader(scrapy.Spider):
         self.filter_urls = filter_urls
         self.mk_missing_dirs = mk_missing_dirs
         self.custom_settings = {
-            'LOG_LEVEL': ['ERROR', 'INFO', 'DEBUG'][verbosity],
-            'DEPTH_STATS': True,
-            'DEPTH_PRIORITY': 1,
+            "LOG_LEVEL": ["ERROR", "INFO", "DEBUG"][verbosity],
+            "DEPTH_STATS": True,
+            "DEPTH_PRIORITY": 1,
             **extra_kwargs,
-            'LOG_FORMAT': '%(levelname)s: %(message)s',
-            'LOG_FILE': None,  # Disable logging to file
+            "LOG_FORMAT": "%(levelname)s: %(message)s",
+            "LOG_FILE": None,  # Disable logging to file
         }
         super().__init__()
 
@@ -144,20 +144,20 @@ class RecursiveDownloader(scrapy.Spider):
                     f"Directory (needed to save scrapes) not found: {dirpath}"
                 )
 
-        with open(filepath, 'wb') as f:
+        with open(filepath, "wb") as f:
             f.write(response.body)
 
-        if self.custom_settings['LOG_LEVEL'] != 'ERROR':
+        if self.custom_settings["LOG_LEVEL"] != "ERROR":
             self.log(f"Downloaded {response.url} to {filepath}")
 
-        depth = response.meta.get('depth', 0)
+        depth = response.meta.get("depth", 0)
 
         if depth < self.depth:
             link_extractor = LinkExtractor()
             for link in link_extractor.extract_links(response):
                 if not self.filter_urls or self.filter_urls(link.url):
                     yield response.follow(
-                        link.url, self.parse, meta={'depth': depth + 1}
+                        link.url, self.parse, meta={"depth": depth + 1}
                     )
 
 
@@ -188,9 +188,9 @@ def _download_site(
 
     process = CrawlerProcess(
         {
-            'LOG_LEVEL': ['ERROR', 'INFO', 'DEBUG'][verbosity],
-            'LOG_FORMAT': '%(levelname)s: %(message)s',
-            'LOG_FILE': None,  # Disable logging to file
+            "LOG_LEVEL": ["ERROR", "INFO", "DEBUG"][verbosity],
+            "LOG_FORMAT": "%(levelname)s: %(message)s",
+            "LOG_FILE": None,  # Disable logging to file
         }
     )
     process.crawl(
@@ -222,13 +222,13 @@ def is_html_content(content: Union[str, bytes]) -> bool:
     False
     """
     if isinstance(content, bytes):
-        content = content.decode('utf-8', errors='ignore')
+        content = content.decode("utf-8", errors="ignore")
 
     # A simple regex to check for common HTML tags
     html_tags = re.compile(
         (
-            r'<(html|head|body|title|meta|link|script|style|div|span|p|a|img|table|tr'
-            r'|td|ul|ol|li|h1|h2|h3|h4|h5|h6|br|hr|!--)'  # Opening tags
+            r"<(html|head|body|title|meta|link|script|style|div|span|p|a|img|table|tr"
+            r"|td|ul|ol|li|h1|h2|h3|h4|h5|h6|br|hr|!--)"  # Opening tags
         ),
         re.IGNORECASE,
     )
@@ -436,10 +436,10 @@ def markdown_of_site(
     if save_filepath:
         # if it's a directory, extend it to contain the filename
         if os.path.isdir(save_filepath):
-            save_filepath = os.path.join(save_filepath, url_to_filename(url) + '.md')
+            save_filepath = os.path.join(save_filepath, url_to_filename(url) + ".md")
         else:  # check that the directory containing the filepath exists
             containing_dir = os.path.dirname(save_filepath)
-            if containing_dir == '':
+            if containing_dir == "":
                 containing_dir = os.getcwd()
             if not os.path.exists(containing_dir):
                 raise FileNotFoundError(
@@ -451,7 +451,7 @@ def markdown_of_site(
     #   would be nice to use a placeholder context manager that does nothing if the
     #   directory is given.
     if not dir_to_save_page_slurps:
-        dir_to_save_page_slurps = TemporaryDirectory(prefix='scraped_').name
+        dir_to_save_page_slurps = TemporaryDirectory(prefix="scraped_").name
     else:
         assert os.path.isdir(
             dir_to_save_page_slurps
@@ -525,10 +525,10 @@ def _filename_from_content_disposition(content_disposition):
     """
     if not content_disposition:
         return None
-    parts = content_disposition.split(';')
+    parts = content_disposition.split(";")
     for part in parts:
-        if part.strip().startswith('filename='):
-            filename = part.split('=')[1].strip('"')
+        if part.strip().startswith("filename="):
+            filename = part.split("=")[1].strip('"')
             return unquote(filename)  # Decode percent-encoded filename
     return None
 
@@ -563,11 +563,11 @@ def _extension_from_response(response, *, custom_mime_map=None):
         or an empty string if not found.
     :rtype: str
     """
-    content_type = response.headers.get('Content-Type', '')
+    content_type = response.headers.get("Content-Type", "")
     return _extension_from_mime(content_type, custom_mime_map)
 
 
-def _dflt_extension_cast(extension, *, prefix='.content_type'):
+def _dflt_extension_cast(extension, *, prefix=".content_type"):
     if extension:
         return prefix + extension
     return extension
@@ -584,7 +584,7 @@ def download_file(
     url_to_filename: Callable[[str], str] = url_to_localpath,
     extension_cast: Optional[Callable] = _dflt_extension_cast,
     custom_mime_map=None,
-    content_attribute='content',  # change to 'body' for scrapy
+    content_attribute="content",  # change to 'body' for scrapy
 ):
     """
     Download a file from the given URL and save it to the specified directory with the correct extension.
@@ -620,7 +620,7 @@ def download_file(
 
         # Save the content to file
         content_bytes = getattr(response, content_attribute)
-        with open(save_path, 'wb') as file:
+        with open(save_path, "wb") as file:
             file.write(content_bytes)
     else:
         raise Exception(
