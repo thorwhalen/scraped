@@ -13,7 +13,7 @@ from functools import partial
 
 DFLT_STORE_DIR = os.environ.get('DFLT_DOL_DOWNLOAD_DIR', '~/Downloads')
 
-URI = VT
+URI = TypeVar('URI')
 Dirpath = str
 ContentType = TypeVar('ContentType')
 StoreFunc = Callable[[KT, ContentType], None]
