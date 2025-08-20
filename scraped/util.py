@@ -492,7 +492,7 @@ def deduplicate_lines(
        - removed_blocks: metadata about removed blocks
 
     :param text:             The input string.
-    :param min_block_size:   The size for initial block match.
+    :param min_block_size:   The size (in number of lines) for initial block match.
     :param key:              Optional key function mapping each line to a comparable/hashable value.
                              If None, lines are hashed as-is.
     """
