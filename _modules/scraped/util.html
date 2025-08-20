@@ -1,0 +1,763 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.util &mdash; scraped 0.0.10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/tools.html">scraped.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">scraped.util</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scraped.util</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Utils for scraped.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlparse</span><span class="p">,</span> <span class="n">urljoin</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">scrapy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scrapy.crawler</span><span class="w"> </span><span class="kn">import</span> <span class="n">CrawlerProcess</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scrapy.linkextractors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinkExtractor</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">html2text</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">config2py</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_app_data_folder</span><span class="p">,</span> <span class="n">process_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">graze.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">url_to_localpath</span> <span class="k">as</span> <span class="n">graze_url_to_localpath</span>
+
+<span class="n">_DFLT_DATA_ROOTDIR</span> <span class="o">=</span> <span class="n">get_app_data_folder</span><span class="p">(</span><span class="s2">&quot;scraped/data&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">DFLT_ROOTDIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;SCRAPED_DFLT_ROOTDIR&quot;</span><span class="p">,</span> <span class="n">_DFLT_DATA_ROOTDIR</span><span class="p">)</span>
+
+<span class="n">_fallback_store_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~/Downloads&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">_fallback_store_dir</span><span class="p">):</span>
+    <span class="n">_fallback_store_dir</span> <span class="o">=</span> <span class="n">process_path</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DFLT_ROOTDIR</span><span class="p">,</span> <span class="s2">&quot;Downloads&quot;</span><span class="p">),</span> <span class="n">ensure_dir_exists</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+<span class="n">DFLT_STORE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DFLT_DOL_DOWNLOAD_DIR&quot;</span><span class="p">,</span> <span class="n">_fallback_store_dir</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="url_to_localpath">
+<a class="viewcode-back" href="../../module_docs/scraped/util.html#scraped.util.url_to_localpath">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">url_to_localpath</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rootdir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_ROOTDIR</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a URL to a local file path, considering slashes as marking directories&quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">graze_url_to_localpath</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rootdir</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rootdir</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+
+
+<div class="viewcode-block" id="url_to_filename">
+<a class="viewcode-back" href="../../module_docs/scraped/util.html#scraped.util.url_to_filename">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">url_to_filename</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a URL to a filename (getting rid of http header and slashes)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># remove slash suffix if there</span>
+    <span class="k">if</span> <span class="n">url</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;/&quot;</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;https://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;http://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;__&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># def explicit_url(response) -&gt; str:</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Takes a URL and returns a more explicit URL indicating the actual filepath.</span>
+<span class="c1">#     (specifically, if it&#39;s an HTML file, a folder, or some other kind of file)</span>
+<span class="c1">#     on the server side.</span>
+
+<span class="c1">#     Parameters:</span>
+<span class="c1">#     url (str): The input URL to be analyzed.</span>
+
+<span class="c1">#     Returns:</span>
+<span class="c1">#     str: A more explicit URL indicating the actual file path.</span>
+
+<span class="c1">#     Examples:</span>
+<span class="c1">#     &gt;&gt;&gt; get_explicit_url(&#39;http://www.example.com/more&#39;)  # doctest: +SKIP</span>
+<span class="c1">#     &#39;http://www.example.com/more/index.html&#39;</span>
+
+<span class="c1">#     &gt;&gt;&gt; get_explicit_url(&#39;http://www.example.com/more/page.html&#39;)  # doctest: +SKIP</span>
+<span class="c1">#     &#39;http://www.example.com/more/page.html&#39;</span>
+
+<span class="c1">#     &gt;&gt;&gt; get_explicit_url(&#39;http://www.example.com/file&#39;)  # doctest: +SKIP</span>
+<span class="c1">#     &#39;http://www.example.com/file&#39;</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     content_type = response.headers.get(&#39;Content-Type&#39;, &#39;&#39;).lower()</span>
+<span class="c1">#     if isinstance(content_type, bytes):</span>
+<span class="c1">#         content_type = content_type.decode()</span>
+<span class="c1">#     url = response.url</span>
+
+<span class="c1">#     # Check if the URL is pointing to an HTML file or another type of file</span>
+<span class="c1">#     if &#39;text/html&#39; in content_type:</span>
+<span class="c1">#         # print(</span>
+<span class="c1">#         #     f&quot;-------------------------\n\n&quot;</span>
+<span class="c1">#         #     f&quot;{url=}\n&quot;</span>
+<span class="c1">#         #     f&quot;\n\n-------------------------&quot;</span>
+<span class="c1">#         #     )</span>
+<span class="c1">#         if not url.endswith(&#39;.html&#39;):</span>
+<span class="c1">#             # URL points to a directory</span>
+<span class="c1">#             url = urljoin(url, &#39;index.html&#39;)</span>
+
+<span class="c1">#     return url</span>
+
+
+<div class="viewcode-block" id="RecursiveDownloader">
+<a class="viewcode-back" href="../../module_docs/scraped/util.html#scraped.util.RecursiveDownloader">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RecursiveDownloader</span><span class="p">(</span><span class="n">scrapy</span><span class="o">.</span><span class="n">Spider</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A Scrapy spider that recursively downloads contents from a given URL to a local dir.</span>
+
+<span class="sd">    :param start_url: The URL to start downloading from.</span>
+<span class="sd">    :param url_to_filepath: The function to convert URLs to local filepaths.</span>
+<span class="sd">    :param depth: The maximum depth to follow links.</span>
+<span class="sd">    :param filter_urls: A function to filter URLs to download.</span>
+<span class="sd">    :param mk_missing_dirs: Whether to create missing directories.</span>
+<span class="sd">    :param verbosity: The verbosity level.</span>
+<span class="sd">    :param rootdir: The root directory to save the downloaded files.</span>
+<span class="sd">    :param extra_kwargs: Extra keyword arguments to pass to the Scrapy spider.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;recursive_downloader&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">start_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">rootdir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_ROOTDIR</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">filter_urls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mk_missing_dirs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">url_to_filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">start_url</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowed_domains</span> <span class="o">=</span> <span class="p">[</span><span class="n">urlparse</span><span class="p">(</span><span class="n">start_url</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url_to_filepath</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">url_to_filepath</span><span class="p">,</span> <span class="n">rootdir</span><span class="o">=</span><span class="n">rootdir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_urls</span> <span class="o">=</span> <span class="n">filter_urls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mk_missing_dirs</span> <span class="o">=</span> <span class="n">mk_missing_dirs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_settings</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;LOG_LEVEL&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="s2">&quot;DEBUG&quot;</span><span class="p">][</span><span class="n">verbosity</span><span class="p">],</span>
+            <span class="s2">&quot;DEPTH_STATS&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;DEPTH_PRIORITY&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">,</span>
+            <span class="s2">&quot;LOG_FORMAT&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%(levelname)s</span><span class="s2">: </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;LOG_FILE&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># Disable logging to file</span>
+        <span class="p">}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">scrapy</span><span class="o">.</span><span class="n">http</span><span class="o">.</span><span class="n">Response</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">url</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_to_filepath</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">dirpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirpath</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mk_missing_dirs</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Directory (needed to save scrapes) not found: </span><span class="si">{</span><span class="n">dirpath</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_settings</span><span class="p">[</span><span class="s2">&quot;LOG_LEVEL&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">depth</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;depth&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">:</span>
+            <span class="n">link_extractor</span> <span class="o">=</span> <span class="n">LinkExtractor</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">link_extractor</span><span class="o">.</span><span class="n">extract_links</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_urls</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_urls</span><span class="p">(</span><span class="n">link</span><span class="o">.</span><span class="n">url</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">response</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span>
+                        <span class="n">link</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;depth&quot;</span><span class="p">:</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span>
+                    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_download_site</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">url_to_filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">filter_urls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">mk_missing_dirs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">rootdir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_ROOTDIR</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recursively downloads contents from the given URL to a local folder.</span>
+
+<span class="sd">    :param start_url: The URL to start downloading from.</span>
+<span class="sd">    :param url_to_filepath: The function to convert URLs to local filepaths.</span>
+<span class="sd">    :param depth: The maximum depth to follow links.</span>
+<span class="sd">    :param filter_urls: A function to filter URLs to download.</span>
+<span class="sd">    :param mk_missing_dirs: Whether to create missing directories.</span>
+<span class="sd">    :param verbosity: The verbosity level.</span>
+<span class="sd">    :param rootdir: The root directory to save the downloaded files.</span>
+<span class="sd">    :param extra_kwargs: Extra keyword arguments to pass to the Scrapy spider.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">process</span> <span class="o">=</span> <span class="n">CrawlerProcess</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;LOG_LEVEL&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="s2">&quot;DEBUG&quot;</span><span class="p">][</span><span class="n">verbosity</span><span class="p">],</span>
+            <span class="s2">&quot;LOG_FORMAT&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%(levelname)s</span><span class="s2">: </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;LOG_FILE&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># Disable logging to file</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">process</span><span class="o">.</span><span class="n">crawl</span><span class="p">(</span>
+        <span class="n">RecursiveDownloader</span><span class="p">,</span>
+        <span class="n">start_url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+        <span class="n">url_to_filepath</span><span class="o">=</span><span class="n">url_to_filepath</span><span class="p">,</span>
+        <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span>
+        <span class="n">filter_urls</span><span class="o">=</span><span class="n">filter_urls</span><span class="p">,</span>
+        <span class="n">mk_missing_dirs</span><span class="o">=</span><span class="n">mk_missing_dirs</span><span class="p">,</span>
+        <span class="n">verbosity</span><span class="o">=</span><span class="n">verbosity</span><span class="p">,</span>
+        <span class="n">rootdir</span><span class="o">=</span><span class="n">rootdir</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">process</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="is_html_content">
+<a class="viewcode-back" href="../../module_docs/scraped/util.html#scraped.util.is_html_content">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_html_content</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the given content is HTML.</span>
+
+<span class="sd">    :param content: The content to check, either a string or bytes.</span>
+<span class="sd">    :return: True if the content is HTML, otherwise False.</span>
+
+<span class="sd">    &gt;&gt;&gt; html_string = &quot;&lt;html&gt;&lt;head&gt;&lt;title&gt;Test&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Hello, World!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; non_html_string = &quot;This is just a plain text.&quot;</span>
+<span class="sd">    &gt;&gt;&gt; is_html_content(html_string)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; is_html_content(non_html_string)</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+    <span class="c1"># A simple regex to check for common HTML tags</span>
+    <span class="n">html_tags</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;&lt;(html|head|body|title|meta|link|script|style|div|span|p|a|img|table|tr&quot;</span>
+            <span class="sa">r</span><span class="s2">&quot;|td|ul|ol|li|h1|h2|h3|h4|h5|h6|br|hr|!--)&quot;</span>  <span class="c1"># Opening tags</span>
+        <span class="p">),</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">html_tags</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">content</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<span class="c1"># TODO: Replace this by a version that uses dol.store_aggregate</span>
+<div class="viewcode-block" id="html_to_markdown">
+<a class="viewcode-back" href="../../module_docs/scraped/util.html#scraped.util.html_to_markdown">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">html_to_markdown</span><span class="p">(</span>
+    <span class="n">htmls</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
+    <span class="n">save_filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">content_filt</span><span class="o">=</span><span class="n">is_html_content</span><span class="p">,</span>
+    <span class="n">markdown_contents_aggregator</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">,</span>
+    <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">html2text_options</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert one or several HTML files into a single Markdown file or return the</span>
+<span class="sd">    Markdown string(s).</span>
+
+<span class="sd">    :param htmls: A single file path, an iterable of file paths, or a mapping of</span>
+<span class="sd">        names to file paths.</span>
+<span class="sd">    :param save_filepath: The file path where the combined Markdown will be saved,</span>
+<span class="sd">        or the folder path where it should be saved (a name will be generated based</span>
+<span class="sd">        on the url).</span>
+<span class="sd">        If None, returns the Markdown string.</span>
+<span class="sd">    :param content_filt: A function to filter the content to be converted to Markdown.</span>
+<span class="sd">    :param markdown_contents_aggregator: A function to aggregate the Markdown strings.</span>
+<span class="sd">    :param prefixes: A list of prefixes to be woven with to each Markdown string</span>
+<span class="sd">        (there must be the same number of prefixes as HTML files).</span>
+<span class="sd">    :param html2text_options: Options to pass to the html2text.HTML2Text()</span>
+<span class="sd">        converter.</span>
+<span class="sd">    :return: Combined Markdown string if save_filepath is None, otherwise returns the</span>
+<span class="sd">        path where the Markdown file was saved.</span>
+
+<span class="sd">    Tips:</span>
+
+<span class="sd">    - If you want to just get a list of Markdown strings, set `save_filepath=None`</span>
+<span class="sd">        and `markdown_contents_aggregator=list`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_html_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">htmls</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+        <span class="n">html_contents</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="n">content_filt</span><span class="p">,</span> <span class="n">htmls</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">htmls</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">htmls</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">):</span>
+                <span class="n">html_contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">read_html_file</span><span class="p">(</span><span class="n">htmls</span><span class="p">)]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">htmls</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1000</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">htmls</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="c1"># TODO: Handle this better, and in such a way that directories can be</span>
+                <span class="c1">#   captured and produce their own markdown content, which will then</span>
+                <span class="c1">#   be combined with the rest of the markdown content.</span>
+
+                <span class="c1"># For now though:</span>
+                <span class="c1"># Recursively find all HTML files in the directory</span>
+                <span class="n">html_contents</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span>
+                    <span class="n">read_html_file</span><span class="p">,</span> <span class="nb">filter</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">is_file</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">htmls</span><span class="p">)</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">html_contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">htmls</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">htmls</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;htmls must be an iterable of file paths or a mapping, not </span><span class="si">{</span><span class="n">htmls</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># html_contents = map(read_html_file, htmls)</span>
+
+    <span class="c1"># Initialize the html2text converter with options</span>
+    <span class="n">converter</span> <span class="o">=</span> <span class="n">html2text</span><span class="o">.</span><span class="n">HTML2Text</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">html2text_options</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">converter</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="c1"># Convert HTML contents to Markdown</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_markdown_contents</span><span class="p">(</span><span class="n">html_contents</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">html_content</span> <span class="ow">in</span> <span class="n">html_contents</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">html_content</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                    <span class="n">html_content</span> <span class="o">=</span> <span class="n">html_content</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="k">yield</span> <span class="n">converter</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to decode HTML content: </span><span class="si">{</span><span class="n">html_content</span><span class="p">[:</span><span class="mi">30</span><span class="p">]</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># TODO: Give more control to the user to decide what to do in this case</span>
+                <span class="c1"># skip it</span>
+                <span class="k">pass</span>
+
+    <span class="n">markdown_contents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_markdown_contents</span><span class="p">(</span><span class="n">html_contents</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">prefixes</span><span class="p">:</span>
+        <span class="n">markdown_contents</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">markdown</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">markdown</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">prefixes</span><span class="p">,</span> <span class="n">markdown_contents</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">combined_markdown</span> <span class="o">=</span> <span class="n">markdown_contents_aggregator</span><span class="p">(</span><span class="n">markdown_contents</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">save_filepath</span><span class="p">:</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">save_filepath</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">combined_markdown</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">save_filepath</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">combined_markdown</span></div>
+
+
+
+<span class="c1"># TODO: Return object that can be used to (a) know where the data is being saved,</span>
+<span class="c1">#  and (b) status on progress</span>
+<div class="viewcode-block" id="download_site">
+<a class="viewcode-back" href="../../module_docs/scraped/util.html#scraped.util.download_site">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_site</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">url_to_filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">url_to_localpath</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">filter_urls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">mk_missing_dirs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">rootdir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_ROOTDIR</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recursively downloads contents from the given URL to a local folder.</span>
+
+<span class="sd">    :param start_url: The URL to start downloading from.</span>
+<span class="sd">    :param url_to_filepath: The function to convert URLs to local filepaths.</span>
+<span class="sd">    :param depth: The maximum depth to follow links.</span>
+<span class="sd">    :param filter_urls: A function to filter URLs to download.</span>
+<span class="sd">    :param mk_missing_dirs: Whether to create missing directories.</span>
+<span class="sd">    :param verbosity: The verbosity level.</span>
+<span class="sd">    :param rootdir: The root directory to save the downloaded files.</span>
+<span class="sd">    :param extra_kwargs: Extra keyword arguments to pass to the Scrapy spider.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_crawl</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">_download_site</span><span class="p">,</span>
+        <span class="n">url</span><span class="p">,</span>
+        <span class="n">url_to_filepath</span><span class="p">,</span>
+        <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span>
+        <span class="n">filter_urls</span><span class="o">=</span><span class="n">filter_urls</span><span class="p">,</span>
+        <span class="n">mk_missing_dirs</span><span class="o">=</span><span class="n">mk_missing_dirs</span><span class="p">,</span>
+        <span class="n">verbosity</span><span class="o">=</span><span class="n">verbosity</span><span class="p">,</span>
+        <span class="n">rootdir</span><span class="o">=</span><span class="n">rootdir</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_crawl</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="markdown_of_site">
+<a class="viewcode-back" href="../../module_docs/scraped/util.html#scraped.util.markdown_of_site">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">markdown_of_site</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">filter_urls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">save_filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">deduplicate_lines_min_block_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">dir_to_save_page_slurps</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Download a site and convert it to markdown.</span>
+
+<span class="sd">    This can be quite useful when you want to perform some NLP analysis on a site,</span>
+<span class="sd">    feed some information to an AI model, or simply want to read the site offline.</span>
+<span class="sd">    Markdown offers a happy medium between readability and simplicity, and is</span>
+<span class="sd">    supported by many tools and platforms.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    - url: The URL of the site to download.</span>
+<span class="sd">    - depth: The maximum depth to follow links.</span>
+<span class="sd">    - filter_urls: A function to filter URLs to download.</span>
+<span class="sd">    - save_filepath: The file path where the combined Markdown will be saved.</span>
+<span class="sd">    - deduplicate_lines_min_block_size: The minimum block size to deduplicate lines.</span>
+<span class="sd">    - verbosity: The verbosity level.</span>
+<span class="sd">    - dir_to_save_page_slurps: The directory to save the downloaded pages.</span>
+<span class="sd">    - extra_kwargs: Extra keyword arguments to pass to the Scrapy spider.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - The Markdown string of the site (if save_filepath is None), otherwise the save_filepath.</span>
+
+<span class="sd">    Note: deduplicate_lines_min_block_size requires the hg package to be installed.</span>
+<span class="sd">        We advise you to install it using `pip install hg`, and use</span>
+<span class="sd">        `hg.deduplicate_string_lines` directly on the output markdown string if you</span>
+<span class="sd">        don&#39;t know what the minimum block size should be. This will avoid having to</span>
+<span class="sd">        redowload the site if you want to change the minimum block size.</span>
+
+<span class="sd">    &gt;&gt;&gt; markdown_of_site(</span>
+<span class="sd">    ...     &quot;https://i2mint.github.io/dol/&quot;,</span>
+<span class="sd">    ...     depth=2,</span>
+<span class="sd">    ...     save_filepath=&#39;~/dol_documentation.md&#39;</span>
+<span class="sd">    ... )  # doctest: +SKIP</span>
+<span class="sd">    &#39;~/dol_documentation.md&#39;</span>
+
+<span class="sd">    If you don&#39;t specify a `save_filepath`, the function will return the Markdown</span>
+<span class="sd">    string, which you can then analyze directly, and/or store as you wish.</span>
+
+<span class="sd">    &gt;&gt;&gt; markdown_string = markdown_of_site(&quot;https://i2mint.github.io/dol/&quot;)  # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; print(f&quot;{type(markdown_string).__name__} of length {len(markdown_string)}&quot;)  # doctest: +SKIP</span>
+<span class="sd">    str of length 626439</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># process the save_filepath</span>
+    <span class="k">if</span> <span class="n">save_filepath</span><span class="p">:</span>
+        <span class="c1"># if it&#39;s a directory, extend it to contain the filename</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">save_filepath</span><span class="p">):</span>
+            <span class="n">save_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_filepath</span><span class="p">,</span> <span class="n">url_to_filename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.md&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># check that the directory containing the filepath exists</span>
+            <span class="n">containing_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">save_filepath</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">containing_dir</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">containing_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">containing_dir</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Directory (needed to save Markdown) not found: </span><span class="si">{</span><span class="n">containing_dir</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+    <span class="c1"># make a temporary directory, ensuring it is empty</span>
+    <span class="c1"># TODO: Wasteful to make a tmpdir if dir_to_save_page_slurps is given. Instead,</span>
+    <span class="c1">#   would be nice to use a placeholder context manager that does nothing if the</span>
+    <span class="c1">#   directory is given.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dir_to_save_page_slurps</span><span class="p">:</span>
+        <span class="n">dir_to_save_page_slurps</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;scraped_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span>
+            <span class="n">dir_to_save_page_slurps</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;dir_to_save_page_slurps must be a directory: </span><span class="si">{</span><span class="n">dir_to_save_page_slurps</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># download the site to the temporary directory</span>
+    <span class="n">_url_to_localpath</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">url_to_localpath</span><span class="p">,</span> <span class="n">rootdir</span><span class="o">=</span><span class="n">dir_to_save_page_slurps</span><span class="p">)</span>
+
+    <span class="n">download_site</span><span class="p">(</span>
+        <span class="n">url</span><span class="p">,</span>
+        <span class="n">url_to_filepath</span><span class="o">=</span><span class="n">_url_to_localpath</span><span class="p">,</span>
+        <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span>
+        <span class="n">filter_urls</span><span class="o">=</span><span class="n">filter_urls</span><span class="p">,</span>
+        <span class="n">verbosity</span><span class="o">=</span><span class="n">verbosity</span><span class="p">,</span>
+        <span class="n">rootdir</span><span class="o">=</span><span class="n">dir_to_save_page_slurps</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># convert the site to markdown</span>
+    <span class="n">markdown</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span><span class="n">dir_to_save_page_slurps</span><span class="p">,</span> <span class="n">save_filepath</span><span class="o">=</span><span class="n">save_filepath</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">deduplicate_lines_min_block_size</span><span class="p">:</span>
+        <span class="n">markdown</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">deduplicate_lines</span><span class="p">(</span>
+            <span class="n">markdown</span><span class="p">,</span> <span class="n">min_block_size</span><span class="o">=</span><span class="n">deduplicate_lines_min_block_size</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">markdown</span></div>
+
+
+
+<div class="viewcode-block" id="deduplicate_lines">
+<a class="viewcode-back" href="../../module_docs/scraped/util.html#scraped.util.deduplicate_lines">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">deduplicate_lines</span><span class="p">(</span>
+    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_block_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="nb">hash</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deduplicate text Deduplicate text lines.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       - final_text: deduplicated text (lines joined by newline)</span>
+<span class="sd">       - removed_blocks: metadata about removed blocks</span>
+
+<span class="sd">    :param text:             The input string.</span>
+<span class="sd">    :param min_block_size:   The size (in number of lines) for initial block match.</span>
+<span class="sd">    :param key:              Optional key function mapping each line to a comparable/hashable value.</span>
+<span class="sd">                             If None, lines are hashed as-is.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">hg</span><span class="w"> </span><span class="kn">import</span> <span class="n">deduplicate_string_lines</span>  <span class="c1"># pip install hg</span>
+
+    <span class="k">return</span> <span class="n">deduplicate_string_lines</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">min_block_size</span><span class="o">=</span><span class="n">min_block_size</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span></div>
+
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mimetypes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">unquote</span>
+
+<span class="c1"># from graze.base import url_to_localpath</span>
+
+
+<span class="c1"># This function is not used in the current implementation of the package,</span>
+<span class="c1"># but is provided here in case it is needed in the future.</span>
+<span class="c1"># TODO: Itegrate the option to use content disposistion in the download_file function.</span>
+<span class="c1">#   Note that this will sill require to use the filepath given by the url, to keep</span>
+<span class="c1">#   since content-disposition gives a filename, but not a path.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_filename_from_content_disposition</span><span class="p">(</span><span class="n">content_disposition</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract filename from the Content-Disposition header if available.</span>
+
+<span class="sd">    :param content_disposition: The Content-Disposition header value.</span>
+<span class="sd">    :type content_disposition: str</span>
+<span class="sd">    :return: The extracted filename or None if not found.</span>
+<span class="sd">    :rtype: str or None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">content_disposition</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="n">content_disposition</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;filename=&quot;</span><span class="p">):</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">unquote</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>  <span class="c1"># Decode percent-encoded filename</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_extension_from_mime</span><span class="p">(</span><span class="n">mime_type</span><span class="p">,</span> <span class="n">custom_mime_map</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the file extension for a given MIME type using the mimetypes module and custom map.</span>
+
+<span class="sd">    :param mime_type: The MIME type of the file.</span>
+<span class="sd">    :type mime_type: str</span>
+<span class="sd">    :param custom_mime_map: A dictionary mapping MIME types to file extensions.</span>
+<span class="sd">    :type custom_mime_map: dict</span>
+<span class="sd">    :return: The file extension for the given MIME type, or an empty string if not found.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">custom_mime_map</span> <span class="o">=</span> <span class="n">custom_mime_map</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">mime_type</span> <span class="ow">in</span> <span class="n">custom_mime_map</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">custom_mime_map</span><span class="p">[</span><span class="n">mime_type</span><span class="p">]</span>
+    <span class="n">extension</span> <span class="o">=</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_extension</span><span class="p">(</span><span class="n">mime_type</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">extension</span> <span class="k">if</span> <span class="n">extension</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_extension_from_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">custom_mime_map</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determine the file extension from the response headers.</span>
+
+<span class="sd">    :param response: The HTTP response object.</span>
+<span class="sd">    :type response: requests.Response</span>
+<span class="sd">    :param custom_mime_map: A dictionary mapping MIME types to file extensions.</span>
+<span class="sd">    :type custom_mime_map: dict</span>
+<span class="sd">    :return: The file extension for the content of the response,</span>
+<span class="sd">        or an empty string if not found.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">content_type</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_extension_from_mime</span><span class="p">(</span><span class="n">content_type</span><span class="p">,</span> <span class="n">custom_mime_map</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_dflt_extension_cast</span><span class="p">(</span><span class="n">extension</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;.content_type&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">extension</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">extension</span>
+    <span class="k">return</span> <span class="n">extension</span>
+
+
+<span class="c1"># Note: Uses requests.get, where as we use scrapy&#39;s get method in scrapy, which</span>
+<span class="c1">#    return a scrapy.http.Response object, which does not have a content attribute</span>
+<span class="c1">#    (the equivalent is the body attribute, which is a bytes object)</span>
+<span class="c1"># TODO: Make the download_file function compatible with scrapy&#39;s Response object.</span>
+<div class="viewcode-block" id="download_file">
+<a class="viewcode-back" href="../../module_docs/scraped/util.html#scraped.util.download_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_file</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">,</span>
+    <span class="n">save_directory</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">url_to_filename</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">url_to_localpath</span><span class="p">,</span>
+    <span class="n">extension_cast</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="n">_dflt_extension_cast</span><span class="p">,</span>
+    <span class="n">custom_mime_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">content_attribute</span><span class="o">=</span><span class="s2">&quot;content&quot;</span><span class="p">,</span>  <span class="c1"># change to &#39;body&#39; for scrapy</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Download a file from the given URL and save it to the specified directory with the correct extension.</span>
+
+<span class="sd">    :param url: The URL of the file to download.</span>
+<span class="sd">    :type url: str</span>
+<span class="sd">    :param extension_cast: A function to cast the extension to a different format.</span>
+<span class="sd">    :param save_directory: The directory where the file will be saved.</span>
+<span class="sd">    :type save_directory: str</span>
+<span class="sd">    :param custom_mime_map: A dictionary mapping MIME types to file extensions. Defaults to None.</span>
+<span class="sd">    :type custom_mime_map: dict, optional</span>
+<span class="sd">    :raises Exception: If the file could not be downloaded successfully.</span>
+
+<span class="sd">    The reason to cast the extension is to allow for the possibility of making</span>
+<span class="sd">    the extension so that we recognize if it comes from the url or from the</span>
+<span class="sd">    content-type.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">__extension_from_response</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">_extension_from_response</span><span class="p">,</span> <span class="n">custom_mime_map</span><span class="o">=</span><span class="n">custom_mime_map</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">url_to_filename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">extension</span> <span class="o">=</span> <span class="n">__extension_from_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">extension_cast</span><span class="p">:</span>
+            <span class="n">extension</span> <span class="o">=</span> <span class="n">extension_cast</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span>
+
+        <span class="c1"># Ensure the save directory exists</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_directory</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Full path to save the file</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_directory</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+        <span class="c1"># Save the content to file</span>
+        <span class="n">content_bytes</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">content_attribute</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content_bytes</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Failed to download the file. Status code: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

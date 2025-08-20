@@ -1,0 +1,229 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.tools &mdash; scraped 0.0.10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="scraped.util" href="util.html" />
+    <link rel="prev" title="scraped" href="../scraped.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../scraped.html">scraped</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">scraped.tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.tools.acquire_content"><code class="docutils literal notranslate"><span class="pre">acquire_content()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.tools.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.tools.scrape_multiple_sites"><code class="docutils literal notranslate"><span class="pre">scrape_multiple_sites()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.tools.url_to_bytes"><code class="docutils literal notranslate"><span class="pre">url_to_bytes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">scraped.tools</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/scraped/tools.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-scraped.tools">
+<span id="scraped-tools"></span><h1>scraped.tools<a class="headerlink" href="#module-scraped.tools" title="Link to this heading"></a></h1>
+<p>Scraping tools</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.tools.acquire_content">
+<span class="sig-prename descclassname"><span class="pre">scraped.tools.</span></span><span class="sig-name descname"><span class="pre">acquire_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">uri_to_content:</span> <span class="pre">~typing.Callable[[~scraped.tools.URI],</span> <span class="pre">~scraped.tools.ContentType],</span> <span class="pre">uris:</span> <span class="pre">~typing.Dict[KT,</span> <span class="pre">~scraped.tools.URI]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">store:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">~typing.MutableMapping</span> <span class="pre">|</span> <span class="pre">~typing.Callable[[KT,</span> <span class="pre">~scraped.tools.ContentType],</span> <span class="pre">None]</span> <span class="pre">=</span> <span class="pre">'/home/runner/.config/scraped/data/Downloads',</span> <span class="pre">*,</span> <span class="pre">save_condition:</span> <span class="pre">~typing.Callable[[~typing.Any],</span> <span class="pre">bool]</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">is_not_none&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/tools.html#acquire_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.tools.acquire_content" title="Link to this definition"></a></dt>
+<dd><p>Downloads and stores content from a given set of URIs.</p>
+<p>uri_to_content is a callable function that takes a URI and returns content. This is usually set to:
+- a function that reads file content, like <cite>open(filepath).read()</cite>
+- a function that fetches URL content, like <cite>requests.get(url).content</cite></p>
+<p>However, here, we demonstrate with a simple string operation (e.g., uppercasing strings) as a substitute
+to show functionality.</p>
+<p>Note that the uri_to_content function will usually be something giving you the
+contents of a file or URL.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">files_uri_to_content</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">filepath</span><span class="p">:</span> <span class="n">Path</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urls_uri_to_content</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">url</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">content</span>  
+</pre></div>
+</div>
+<p>Here, we use a simple <cite>str.upper</cite> to not have to deal with actual IO during tests:
+Also, we’ll use a dict as a store, for test simplicity purposes.
+Usually, though, you’ll want to use a directory or a MutableMapping as store,
+or a function that stores content in a specific way.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uris</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;example1&#39;</span><span class="p">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;example2&#39;</span><span class="p">:</span> <span class="s1">&#39;world&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">acquire_content</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">uris</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>  <span class="c1"># uri_to_content here is str.upper, to simulate content acquisition.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
+<span class="go">{&#39;example1&#39;: &#39;HELLO&#39;, &#39;example2&#39;: &#39;WORLD&#39;}</span>
+</pre></div>
+</div>
+<p>Note that often you want to just fix the uri_to_content function and sometimes store.
+The acquire_content acts as a function factory for your convenience. If you don’t
+specify uris (but at least specify <cite>uri_to_content</cite>), you get a function that takes
+uris as the first argument, and stores the content therefrom.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">content_acquirer</span> <span class="o">=</span> <span class="n">acquire_content</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">content_acquirer</span><span class="p">({</span><span class="s1">&#39;example3&#39;</span><span class="p">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;example4&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
+<span class="go">{&#39;example1&#39;: &#39;HELLO&#39;, &#39;example2&#39;: &#39;WORLD&#39;, &#39;example3&#39;: &#39;FOO&#39;, &#39;example4&#39;: &#39;BAR&#39;}</span>
+</pre></div>
+</div>
+<p># Examples that would be typical for uri_to_content:
+# acquire_content(lambda filepath: open(filepath, ‘rb’).read(), uris, store)  # Reads file content +SKIP
+# acquire_content(lambda url: requests.get(url).content, uris, store)  # Fetches URL content +SKIP</p>
+<p>See:
+* [A tiny flexible data acquisition python function](<a class="reference external" href="https://medium.com/&#64;thorwhalen1/a-tiny-flexible-data-acquisition-python-function-518289dcd1e6">https://medium.com/&#64;thorwhalen1/a-tiny-flexible-data-acquisition-python-function-518289dcd1e6</a>) and
+* [gist](<a class="reference external" href="https://gist.github.com/thorwhalen/e8fe6c0454ab2109d4713f886b38bbda">https://gist.github.com/thorwhalen/e8fe6c0454ab2109d4713f886b38bbda</a>)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.tools.main">
+<span class="sig-prename descclassname"><span class="pre">scraped.tools.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/tools.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.tools.main" title="Link to this definition"></a></dt>
+<dd><p>Run the command-line interface of scraped.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.tools.scrape_multiple_sites">
+<span class="sig-prename descclassname"><span class="pre">scraped.tools.</span></span><span class="sig-name descname"><span class="pre">scrape_multiple_sites</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_and_url:</span> <span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url_scrape_function:</span> <span class="pre">callable</span> <span class="pre">=</span> <span class="pre">functools.partial(&lt;function</span> <span class="pre">markdown_of_site&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth=3)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/tools.html#scrape_multiple_sites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.tools.scrape_multiple_sites" title="Link to this definition"></a></dt>
+<dd><p>Scrape multiple URLs and save the results to a directory.</p>
+<p>Args:
+- name_and_url: a dictionary mapping names to URLs
+- save_dir: the directory to save the results to
+- url_scrape_function: the function to use to scrape the URLs</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.tools.url_to_bytes">
+<span class="sig-prename descclassname"><span class="pre">scraped.tools.</span></span><span class="sig-name descname"><span class="pre">url_to_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">uris:</span> <span class="pre">~typing.Dict[KT,</span> <span class="pre">~scraped.tools.URI]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">*,</span> <span class="pre">store:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">~typing.MutableMapping</span> <span class="pre">|</span> <span class="pre">~typing.Callable[[KT,</span> <span class="pre">~scraped.tools.ContentType],</span> <span class="pre">None]</span> <span class="pre">=</span> <span class="pre">&lt;bound</span> <span class="pre">method</span> <span class="pre">Store.__setitem__</span> <span class="pre">of</span> <span class="pre">Files(rootdir='/home/runner/.config/scraped/data/Downloads',</span> <span class="pre">subpath='',</span> <span class="pre">pattern_for_field=None,</span> <span class="pre">max_levels=None,</span> <span class="pre">include_hidden=False,</span> <span class="pre">assert_rootdir_existence=False)&gt;,</span> <span class="pre">save_condition:</span> <span class="pre">~typing.Callable[[~typing.Any],</span> <span class="pre">bool]</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">is_not_none&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scraped.tools.url_to_bytes" title="Link to this definition"></a></dt>
+<dd><p>Downloads and stores content from a given set of URIs.</p>
+<p>uri_to_content is a callable function that takes a URI and returns content. This is usually set to:
+- a function that reads file content, like <cite>open(filepath).read()</cite>
+- a function that fetches URL content, like <cite>requests.get(url).content</cite></p>
+<p>However, here, we demonstrate with a simple string operation (e.g., uppercasing strings) as a substitute
+to show functionality.</p>
+<p>Note that the uri_to_content function will usually be something giving you the
+contents of a file or URL.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">files_uri_to_content</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">filepath</span><span class="p">:</span> <span class="n">Path</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urls_uri_to_content</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">url</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">content</span>  
+</pre></div>
+</div>
+<p>Here, we use a simple <cite>str.upper</cite> to not have to deal with actual IO during tests:
+Also, we’ll use a dict as a store, for test simplicity purposes.
+Usually, though, you’ll want to use a directory or a MutableMapping as store,
+or a function that stores content in a specific way.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uris</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;example1&#39;</span><span class="p">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;example2&#39;</span><span class="p">:</span> <span class="s1">&#39;world&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">acquire_content</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">uris</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>  <span class="c1"># uri_to_content here is str.upper, to simulate content acquisition.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
+<span class="go">{&#39;example1&#39;: &#39;HELLO&#39;, &#39;example2&#39;: &#39;WORLD&#39;}</span>
+</pre></div>
+</div>
+<p>Note that often you want to just fix the uri_to_content function and sometimes store.
+The acquire_content acts as a function factory for your convenience. If you don’t
+specify uris (but at least specify <cite>uri_to_content</cite>), you get a function that takes
+uris as the first argument, and stores the content therefrom.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">content_acquirer</span> <span class="o">=</span> <span class="n">acquire_content</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">content_acquirer</span><span class="p">({</span><span class="s1">&#39;example3&#39;</span><span class="p">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;example4&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
+<span class="go">{&#39;example1&#39;: &#39;HELLO&#39;, &#39;example2&#39;: &#39;WORLD&#39;, &#39;example3&#39;: &#39;FOO&#39;, &#39;example4&#39;: &#39;BAR&#39;}</span>
+</pre></div>
+</div>
+<p># Examples that would be typical for uri_to_content:
+# acquire_content(lambda filepath: open(filepath, ‘rb’).read(), uris, store)  # Reads file content +SKIP
+# acquire_content(lambda url: requests.get(url).content, uris, store)  # Fetches URL content +SKIP</p>
+<p>See:
+* [A tiny flexible data acquisition python function](<a class="reference external" href="https://medium.com/&#64;thorwhalen1/a-tiny-flexible-data-acquisition-python-function-518289dcd1e6">https://medium.com/&#64;thorwhalen1/a-tiny-flexible-data-acquisition-python-function-518289dcd1e6</a>) and
+* [gist](<a class="reference external" href="https://gist.github.com/thorwhalen/e8fe6c0454ab2109d4713f886b38bbda">https://gist.github.com/thorwhalen/e8fe6c0454ab2109d4713f886b38bbda</a>)</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../scraped.html" class="btn btn-neutral float-left" title="scraped" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="util.html" class="btn btn-neutral float-right" title="scraped.util" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,328 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.util &mdash; scraped 0.0.10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="scraped.tools" href="tools.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">scraped.tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">scraped.util</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.util.RecursiveDownloader"><code class="docutils literal notranslate"><span class="pre">RecursiveDownloader</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.util.deduplicate_lines"><code class="docutils literal notranslate"><span class="pre">deduplicate_lines()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.util.download_file"><code class="docutils literal notranslate"><span class="pre">download_file()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.util.download_site"><code class="docutils literal notranslate"><span class="pre">download_site()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.util.html_to_markdown"><code class="docutils literal notranslate"><span class="pre">html_to_markdown()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.util.is_html_content"><code class="docutils literal notranslate"><span class="pre">is_html_content()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.util.markdown_of_site"><code class="docutils literal notranslate"><span class="pre">markdown_of_site()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.util.url_to_filename"><code class="docutils literal notranslate"><span class="pre">url_to_filename()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.util.url_to_localpath"><code class="docutils literal notranslate"><span class="pre">url_to_localpath()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">scraped.util</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/scraped/util.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-scraped.util">
+<span id="scraped-util"></span><h1>scraped.util<a class="headerlink" href="#module-scraped.util" title="Link to this heading"></a></h1>
+<p>Utils for scraped.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.util.RecursiveDownloader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">RecursiveDownloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/util.html#RecursiveDownloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.RecursiveDownloader" title="Link to this definition"></a></dt>
+<dd><p>A Scrapy spider that recursively downloads contents from a given URL to a local dir.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_url</strong> – The URL to start downloading from.</p></li>
+<li><p><strong>url_to_filepath</strong> – The function to convert URLs to local filepaths.</p></li>
+<li><p><strong>depth</strong> – The maximum depth to follow links.</p></li>
+<li><p><strong>filter_urls</strong> – A function to filter URLs to download.</p></li>
+<li><p><strong>mk_missing_dirs</strong> – Whether to create missing directories.</p></li>
+<li><p><strong>verbosity</strong> – The verbosity level.</p></li>
+<li><p><strong>rootdir</strong> – The root directory to save the downloaded files.</p></li>
+<li><p><strong>extra_kwargs</strong> – Extra keyword arguments to pass to the Scrapy spider.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.util.deduplicate_lines">
+<span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">deduplicate_lines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_block_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key:</span> <span class="pre">~typing.Callable</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">&lt;built-in</span> <span class="pre">function</span> <span class="pre">hash&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/scraped/util.html#deduplicate_lines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.deduplicate_lines" title="Link to this definition"></a></dt>
+<dd><p>Deduplicate text Deduplicate text lines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>deduplicated text (lines joined by newline)
+- removed_blocks: metadata about removed blocks</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>final_text</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – The input string.</p></li>
+<li><p><strong>min_block_size</strong> – The size (in number of lines) for initial block match.</p></li>
+<li><p><strong>key</strong> – Optional key function mapping each line to a comparable/hashable value.
+If None, lines are hashed as-is.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.util.download_file">
+<span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">download_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">url,</span> <span class="pre">save_directory,</span> <span class="pre">*,</span> <span class="pre">url_to_filename:</span> <span class="pre">~typing.Callable[[str],</span> <span class="pre">str]</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">url_to_localpath&gt;,</span> <span class="pre">extension_cast:</span> <span class="pre">~typing.Callable</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">_dflt_extension_cast&gt;,</span> <span class="pre">custom_mime_map=None,</span> <span class="pre">content_attribute='content'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/util.html#download_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.download_file" title="Link to this definition"></a></dt>
+<dd><p>Download a file from the given URL and save it to the specified directory with the correct extension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – The URL of the file to download.</p></li>
+<li><p><strong>extension_cast</strong> – A function to cast the extension to a different format.</p></li>
+<li><p><strong>save_directory</strong> (<em>str</em>) – The directory where the file will be saved.</p></li>
+<li><p><strong>custom_mime_map</strong> (<em>dict</em><em>, </em><em>optional</em>) – A dictionary mapping MIME types to file extensions. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – If the file could not be downloaded successfully.</p>
+</dd>
+</dl>
+<p>The reason to cast the extension is to allow for the possibility of making
+the extension so that we recognize if it comes from the url or from the
+content-type.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.util.download_site">
+<span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">download_site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">url:</span> <span class="pre">str,</span> <span class="pre">url_to_filepath:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">~typing.Callable[[str],</span> <span class="pre">str]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">url_to_localpath&gt;,</span> <span class="pre">*,</span> <span class="pre">depth:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">filter_urls:</span> <span class="pre">~typing.Callable[[str],</span> <span class="pre">bool]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">mk_missing_dirs:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True,</span> <span class="pre">verbosity:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">rootdir:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'/home/runner/.config/scraped/data',</span> <span class="pre">**extra_kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/util.html#download_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.download_site" title="Link to this definition"></a></dt>
+<dd><p>Recursively downloads contents from the given URL to a local folder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_url</strong> – The URL to start downloading from.</p></li>
+<li><p><strong>url_to_filepath</strong> – The function to convert URLs to local filepaths.</p></li>
+<li><p><strong>depth</strong> – The maximum depth to follow links.</p></li>
+<li><p><strong>filter_urls</strong> – A function to filter URLs to download.</p></li>
+<li><p><strong>mk_missing_dirs</strong> – Whether to create missing directories.</p></li>
+<li><p><strong>verbosity</strong> – The verbosity level.</p></li>
+<li><p><strong>rootdir</strong> – The root directory to save the downloaded files.</p></li>
+<li><p><strong>extra_kwargs</strong> – Extra keyword arguments to pass to the Scrapy spider.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.util.html_to_markdown">
+<span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">html_to_markdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">htmls:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">~typing.Iterable[str]</span> <span class="pre">|</span> <span class="pre">~typing.Mapping[str,</span> <span class="pre">str],</span> <span class="pre">save_filepath:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">*,</span> <span class="pre">content_filt=&lt;function</span> <span class="pre">is_html_content&gt;,</span> <span class="pre">markdown_contents_aggregator:</span> <span class="pre">~typing.Callable</span> <span class="pre">=</span> <span class="pre">&lt;built-in</span> <span class="pre">method</span> <span class="pre">join</span> <span class="pre">of</span> <span class="pre">str</span> <span class="pre">object&gt;,</span> <span class="pre">prefixes=None,</span> <span class="pre">**html2text_options</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/util.html#html_to_markdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.html_to_markdown" title="Link to this definition"></a></dt>
+<dd><p>Convert one or several HTML files into a single Markdown file or return the
+Markdown string(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>htmls</strong> – A single file path, an iterable of file paths, or a mapping of
+names to file paths.</p></li>
+<li><p><strong>save_filepath</strong> – The file path where the combined Markdown will be saved,
+or the folder path where it should be saved (a name will be generated based
+on the url).
+If None, returns the Markdown string.</p></li>
+<li><p><strong>content_filt</strong> – A function to filter the content to be converted to Markdown.</p></li>
+<li><p><strong>markdown_contents_aggregator</strong> – A function to aggregate the Markdown strings.</p></li>
+<li><p><strong>prefixes</strong> – A list of prefixes to be woven with to each Markdown string
+(there must be the same number of prefixes as HTML files).</p></li>
+<li><p><strong>html2text_options</strong> – Options to pass to the html2text.HTML2Text()
+converter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Combined Markdown string if save_filepath is None, otherwise returns the
+path where the Markdown file was saved.</p>
+</dd>
+</dl>
+<p>Tips:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>If you want to just get a list of Markdown strings, set <cite>save_filepath=None</cite></dt><dd><p>and <cite>markdown_contents_aggregator=list</cite>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.util.is_html_content">
+<span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">is_html_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/scraped/util.html#is_html_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.is_html_content" title="Link to this definition"></a></dt>
+<dd><p>Check if the given content is HTML.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>content</strong> – The content to check, either a string or bytes.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the content is HTML, otherwise False.</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">html_string</span> <span class="o">=</span> <span class="s2">&quot;&lt;html&gt;&lt;head&gt;&lt;title&gt;Test&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Hello, World!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">non_html_string</span> <span class="o">=</span> <span class="s2">&quot;This is just a plain text.&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_html_content</span><span class="p">(</span><span class="n">html_string</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_html_content</span><span class="p">(</span><span class="n">non_html_string</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.util.markdown_of_site">
+<span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">markdown_of_site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_urls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deduplicate_lines_min_block_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_to_save_page_slurps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/util.html#markdown_of_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.markdown_of_site" title="Link to this definition"></a></dt>
+<dd><p>Download a site and convert it to markdown.</p>
+<p>This can be quite useful when you want to perform some NLP analysis on a site,
+feed some information to an AI model, or simply want to read the site offline.
+Markdown offers a happy medium between readability and simplicity, and is
+supported by many tools and platforms.</p>
+<p>Args:
+- url: The URL of the site to download.
+- depth: The maximum depth to follow links.
+- filter_urls: A function to filter URLs to download.
+- save_filepath: The file path where the combined Markdown will be saved.
+- deduplicate_lines_min_block_size: The minimum block size to deduplicate lines.
+- verbosity: The verbosity level.
+- dir_to_save_page_slurps: The directory to save the downloaded pages.
+- extra_kwargs: Extra keyword arguments to pass to the Scrapy spider.</p>
+<p>Returns:
+- The Markdown string of the site (if save_filepath is None), otherwise the save_filepath.</p>
+<dl class="simple">
+<dt>Note: deduplicate_lines_min_block_size requires the hg package to be installed.</dt><dd><p>We advise you to install it using <cite>pip install hg</cite>, and use
+<cite>hg.deduplicate_string_lines</cite> directly on the output markdown string if you
+don’t know what the minimum block size should be. This will avoid having to
+redowload the site if you want to change the minimum block size.</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">markdown_of_site</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">&quot;https://i2mint.github.io/dol/&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">save_filepath</span><span class="o">=</span><span class="s1">&#39;~/dol_documentation.md&#39;</span>
+<span class="gp">... </span><span class="p">)</span>  
+<span class="go">&#39;~/dol_documentation.md&#39;</span>
+</pre></div>
+</div>
+<p>If you don’t specify a <cite>save_filepath</cite>, the function will return the Markdown
+string, which you can then analyze directly, and/or store as you wish.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">markdown_string</span> <span class="o">=</span> <span class="n">markdown_of_site</span><span class="p">(</span><span class="s2">&quot;https://i2mint.github.io/dol/&quot;</span><span class="p">)</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">markdown_string</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> of length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">markdown_string</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  
+<span class="go">str of length 626439</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.util.url_to_filename">
+<span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">url_to_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/scraped/util.html#url_to_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.url_to_filename" title="Link to this definition"></a></dt>
+<dd><p>Convert a URL to a filename (getting rid of http header and slashes)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.util.url_to_localpath">
+<span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">url_to_localpath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rootdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'/home/runner/.config/scraped/data'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/scraped/util.html#url_to_localpath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.url_to_localpath" title="Link to this definition"></a></dt>
+<dd><p>Convert a URL to a local file path, considering slashes as marking directories</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tools.html" class="btn btn-neutral float-left" title="scraped.tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

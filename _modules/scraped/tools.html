@@ -1,0 +1,346 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.tools &mdash; scraped 0.0.10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/tools.html">scraped.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">scraped.tools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scraped.tools</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Scraping tools&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scraped.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">markdown_of_site</span><span class="p">,</span> <span class="n">download_site</span><span class="p">,</span> <span class="n">DFLT_STORE_DIR</span>
+
+<span class="n">markdown_of_site_depth_3</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">markdown_of_site</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">MutableMapping</span><span class="p">,</span> <span class="n">KT</span><span class="p">,</span> <span class="n">VT</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+
+<span class="n">URI</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;URI&quot;</span><span class="p">)</span>
+<span class="n">Dirpath</span> <span class="o">=</span> <span class="nb">str</span>
+<span class="n">ContentType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;ContentType&quot;</span><span class="p">)</span>
+<span class="n">StoreFunc</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">KT</span><span class="p">,</span> <span class="n">ContentType</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">is_not_none</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+
+<span class="c1"># TODO: Make a general uri_to_content function parametrized by a plugin architecture for the</span>
+<span class="c1">#   uri-&gt;uri_to_content function (see graze, pyckyp, dol, dacc for ideas and code)</span>
+<div class="viewcode-block" id="acquire_content">
+<a class="viewcode-back" href="../../module_docs/scraped/tools.html#scraped.tools.acquire_content">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">acquire_content</span><span class="p">(</span>
+    <span class="n">uri_to_content</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">URI</span><span class="p">],</span> <span class="n">ContentType</span><span class="p">],</span>
+    <span class="n">uris</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">KT</span><span class="p">,</span> <span class="n">URI</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">store</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dirpath</span><span class="p">,</span> <span class="n">MutableMapping</span><span class="p">,</span> <span class="n">StoreFunc</span><span class="p">]</span> <span class="o">=</span> <span class="n">DFLT_STORE_DIR</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">save_condition</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_not_none</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Downloads and stores content from a given set of URIs.</span>
+
+<span class="sd">    uri_to_content is a callable function that takes a URI and returns content. This is usually set to:</span>
+<span class="sd">    - a function that reads file content, like `open(filepath).read()`</span>
+<span class="sd">    - a function that fetches URL content, like `requests.get(url).content`</span>
+
+<span class="sd">    However, here, we demonstrate with a simple string operation (e.g., uppercasing strings) as a substitute</span>
+<span class="sd">    to show functionality.</span>
+
+<span class="sd">    Note that the uri_to_content function will usually be something giving you the</span>
+<span class="sd">    contents of a file or URL.</span>
+
+<span class="sd">    &gt;&gt;&gt; from pathlib import Path</span>
+<span class="sd">    &gt;&gt;&gt; files_uri_to_content = lambda filepath: Path(filepath).read_text()</span>
+<span class="sd">    &gt;&gt;&gt; urls_uri_to_content = lambda url: requests.get(url).content  # doctest: +SKIP</span>
+
+<span class="sd">    Here, we use a simple `str.upper` to not have to deal with actual IO during tests:</span>
+<span class="sd">    Also, we&#39;ll use a dict as a store, for test simplicity purposes.</span>
+<span class="sd">    Usually, though, you&#39;ll want to use a directory or a MutableMapping as store,</span>
+<span class="sd">    or a function that stores content in a specific way.</span>
+
+<span class="sd">    &gt;&gt;&gt; store = {}</span>
+<span class="sd">    &gt;&gt;&gt; uris = {&#39;example1&#39;: &#39;hello&#39;, &#39;example2&#39;: &#39;world&#39;}</span>
+<span class="sd">    &gt;&gt;&gt; acquire_content(str.upper, uris, store)  # uri_to_content here is str.upper, to simulate content acquisition.</span>
+<span class="sd">    &gt;&gt;&gt; store</span>
+<span class="sd">    {&#39;example1&#39;: &#39;HELLO&#39;, &#39;example2&#39;: &#39;WORLD&#39;}</span>
+
+<span class="sd">    Note that often you want to just fix the uri_to_content function and sometimes store.</span>
+<span class="sd">    The acquire_content acts as a function factory for your convenience. If you don&#39;t</span>
+<span class="sd">    specify uris (but at least specify `uri_to_content`), you get a function that takes</span>
+<span class="sd">    uris as the first argument, and stores the content therefrom.</span>
+
+<span class="sd">    &gt;&gt;&gt; content_acquirer = acquire_content(str.upper, store=store)  # doctest: +ELLIPSIS</span>
+<span class="sd">    &gt;&gt;&gt; content_acquirer({&#39;example3&#39;: &#39;foo&#39;, &#39;example4&#39;: &#39;bar&#39;})</span>
+<span class="sd">    &gt;&gt;&gt; store</span>
+<span class="sd">    {&#39;example1&#39;: &#39;HELLO&#39;, &#39;example2&#39;: &#39;WORLD&#39;, &#39;example3&#39;: &#39;FOO&#39;, &#39;example4&#39;: &#39;BAR&#39;}</span>
+
+
+<span class="sd">    # Examples that would be typical for uri_to_content:</span>
+<span class="sd">    # acquire_content(lambda filepath: open(filepath, &#39;rb&#39;).read(), uris, store)  # Reads file content +SKIP</span>
+<span class="sd">    # acquire_content(lambda url: requests.get(url).content, uris, store)  # Fetches URL content +SKIP</span>
+
+<span class="sd">    See:</span>
+<span class="sd">    * [A tiny flexible data acquisition python function](https://medium.com/@thorwhalen1/a-tiny-flexible-data-acquisition-python-function-518289dcd1e6) and</span>
+<span class="sd">    * [gist](https://gist.github.com/thorwhalen/e8fe6c0454ab2109d4713f886b38bbda)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if uris is None, we&#39;re parametrizing the download_content function</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="n">_ensure_store_func</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">uris</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">callable</span><span class="p">(</span>
+            <span class="n">uri_to_content</span>
+        <span class="p">),</span> <span class="s2">&quot;uri_to_content must be a callable if uris is None&quot;</span>
+        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">acquire_content</span><span class="p">,</span> <span class="n">uri_to_content</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
+
+    <span class="c1"># Loop through uris and store the processed content</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">uri</span> <span class="ow">in</span> <span class="n">uris</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">uri_to_content</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">save_condition</span><span class="p">(</span><span class="n">content</span><span class="p">):</span>
+            <span class="n">store</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_ensure_store_func</span><span class="p">(</span><span class="n">store</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dirpath</span><span class="p">,</span> <span class="n">MutableMapping</span><span class="p">,</span> <span class="n">Callable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">StoreFunc</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ensures a store function is returned based on the type of &#39;store&#39; argument provided.</span>
+
+<span class="sd">    - If store is a callable, it returns store directly.</span>
+<span class="sd">    - If store is a directory path, it creates a Files object (using dol) to manage file storage in that directory.</span>
+<span class="sd">    - If store is a MutableMapping, it returns the __setitem__ method of the store.</span>
+<span class="sd">    - If none of these types match, a ValueError is raised.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">    &gt;&gt;&gt; store = {}</span>
+<span class="sd">    &gt;&gt;&gt; func = _ensure_store_func(store)</span>
+<span class="sd">    &gt;&gt;&gt; func(&#39;key&#39;, &#39;value&#39;)  # should store the value in the dictionary</span>
+<span class="sd">    &gt;&gt;&gt; assert store == {&#39;key&#39;: &#39;value&#39;}</span>
+
+<span class="sd">    Let&#39;s specify a (temporary) directory path as the store:</span>
+<span class="sd">    &gt;&gt;&gt; import tempfile</span>
+<span class="sd">    &gt;&gt;&gt; store = tempfile.gettempdir()</span>
+<span class="sd">    &gt;&gt;&gt; try:</span>
+<span class="sd">    ...     func = _ensure_store_func(store)</span>
+<span class="sd">    ... except ValueError:</span>
+<span class="sd">    ...     print(&quot;Directory does not exist, as expected.&quot;)  # Simulates an invalid directory check</span>
+
+<span class="sd">    &gt;&gt;&gt; _ensure_store_func(lambda k, v: print(f&quot;Storing {k}: {v}&quot;))  # doctest: +ELLIPSIS</span>
+<span class="sd">    &lt;function &lt;lambda&gt; at ...&gt;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">store</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">store</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">dirpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dirpath</span><span class="p">):</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Files</span>
+
+            <span class="k">return</span> <span class="n">Files</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span><span class="o">.</span><span class="fm">__setitem__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The directory path </span><span class="si">{</span><span class="n">dirpath</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">MutableMapping</span><span class="p">):</span>
+        <span class="c1"># If store is a MutableMapping, we&#39;ll use its __setitem__ method</span>
+        <span class="n">store_obj</span> <span class="o">=</span> <span class="n">store</span>
+        <span class="k">return</span> <span class="n">store_obj</span><span class="o">.</span><span class="fm">__setitem__</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;uri_to_content must be a callable, or MutableMapping, or a dir path&quot;</span>
+        <span class="p">)</span>
+
+
+<span class="c1"># A few useful uri_to_content functions, elegantly defined as (picklable) function compositions</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">methodcaller</span><span class="p">,</span> <span class="n">attrgetter</span>
+
+<span class="n">acquire_content</span><span class="o">.</span><span class="n">path_to_bytes</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span><span class="n">Path</span><span class="p">,</span> <span class="n">methodcaller</span><span class="p">(</span><span class="s2">&quot;read_bytes&quot;</span><span class="p">))</span>
+<span class="n">acquire_content</span><span class="o">.</span><span class="n">path_to_string</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span><span class="n">Path</span><span class="p">,</span> <span class="n">methodcaller</span><span class="p">(</span><span class="s2">&quot;read_text&quot;</span><span class="p">))</span>
+
+
+<span class="nd">@acquire_content</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">url_to_bytes</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="n">URI</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>  <span class="c1"># Check for HTTP errors</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully downloaded and stored contents from </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span>
+    <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download from </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="n">acquire_content</span><span class="o">.</span><span class="n">url_to_bytes</span> <span class="o">=</span> <span class="n">url_to_bytes</span>
+
+
+<div class="viewcode-block" id="scrape_multiple_sites">
+<a class="viewcode-back" href="../../module_docs/scraped/tools.html#scraped.tools.scrape_multiple_sites">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">scrape_multiple_sites</span><span class="p">(</span>
+    <span class="n">name_and_url</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">url_scrape_function</span><span class="p">:</span> <span class="nb">callable</span> <span class="o">=</span> <span class="n">markdown_of_site_depth_3</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scrape multiple URLs and save the results to a directory.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    - name_and_url: a dictionary mapping names to URLs</span>
+<span class="sd">    - save_dir: the directory to save the results to</span>
+<span class="sd">    - url_scrape_function: the function to use to scrape the URLs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lkj</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_progress</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">scraped</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+    <span class="n">save_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">save_dir</span><span class="p">))</span>
+    <span class="c1"># raise if save_dir is not a directory</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">save_dir</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_dir</span><span class="si">}</span><span class="s2"> is not a directory&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">gen</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">name_and_url</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">print_progress</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scraping </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">)...&quot;</span><span class="p">)</span>
+                <span class="n">md_content</span> <span class="o">=</span> <span class="n">url_scrape_function</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.md&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">md_content</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error scraping </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Continuing (but returning (name, url) pair in output dict)...&quot;</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">name</span><span class="p">,</span> <span class="n">url</span>
+
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">gen</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../module_docs/scraped/tools.html#scraped.tools.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run the command-line interface of scraped.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">argh</span>
+
+    <span class="n">argh</span><span class="o">.</span><span class="n">dispatch_commands</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">markdown_of_site</span><span class="p">,</span>
+            <span class="n">download_site</span><span class="p">,</span>
+            <span class="n">scrape_multiple_sites</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
