@@ -14,10 +14,10 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
 
 import html2text
-from config2py import get_app_data_folder, process_path
+from config2py import get_app_config_folder, process_path
 from graze.base import url_to_localpath as graze_url_to_localpath
 
-_DFLT_DATA_ROOTDIR = get_app_data_folder("scraped/data", ensure_exists=True)
+_DFLT_DATA_ROOTDIR = get_app_config_folder("scraped/data", ensure_exists=True)
 DFLT_ROOTDIR = os.environ.get("SCRAPED_DFLT_ROOTDIR", _DFLT_DATA_ROOTDIR)
 
 _fallback_store_dir = os.path.expanduser("~/Downloads")
