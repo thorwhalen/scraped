@@ -8,7 +8,8 @@ markdown_of_site_depth_3 = partial(markdown_of_site, depth=3)
 
 import os
 import requests
-from typing import Dict, Union, MutableMapping, KT, VT, TypeVar, Callable, Any
+from typing import Dict, Union, KT, VT, TypeVar, Any
+from collections.abc import MutableMapping, Callable
 from functools import partial
 
 
@@ -26,8 +27,8 @@ def is_not_none(x):
 #   uri->uri_to_content function (see graze, pyckyp, dol, dacc for ideas and code)
 def acquire_content(
     uri_to_content: Callable[[URI], ContentType],
-    uris: Dict[KT, URI] = None,
-    store: Union[Dirpath, MutableMapping, StoreFunc] = DFLT_STORE_DIR,
+    uris: dict[KT, URI] = None,
+    store: Dirpath | MutableMapping | StoreFunc = DFLT_STORE_DIR,
     *,
     save_condition: Callable[[Any], bool] = is_not_none,
 ):
@@ -95,7 +96,7 @@ def acquire_content(
             store(key, content)
 
 
-def _ensure_store_func(store: Union[Dirpath, MutableMapping, Callable]) -> StoreFunc:
+def _ensure_store_func(store: Dirpath | MutableMapping | Callable) -> StoreFunc:
     """
     Ensures a store function is returned based on the type of 'store' argument provided.
 

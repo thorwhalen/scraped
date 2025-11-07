@@ -2,7 +2,8 @@
 
 import os
 from functools import partial
-from typing import Iterable, Mapping, Optional, Callable, Union, Tuple, List, Dict
+from typing import Optional, Union, Tuple, List, Dict
+from collections.abc import Iterable, Mapping, Callable
 import multiprocessing
 import re
 from tempfile import TemporaryDirectory
@@ -109,10 +110,10 @@ class RecursiveDownloader(scrapy.Spider):
         rootdir: str = DFLT_ROOTDIR,
         *,
         depth: int = 1,
-        filter_urls: Optional[Callable[[str], bool]] = None,
+        filter_urls: Callable[[str], bool] | None = None,
         mk_missing_dirs: bool = True,
         verbosity: int = 0,
-        url_to_filepath: Optional[Union[str, Callable[[str], str]]] = None,
+        url_to_filepath: str | Callable[[str], str] | None = None,
         **extra_kwargs,
     ):
         self.start_urls = [start_url]
@@ -163,10 +164,10 @@ class RecursiveDownloader(scrapy.Spider):
 
 def _download_site(
     url: str,
-    url_to_filepath: Optional[Union[str, Callable[[str], str]]] = None,
+    url_to_filepath: str | Callable[[str], str] | None = None,
     *,
     depth: int = 1,
-    filter_urls: Optional[Callable[[str], bool]] = None,
+    filter_urls: Callable[[str], bool] | None = None,
     mk_missing_dirs: bool = True,
     verbosity: int = 0,
     rootdir: str = DFLT_ROOTDIR,
@@ -207,7 +208,7 @@ def _download_site(
     process.start()
 
 
-def is_html_content(content: Union[str, bytes]) -> bool:
+def is_html_content(content: str | bytes) -> bool:
     """
     Check if the given content is HTML.
 
@@ -240,8 +241,8 @@ def is_html_content(content: Union[str, bytes]) -> bool:
 
 # TODO: Replace this by a version that uses dol.store_aggregate
 def html_to_markdown(
-    htmls: Union[str, Iterable[str], Mapping[str, str]],
-    save_filepath: Optional[str] = None,
+    htmls: str | Iterable[str] | Mapping[str, str],
+    save_filepath: str | None = None,
     *,
     content_filt=is_html_content,
     markdown_contents_aggregator: Callable = "\n\n".join,
@@ -338,10 +339,10 @@ def html_to_markdown(
 #  and (b) status on progress
 def download_site(
     url: str,
-    url_to_filepath: Optional[Union[str, Callable[[str], str]]] = url_to_localpath,
+    url_to_filepath: str | Callable[[str], str] | None = url_to_localpath,
     *,
     depth: int = 1,
-    filter_urls: Optional[Callable[[str], bool]] = None,
+    filter_urls: Callable[[str], bool] | None = None,
     mk_missing_dirs: bool = True,
     verbosity: int = 0,
     rootdir: str = DFLT_ROOTDIR,
@@ -382,9 +383,9 @@ def markdown_of_site(
     url: str,
     *,
     depth: int = 1,
-    filter_urls: Optional[Callable[[str], bool]] = None,
-    save_filepath: Optional[str] = None,
-    deduplicate_lines_min_block_size: Optional[int] = None,
+    filter_urls: Callable[[str], bool] | None = None,
+    save_filepath: str | None = None,
+    deduplicate_lines_min_block_size: int | None = None,
     verbosity: int = 0,
     dir_to_save_page_slurps: str = None,
     **extra_kwargs,
@@ -482,8 +483,8 @@ def markdown_of_site(
 
 
 def deduplicate_lines(
-    text: str, min_block_size: int = 5, key: Optional[Callable] = hash
-) -> Tuple[str, List[Dict]]:
+    text: str, min_block_size: int = 5, key: Callable | None = hash
+) -> tuple[str, list[dict]]:
     """
     Deduplicate text Deduplicate text lines.
 
@@ -582,7 +583,7 @@ def download_file(
     save_directory,
     *,
     url_to_filename: Callable[[str], str] = url_to_localpath,
-    extension_cast: Optional[Callable] = _dflt_extension_cast,
+    extension_cast: Callable | None = _dflt_extension_cast,
     custom_mime_map=None,
     content_attribute="content",  # change to 'body' for scrapy
 ):
