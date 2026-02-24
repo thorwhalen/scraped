@@ -472,14 +472,20 @@ def markdown_of_site(
     )
 
     # convert the site to markdown
-    markdown = html_to_markdown(dir_to_save_page_slurps, save_filepath=save_filepath)
-
     if deduplicate_lines_min_block_size:
+        # Get markdown as string first (don't save yet), deduplicate, then save
+        markdown = html_to_markdown(dir_to_save_page_slurps, save_filepath=None)
         markdown, _ = deduplicate_lines(
             markdown, min_block_size=deduplicate_lines_min_block_size
         )
-
-    return markdown
+        if save_filepath:
+            Path(save_filepath).expanduser().absolute().write_text(markdown)
+            return save_filepath
+        return markdown
+    else:
+        return html_to_markdown(
+            dir_to_save_page_slurps, save_filepath=save_filepath
+        )
 
 
 def deduplicate_lines(
