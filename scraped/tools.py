@@ -12,7 +12,6 @@ from typing import Dict, Union, KT, VT, TypeVar, Any
 from collections.abc import MutableMapping, Callable
 from functools import partial
 
-
 URI = TypeVar("URI")
 Dirpath = str
 ContentType = TypeVar("ContentType")

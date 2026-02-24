@@ -483,9 +483,7 @@ def markdown_of_site(
             return save_filepath
         return markdown
     else:
-        return html_to_markdown(
-            dir_to_save_page_slurps, save_filepath=save_filepath
-        )
+        return html_to_markdown(dir_to_save_page_slurps, save_filepath=save_filepath)
 
 
 def deduplicate_lines(
