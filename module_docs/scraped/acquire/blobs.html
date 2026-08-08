@@ -1,0 +1,216 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.acquire.blobs &mdash; scraped 0.0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="scraped.acquire.cache" href="cache.html" />
+    <link rel="prev" title="scraped.acquire" href="../acquire.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire.html">scraped.acquire</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">scraped.acquire.blobs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.blobs.StateBlob"><code class="docutils literal notranslate"><span class="pre">StateBlob</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.blobs.StateBlob.parsed"><code class="docutils literal notranslate"><span class="pre">StateBlob.parsed</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.blobs.iter_script_texts"><code class="docutils literal notranslate"><span class="pre">iter_script_texts()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.blobs.scan_state_blobs"><code class="docutils literal notranslate"><span class="pre">scan_state_blobs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.blobs.state_blob_markers"><code class="docutils literal notranslate"><span class="pre">state_blob_markers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">scraped.acquire.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capture.html">scraped.acquire.capture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fetchers.html">scraped.acquire.fetchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fetchers/browser.html">scraped.acquire.fetchers.browser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fetchers/http.html">scraped.acquire.fetchers.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="policy.html">scraped.acquire.policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="probe.html">scraped.acquire.probe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="signals.html">scraped.acquire.signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="url.html">scraped.acquire.url</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">scraped.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">scraped.acquire.blobs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/module_docs/scraped/acquire/blobs.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-scraped.acquire.blobs">
+<span id="scraped-acquire-blobs"></span><h1>scraped.acquire.blobs<a class="headerlink" href="#module-scraped.acquire.blobs" title="Link to this heading"></a></h1>
+<p>Find the structured data a page already contains, without parsing its DOM.</p>
+<p>Server-rendered sites routinely ship their own object graph inside the HTML —
+<cite>__NEXT_DATA__</cite>, <cite>__APOLLO_STATE__</cite>, JSON-LD, and friends. Reading that blob is
+strictly better than scraping the DOM: it is the data rather than a <em>rendering</em>
+of the data, it is complete even when the DOM lazily renders only what is
+visible, and it survives CSS and markup redesigns.</p>
+<p>This module is the seam to the extraction layer. It does not extract anything; it
+reports <em>where the structured data is</em> and how big it is, and leaves the choosing
+to the caller.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="s1">&#39;&lt;html&gt;&lt;script id=&quot;__NEXT_DATA__&quot; type=&quot;application/json&quot;&gt;{&quot;a&quot;:1}&lt;/script&gt;&lt;/html&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blobs</span> <span class="o">=</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">b</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blobs</span><span class="p">]</span>
+<span class="go">[(&#39;next_data&#39;, {&#39;a&#39;: 1})]</span>
+</pre></div>
+</div>
+<p>Lazily-rendered listings are the motivating case: a DOM scrape of a paginated
+site returned 35/32/29 items on pages that each held 35, while the state blob
+held all of them on every page.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.blobs.StateBlob">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.blobs.</span></span><span class="sig-name descname"><span class="pre">StateBlob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/scraped/acquire/blobs.html#StateBlob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.blobs.StateBlob" title="Link to this definition"></a></dt>
+<dd><p>One embedded structured-data payload found in an HTML document.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="scraped.acquire.blobs.StateBlob.parsed">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">parsed</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#scraped.acquire.blobs.StateBlob.parsed" title="Link to this definition"></a></dt>
+<dd><p>Whether the payload was decodable as JSON.</p>
+<p><cite>False</cite> with a non-empty <cite>raw</cite> means the payload needs a format-specific
+parser — React Flight chunks and Nuxt 2 function expressions are the
+common cases.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.blobs.iter_script_texts">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.blobs.</span></span><span class="sig-name descname"><span class="pre">iter_script_texts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/blobs.html#iter_script_texts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.blobs.iter_script_texts" title="Link to this definition"></a></dt>
+<dd><p>Yield <cite>(attributes, body)</cite> for every <cite>&lt;script&gt;</cite> element.</p>
+<p>A regex rather than a DOM parse, deliberately: this must work on truncated,
+malformed, and challenge-page HTML where a parser may bail.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">iter_script_texts</span><span class="p">(</span><span class="s1">&#39;&lt;script type=&quot;x&quot; id=&quot;y&quot;&gt;B&lt;/script&gt;&#39;</span><span class="p">))</span>
+<span class="go">[({&#39;type&#39;: &#39;x&#39;, &#39;id&#39;: &#39;y&#39;}, &#39;B&#39;)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.blobs.scan_state_blobs">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.blobs.</span></span><span class="sig-name descname"><span class="pre">scan_state_blobs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_generic_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2048</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_generic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#scraped.acquire.blobs.StateBlob" title="scraped.acquire.blobs.StateBlob"><span class="pre">StateBlob</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/blobs.html#scan_state_blobs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.blobs.scan_state_blobs" title="Link to this definition"></a></dt>
+<dd><p>Find every embedded structured-data payload, largest first.</p>
+<p>Recognizes framework-specific markers (Next.js, Nuxt, Apollo, Redux, Remix,
+Angular TransferState), standardized JSON-LD, and — when <cite>include_generic</cite> —
+any sufficiently large bare JSON script.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">&lt;script type=&quot;application/ld+json&quot;&gt;{&quot;@type&quot;:&quot;Product&quot;}&lt;/script&gt;</span>
+<span class="gp">... </span><span class="s1">&lt;script&gt;window.__APOLLO_STATE__ = {&quot;Product:1&quot;:{&quot;name&quot;:&quot;x&quot;}};&lt;/script&gt;</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">kind</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">))</span>
+<span class="go">[&#39;apollo&#39;, &#39;ld_json&#39;]</span>
+</pre></div>
+</div>
+<p>JSON-LD is worth trying first when present: it is standardized, so it is the
+most stable payload on the web.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">blob</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">)</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;ld_json&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blob</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;@type&#39;</span><span class="p">]</span>
+<span class="go">&#39;Product&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.blobs.state_blob_markers">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.blobs.</span></span><span class="sig-name descname"><span class="pre">state_blob_markers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/blobs.html#state_blob_markers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.blobs.state_blob_markers" title="Link to this definition"></a></dt>
+<dd><p>The marker names present, cheapest possible summary for capture metadata.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">state_blob_markers</span><span class="p">(</span><span class="s1">&#39;&lt;script id=&quot;__NEXT_DATA__&quot; type=&quot;application/json&quot;&gt;</span><span class="si">{}</span><span class="s1">&lt;/script&gt;&#39;</span><span class="p">)</span>
+<span class="go">[&#39;__NEXT_DATA__&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../acquire.html" class="btn btn-neutral float-left" title="scraped.acquire" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cache.html" class="btn btn-neutral float-right" title="scraped.acquire.cache" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

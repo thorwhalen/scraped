@@ -1,0 +1,473 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.acquire.capture &mdash; scraped 0.0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire.html">scraped.acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/blobs.html">scraped.acquire.blobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/cache.html">scraped.acquire.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/capture.html">scraped.acquire.capture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/fetchers.html">scraped.acquire.fetchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/fetchers/browser.html">scraped.acquire.fetchers.browser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/fetchers/http.html">scraped.acquire.fetchers.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/policy.html">scraped.acquire.policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/probe.html">scraped.acquire.probe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/signals.html">scraped.acquire.signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/url.html">scraped.acquire.url</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/tools.html">scraped.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../acquire.html">scraped.acquire</a></li>
+      <li class="breadcrumb-item active">scraped.acquire.capture</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scraped.acquire.capture</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The `Capture` record: an immutable, provenance-bearing result of one fetch.</span>
+
+<span class="sd">A `Capture` is deliberately isomorphic to a WARC (ISO 28500) request/response</span>
+<span class="sd">pair, so that emitting real WARC later is a serialization change rather than a</span>
+<span class="sd">redesign. It carries everything needed to answer &quot;where did this byte string come</span>
+<span class="sd">from, when, how, and were we allowed to take it&quot; without re-reading the network.</span>
+
+<span class="sd">Two invariants matter:</span>
+
+<span class="sd">- **Raw bytes, never decoded text.** Decoding is a lossy interpretation and</span>
+<span class="sd">  belongs to the extraction layer. `Capture.text()` exists for convenience but is</span>
+<span class="sd">  explicit about the encoding it chose.</span>
+<span class="sd">- **Body is content-addressed.** `body_sha256` is the identity of the payload,</span>
+<span class="sd">  which buys deduplication, change detection, and cheap re-runs together.</span>
+
+<span class="sd">&gt;&gt;&gt; capture = Capture.from_body(</span>
+<span class="sd">...     Request(&quot;https://example.com&quot;), b&quot;&lt;html&gt;&lt;/html&gt;&quot;, status=200</span>
+<span class="sd">... )</span>
+<span class="sd">&gt;&gt;&gt; capture.response.status</span>
+<span class="sd">200</span>
+<span class="sd">&gt;&gt;&gt; capture.response.body_len</span>
+<span class="sd">13</span>
+<span class="sd">&gt;&gt;&gt; capture.ok</span>
+<span class="sd">True</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">codecs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">replace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">runtime_checkable</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.url</span><span class="w"> </span><span class="kn">import</span> <span class="n">canonicalize_url</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Request&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Response&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FetcherInfo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PolicyOutcome&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ProbeMarks&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Capture&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Fetcher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;body_digest&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;request_digest&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;utcnow&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># Headers that legitimately vary a response and therefore belong in a cache key.</span>
+<span class="c1"># Anything else is noise that would fragment the cache for no benefit.</span>
+<span class="n">DFLT_VARY_HEADERS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;accept&quot;</span><span class="p">,</span> <span class="s2">&quot;accept-language&quot;</span><span class="p">,</span> <span class="s2">&quot;authorization&quot;</span><span class="p">,</span> <span class="s2">&quot;cookie&quot;</span><span class="p">)</span>
+
+<span class="n">_TEXTUAL_HINTS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;text/&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;xml&quot;</span><span class="p">,</span> <span class="s2">&quot;javascript&quot;</span><span class="p">,</span> <span class="s2">&quot;html&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="utcnow">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.utcnow">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">utcnow</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Timezone-aware current time. Provenance timestamps are always UTC.</span>
+
+<span class="sd">    &gt;&gt;&gt; utcnow().tzinfo is timezone.utc</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="body_digest">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.body_digest">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">body_digest</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Content address of a payload.</span>
+
+<span class="sd">    &gt;&gt;&gt; body_digest(b&quot;&quot;)[:8]</span>
+<span class="sd">    &#39;e3b0c442&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="Request">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.Request">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Request</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;What we asked for.&quot;&quot;&quot;</span>
+
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GET&quot;</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="Response">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.Response">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Response</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;What came back, minus the payload itself.&quot;&quot;&quot;</span>
+
+    <span class="n">status</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">final_url</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">redirect_chain</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="n">body_sha256</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">body_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">content_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lowercased `Content-Type`, or empty string when absent.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;content-type&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_textual</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether the declared content type suggests text rather than binary.</span>
+
+<span class="sd">        &gt;&gt;&gt; Response(200, &quot;u&quot;, {&quot;Content-Type&quot;: &quot;text/html&quot;}).is_textual</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; Response(200, &quot;u&quot;, {&quot;Content-Type&quot;: &quot;image/png&quot;}).is_textual</span>
+<span class="sd">        False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">hint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_type</span> <span class="k">for</span> <span class="n">hint</span> <span class="ow">in</span> <span class="n">_TEXTUAL_HINTS</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="FetcherInfo">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.FetcherInfo">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FetcherInfo</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Which machinery produced this capture, and at what transport rung.&quot;&quot;&quot;</span>
+
+    <span class="n">client_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+    <span class="n">client_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">impersonate_profile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">transport_rung</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+
+<div class="viewcode-block" id="PolicyOutcome">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.PolicyOutcome">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PolicyOutcome</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether policy was consulted, and what it said.</span>
+
+<span class="sd">    Recording the override *reason* is the point: &quot;did we respect robots on this</span>
+<span class="sd">    capture&quot; becomes a queryable fact rather than an archaeology exercise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">robots_checked</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">robots_allowed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">robots_override_reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="ProbeMarks">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.ProbeMarks">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProbeMarks</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cheap structural facts noticed at capture time.</span>
+
+<span class="sd">    Filled in automatically for HTML captures. This is the seam to the extraction</span>
+<span class="sd">    layer: it says *where the structured data is* without extracting anything.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">state_blob_markers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="n">ld_json_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1">#: Body shorter than the declared Content-Length: a silent corruption that</span>
+    <span class="c1">#: otherwise only shows up downstream.</span>
+    <span class="n">truncated</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">challenge_vendor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1">#: Whether a challenge was served *instead of* content. A `challenge_vendor`</span>
+    <span class="c1">#: without this only records who guards the origin.</span>
+    <span class="n">challenge_serving</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="Capture">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.Capture">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Capture</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;One fetch, with provenance.</span>
+
+<span class="sd">    The body is carried in memory here; stores persist it separately, keyed by</span>
+<span class="sd">    `response.body_sha256`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span>
+    <span class="n">response</span><span class="p">:</span> <span class="n">Response</span>
+    <span class="n">fetched_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">elapsed_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">fetcher</span><span class="p">:</span> <span class="n">FetcherInfo</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">FetcherInfo</span><span class="p">)</span>
+    <span class="n">policy</span><span class="p">:</span> <span class="n">PolicyOutcome</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">PolicyOutcome</span><span class="p">)</span>
+    <span class="n">probe</span><span class="p">:</span> <span class="n">ProbeMarks</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ProbeMarks</span><span class="p">)</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+
+<div class="viewcode-block" id="Capture.from_body">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.Capture.from_body">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_body</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Capture&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a capture from a payload, deriving the content address.</span>
+
+<span class="sd">        Convenience for tests, replays, and fetchers that already hold the bytes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">Response</span><span class="p">(</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
+            <span class="n">final_url</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;final_url&quot;</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+            <span class="n">redirect_chain</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;redirect_chain&quot;</span><span class="p">,</span> <span class="p">()),</span>
+        <span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">body_sha256</span><span class="o">=</span><span class="n">body_digest</span><span class="p">(</span><span class="n">body</span><span class="p">),</span> <span class="n">body_len</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">body</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ok</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether the status is a success code.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">200</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">&lt;</span> <span class="mi">300</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">blocked</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether this looks like an access-control rejection rather than an error.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">401</span><span class="p">,</span> <span class="mi">403</span><span class="p">,</span> <span class="mi">429</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">probe</span><span class="o">.</span><span class="n">challenge_serving</span>
+
+<div class="viewcode-block" id="Capture.text">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.Capture.text">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;replace&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decode the body, explicitly.</span>
+
+<span class="sd">        Decoding is the extraction layer&#39;s concern; this is a convenience, and it</span>
+<span class="sd">        is deliberate about the fact that a choice is being made.</span>
+
+<span class="sd">        &gt;&gt;&gt; Capture.from_body(Request(&quot;u&quot;), b&quot;hi&quot;).text()</span>
+<span class="sd">        &#39;hi&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_declared_encoding</span><span class="p">(),</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_declared_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The charset the server claimed, if Python actually has that codec.</span>
+
+<span class="sd">        `errors=&quot;replace&quot;` protects against bad *bytes*, not a bad codec *name*:</span>
+<span class="sd">        `charset=utf8mb4` (MySQL-backed CMSes) raises `LookupError`. Servers</span>
+<span class="sd">        declare nonexistent charsets often enough that this must never propagate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">content_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">content_type</span>
+        <span class="k">if</span> <span class="s2">&quot;charset=&quot;</span> <span class="ow">in</span> <span class="n">content_type</span><span class="p">:</span>
+            <span class="n">declared</span> <span class="o">=</span> <span class="n">content_type</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;charset=&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">declared</span> <span class="o">=</span> <span class="n">declared</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">codecs</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">declared</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">declared</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">LookupError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="s2">&quot;utf-8&quot;</span>
+
+<div class="viewcode-block" id="Capture.metadata">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.Capture.metadata">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Everything except the payload, JSON-ready.</span>
+
+<span class="sd">        This is what a store persists alongside the content-addressed body.</span>
+
+<span class="sd">        A `bytes` request body is base64-encoded rather than stringified. JSON&#39;s</span>
+<span class="sd">        `default=str` turns bytes into their *repr*, which round-trips to a</span>
+<span class="sd">        corrupted `str` with no error at write time — and rung (b), calling a</span>
+<span class="sd">        site&#39;s internal JSON/GraphQL API, is POST-shaped by definition, so this</span>
+<span class="sd">        is the common case rather than an exotic one.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">as_dict</span> <span class="o">=</span> <span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">as_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
+        <span class="n">as_dict</span><span class="p">[</span><span class="s2">&quot;fetched_at&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetched_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="n">request_body</span> <span class="o">=</span> <span class="n">as_dict</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request_body</span><span class="p">,</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">)):</span>
+            <span class="n">as_dict</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">][</span><span class="s2">&quot;body&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">request_body</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span>
+            <span class="n">as_dict</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">][</span><span class="s2">&quot;body_is_base64&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">as_dict</span></div>
+
+
+<div class="viewcode-block" id="Capture.to_json">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.Capture.to_json">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serialize the metadata.</span>
+
+<span class="sd">        Deliberately no `default=` fallback: an unserializable field should fail</span>
+<span class="sd">        loudly here rather than be silently stringified into the store.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Fetcher">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.Fetcher">[docs]</a>
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Fetcher</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The dependency-injection seam of the whole package.</span>
+
+<span class="sd">    Every transport rung — plain HTTP, impersonating HTTP, browser — is just a</span>
+<span class="sd">    callable of this shape. This is the generalization of the older</span>
+<span class="sd">    `acquire_content(uri_to_content, ...)` seam.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Capture</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one request into one capture.&quot;&quot;&quot;</span>
+        <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="request_digest">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/capture.html#scraped.acquire.request_digest">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">request_digest</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">vary_headers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DFLT_VARY_HEADERS</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cache key for a request: what actually distinguishes one fetch from another.</span>
+
+<span class="sd">    Canonicalized URL + method + the subset of headers that plausibly vary the</span>
+<span class="sd">    response + a hash of any body. Deliberately ignores headers that only add</span>
+<span class="sd">    noise (User-Agent, tracing ids), because fragmenting the cache on those makes</span>
+<span class="sd">    re-runs expensive for no correctness gain.</span>
+
+<span class="sd">    &gt;&gt;&gt; a = Request(&quot;https://x.com/p?b=2&amp;a=1&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; b = Request(&quot;https://x.com/p?a=1&amp;b=2&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; request_digest(a) == request_digest(b)  # query order is not meaningful</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; c = Request(&quot;https://x.com/p?a=1&amp;b=2&quot;, headers={&quot;User-Agent&quot;: &quot;whatever&quot;})</span>
+<span class="sd">    &gt;&gt;&gt; request_digest(b) == request_digest(c)  # noise headers ignored</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Fold case deterministically: with both &quot;Accept&quot; and &quot;accept&quot; present, a</span>
+    <span class="c1"># plain dict comprehension would let insertion order decide the digest.</span>
+    <span class="n">lowered</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">lowered</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="n">significant</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">key</span><span class="p">:</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">lowered</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">vary_headers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">lowered</span>
+    <span class="p">}</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
+        <span class="n">canonicalize_url</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">),</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">significant</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">body_digest</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

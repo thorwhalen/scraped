@@ -3,5 +3,17 @@
    :caption: Contents:
 
    module_docs/scraped
+   module_docs/scraped/acquire
+   module_docs/scraped/acquire/blobs
+   module_docs/scraped/acquire/cache
+   module_docs/scraped/acquire/capture
+   module_docs/scraped/acquire/fetchers
+   module_docs/scraped/acquire/fetchers/browser
+   module_docs/scraped/acquire/fetchers/http
+   module_docs/scraped/acquire/policy
+   module_docs/scraped/acquire/probe
+   module_docs/scraped/acquire/signals
+   module_docs/scraped/acquire/url
+   module_docs/scraped/tests/test_acquire
    module_docs/scraped/tools
    module_docs/scraped/util

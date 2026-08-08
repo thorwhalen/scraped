@@ -1,0 +1,809 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.acquire &mdash; scraped 0.0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="scraped.acquire.blobs" href="acquire/blobs.html" />
+    <link rel="prev" title="scraped" href="../scraped.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../scraped.html">scraped</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">scraped.acquire</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.BrowserArtifacts"><code class="docutils literal notranslate"><span class="pre">BrowserArtifacts</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.BrowserFetcher"><code class="docutils literal notranslate"><span class="pre">BrowserFetcher</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.BrowserSession"><code class="docutils literal notranslate"><span class="pre">BrowserSession</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.BrowserSession.artifacts"><code class="docutils literal notranslate"><span class="pre">BrowserSession.artifacts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.BrowserSession.save_storage_state"><code class="docutils literal notranslate"><span class="pre">BrowserSession.save_storage_state()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.Capture"><code class="docutils literal notranslate"><span class="pre">Capture</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.Capture.blocked"><code class="docutils literal notranslate"><span class="pre">Capture.blocked</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.Capture.from_body"><code class="docutils literal notranslate"><span class="pre">Capture.from_body()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.Capture.metadata"><code class="docutils literal notranslate"><span class="pre">Capture.metadata()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.Capture.ok"><code class="docutils literal notranslate"><span class="pre">Capture.ok</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.Capture.text"><code class="docutils literal notranslate"><span class="pre">Capture.text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.Capture.to_json"><code class="docutils literal notranslate"><span class="pre">Capture.to_json()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.CaptureStore"><code class="docutils literal notranslate"><span class="pre">CaptureStore</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.CaptureStore.add"><code class="docutils literal notranslate"><span class="pre">CaptureStore.add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.CaptureStore.in_memory"><code class="docutils literal notranslate"><span class="pre">CaptureStore.in_memory()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.ChallengeEncountered"><code class="docutils literal notranslate"><span class="pre">ChallengeEncountered</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.CurlCffiTransport"><code class="docutils literal notranslate"><span class="pre">CurlCffiTransport</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.Fetcher"><code class="docutils literal notranslate"><span class="pre">Fetcher</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.FetcherInfo"><code class="docutils literal notranslate"><span class="pre">FetcherInfo</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.HttpFetcher"><code class="docutils literal notranslate"><span class="pre">HttpFetcher</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.PolicyOutcome"><code class="docutils literal notranslate"><span class="pre">PolicyOutcome</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.Politeness"><code class="docutils literal notranslate"><span class="pre">Politeness</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.Politeness.wait"><code class="docutils literal notranslate"><span class="pre">Politeness.wait()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.ProbeMarks"><code class="docutils literal notranslate"><span class="pre">ProbeMarks</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.ProbeMarks.challenge_serving"><code class="docutils literal notranslate"><span class="pre">ProbeMarks.challenge_serving</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.ProbeMarks.truncated"><code class="docutils literal notranslate"><span class="pre">ProbeMarks.truncated</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.Request"><code class="docutils literal notranslate"><span class="pre">Request</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.Response"><code class="docutils literal notranslate"><span class="pre">Response</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.Response.content_type"><code class="docutils literal notranslate"><span class="pre">Response.content_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.Response.is_textual"><code class="docutils literal notranslate"><span class="pre">Response.is_textual</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.RobotsDisallowed"><code class="docutils literal notranslate"><span class="pre">RobotsDisallowed</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.RobotsPolicy"><code class="docutils literal notranslate"><span class="pre">RobotsPolicy</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.RobotsPolicy.allowed"><code class="docutils literal notranslate"><span class="pre">RobotsPolicy.allowed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.RobotsPolicy.check"><code class="docutils literal notranslate"><span class="pre">RobotsPolicy.check()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.RobotsPolicy.crawl_delay"><code class="docutils literal notranslate"><span class="pre">RobotsPolicy.crawl_delay()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.RobotsPolicy.enforce"><code class="docutils literal notranslate"><span class="pre">RobotsPolicy.enforce()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.SiteProfile"><code class="docutils literal notranslate"><span class="pre">SiteProfile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.SiteProfile.best_payload_rung"><code class="docutils literal notranslate"><span class="pre">SiteProfile.best_payload_rung</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.SiteProfile.summary"><code class="docutils literal notranslate"><span class="pre">SiteProfile.summary()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.StateBlob"><code class="docutils literal notranslate"><span class="pre">StateBlob</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.StateBlob.parsed"><code class="docutils literal notranslate"><span class="pre">StateBlob.parsed</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.UrllibTransport"><code class="docutils literal notranslate"><span class="pre">UrllibTransport</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.body_digest"><code class="docutils literal notranslate"><span class="pre">body_digest()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.browser_check_requirements"><code class="docutils literal notranslate"><span class="pre">browser_check_requirements()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.cached"><code class="docutils literal notranslate"><span class="pre">cached()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.canonicalize_url"><code class="docutils literal notranslate"><span class="pre">canonicalize_url()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.capture_store"><code class="docutils literal notranslate"><span class="pre">capture_store()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.classify"><code class="docutils literal notranslate"><span class="pre">classify()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.default_fetcher"><code class="docutils literal notranslate"><span class="pre">default_fetcher()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.detect_challenge"><code class="docutils literal notranslate"><span class="pre">detect_challenge()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.fetch"><code class="docutils literal notranslate"><span class="pre">fetch()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.probe"><code class="docutils literal notranslate"><span class="pre">probe()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.request_digest"><code class="docutils literal notranslate"><span class="pre">request_digest()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.robots_sitemaps"><code class="docutils literal notranslate"><span class="pre">robots_sitemaps()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.scan_state_blobs"><code class="docutils literal notranslate"><span class="pre">scan_state_blobs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.state_blob_markers"><code class="docutils literal notranslate"><span class="pre">state_blob_markers()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.storage_state_headers"><code class="docutils literal notranslate"><span class="pre">storage_state_headers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acquire/blobs.html">scraped.acquire.blobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acquire/cache.html">scraped.acquire.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acquire/capture.html">scraped.acquire.capture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acquire/fetchers.html">scraped.acquire.fetchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acquire/fetchers/browser.html">scraped.acquire.fetchers.browser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acquire/fetchers/http.html">scraped.acquire.fetchers.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acquire/policy.html">scraped.acquire.policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acquire/probe.html">scraped.acquire.probe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acquire/signals.html">scraped.acquire.signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acquire/url.html">scraped.acquire.url</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">scraped.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">scraped.acquire</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/scraped/acquire.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-scraped.acquire">
+<span id="scraped-acquire"></span><h1>scraped.acquire<a class="headerlink" href="#module-scraped.acquire" title="Link to this heading"></a></h1>
+<p>Raw data acquisition: get the bytes down faithfully, with provenance.</p>
+<p>An information-extraction job splits into three concerns. This package owns only
+the first, and provides seams for the other two rather than implementing them:</p>
+<ol class="arabic simple">
+<li><p><strong>acquisition</strong> — get the raw bytes, with enough provenance to know where they
+came from and whether you were allowed to take them. <em>This package.</em></p></li>
+<li><p><strong>extraction</strong> — pull the target fields out. Hand <cite>Capture</cite> and the located
+state blobs to whatever does this (an LLM, a schema, hand-written code).</p></li>
+<li><p><strong>formatting</strong> — shape the result. Downstream entirely.</p></li>
+</ol>
+<p>## Simple path</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">scraped.acquire</span><span class="w"> </span><span class="kn">import</span> <span class="n">probe</span><span class="p">,</span> <span class="n">fetch</span><span class="p">,</span> <span class="n">scan_state_blobs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span> <span class="o">=</span> <span class="n">probe</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">capture</span> <span class="o">=</span> <span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blobs</span> <span class="o">=</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">capture</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>## The one idea worth internalizing</p>
+<p>Payload shape and transport are <strong>independent axes</strong>. Optimize payload first:</p>
+<blockquote>
+<div><p>payload:    api &gt; internal api &gt; state blob &gt; sitemap &gt; dom &gt; text &gt; vision
+transport:  plain http &gt; impersonating http &gt; +session &gt; browser &gt; headful</p>
+</div></blockquote>
+<p>Any payload rung is reachable from any transport rung, and the highest-value cell
+on the grid — <em>drive a real browser, then read the embedded state blob</em> — is the
+one the usual single-ladder framing hides. Reading a page’s own <cite>__NEXT_DATA__</cite>
+beats parsing its DOM even when you had to pay for a browser to see it: the blob
+is the data rather than a rendering of it, and it is complete even when the DOM
+renders lazily.</p>
+<p>See <cite>misc/docs/acquisition-architecture.md</cite> for the full design.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.BrowserArtifacts">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">BrowserArtifacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">har_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downloads_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_state_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">captured_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/fetchers/browser.html#BrowserArtifacts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.BrowserArtifacts" title="Link to this definition"></a></dt>
+<dd><p>Where this fetch’s evidence landed on disk.</p>
+<p>Paths, never payloads. The HAR in particular is both the safety net (every
+byte the page received is on disk regardless of what the page did with it)
+and the input to internal-API discovery.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.BrowserFetcher">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">BrowserFetcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/fetchers/browser.html#scraped.acquire.fetchers.browser.BrowserSession" title="scraped.acquire.fetchers.browser.BrowserSession"><span class="pre">BrowserSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_until</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'domcontentloaded'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settle_ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/policy.html#scraped.acquire.policy.RobotsPolicy" title="scraped.acquire.policy.RobotsPolicy"><span class="pre">RobotsPolicy</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_on_challenge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rung</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/fetchers/browser.html#BrowserFetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.BrowserFetcher" title="Link to this definition"></a></dt>
+<dd><p>A <cite>Fetcher</cite> that drives a real browser and writes its evidence to disk.</p>
+<p>Same callable shape as the HTTP rungs, so callers do not know or care which
+transport is underneath.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.BrowserSession">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">BrowserSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">artifact_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headless</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_har</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">har_url_filter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_json_responses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewport</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int]</span> <span class="pre">|</span> <span class="pre">None</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/fetchers/browser.html#BrowserSession"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.BrowserSession" title="Link to this definition"></a></dt>
+<dd><p>A browser context configured so results cannot be lost.</p>
+<p>Use as a context manager. Artifacts go to <cite>artifact_dir</cite>; nothing of
+consequence is returned through memory alone.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.BrowserSession.artifacts">
+<span class="sig-name descname"><span class="pre">artifacts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="acquire/fetchers/browser.html#scraped.acquire.fetchers.browser.BrowserArtifacts" title="scraped.acquire.fetchers.browser.BrowserArtifacts"><span class="pre">BrowserArtifacts</span></a></span></span><a class="reference internal" href="../../_modules/scraped/acquire/fetchers/browser.html#BrowserSession.artifacts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.BrowserSession.artifacts" title="Link to this definition"></a></dt>
+<dd><p>Where everything landed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.BrowserSession.save_storage_state">
+<span class="sig-name descname"><span class="pre">save_storage_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/fetchers/browser.html#BrowserSession.save_storage_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.BrowserSession.save_storage_state" title="Link to this definition"></a></dt>
+<dd><p>Persist cookies and origin storage so cheap rungs can reuse this session.</p>
+<p><strong>Treat the result as a credential.</strong> It carries live session cookies:
+never commit it, and scope its lifetime deliberately.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.Capture">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">Capture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.Request" title="scraped.acquire.capture.Request"><span class="pre">Request</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.Response" title="scraped.acquire.capture.Response"><span class="pre">Response</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetched_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed_ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetcher</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.FetcherInfo" title="scraped.acquire.capture.FetcherInfo"><span class="pre">FetcherInfo</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.PolicyOutcome" title="scraped.acquire.capture.PolicyOutcome"><span class="pre">PolicyOutcome</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.ProbeMarks" title="scraped.acquire.capture.ProbeMarks"><span class="pre">ProbeMarks</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">b''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#Capture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.Capture" title="Link to this definition"></a></dt>
+<dd><p>One fetch, with provenance.</p>
+<p>The body is carried in memory here; stores persist it separately, keyed by
+<cite>response.body_sha256</cite>.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="scraped.acquire.Capture.blocked">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">blocked</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#scraped.acquire.Capture.blocked" title="Link to this definition"></a></dt>
+<dd><p>Whether this looks like an access-control rejection rather than an error.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.Capture.from_body">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.Request" title="scraped.acquire.capture.Request"><span class="pre">Request</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.Capture" title="scraped.acquire.capture.Capture"><span class="pre">Capture</span></a></span></span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#Capture.from_body"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.Capture.from_body" title="Link to this definition"></a></dt>
+<dd><p>Build a capture from a payload, deriving the content address.</p>
+<p>Convenience for tests, replays, and fetchers that already hold the bytes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.Capture.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#Capture.metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.Capture.metadata" title="Link to this definition"></a></dt>
+<dd><p>Everything except the payload, JSON-ready.</p>
+<p>This is what a store persists alongside the content-addressed body.</p>
+<p>A <cite>bytes</cite> request body is base64-encoded rather than stringified. JSON’s
+<cite>default=str</cite> turns bytes into their <em>repr</em>, which round-trips to a
+corrupted <cite>str</cite> with no error at write time — and rung (b), calling a
+site’s internal JSON/GraphQL API, is POST-shaped by definition, so this
+is the common case rather than an exotic one.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="scraped.acquire.Capture.ok">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ok</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#scraped.acquire.Capture.ok" title="Link to this definition"></a></dt>
+<dd><p>Whether the status is a success code.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.Capture.text">
+<span class="sig-name descname"><span class="pre">text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'replace'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#Capture.text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.Capture.text" title="Link to this definition"></a></dt>
+<dd><p>Decode the body, explicitly.</p>
+<p>Decoding is the extraction layer’s concern; this is a convenience, and it
+is deliberate about the fact that a choice is being made.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">),</span> <span class="sa">b</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+<span class="go">&#39;hi&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.Capture.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#Capture.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.Capture.to_json" title="Link to this definition"></a></dt>
+<dd><p>Serialize the metadata.</p>
+<p>Deliberately no <cite>default=</cite> fallback: an unserializable field should fail
+loudly here rather than be silently stringified into the store.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.CaptureStore">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">CaptureStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MutableMapping</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bodies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MutableMapping</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/cache.html#CaptureStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.CaptureStore" title="Link to this definition"></a></dt>
+<dd><p>A <cite>Mapping[request_digest, Capture]</cite> over two content stores.</p>
+<p><cite>metadata</cite> and <cite>bodies</cite> are any <cite>MutableMapping</cite> — a dict, a <cite>dol</cite> directory
+store, an S3 store. That is the whole migration story: local-dir to cloud is a
+constructor change and touches no acquisition logic.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.CaptureStore.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.Capture" title="scraped.acquire.capture.Capture"><span class="pre">Capture</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/cache.html#CaptureStore.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.CaptureStore.add" title="Link to this definition"></a></dt>
+<dd><p>Store a capture under its own request digest; return the digest.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.CaptureStore.in_memory">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">in_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="acquire/cache.html#scraped.acquire.cache.CaptureStore" title="scraped.acquire.cache.CaptureStore"><span class="pre">CaptureStore</span></a></span></span><a class="reference internal" href="../../_modules/scraped/acquire/cache.html#CaptureStore.in_memory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.CaptureStore.in_memory" title="Link to this definition"></a></dt>
+<dd><p>A store backed by dicts. For tests and one-shot jobs.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="scraped.acquire.ChallengeEncountered">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">ChallengeEncountered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/signals.html#ChallengeEncountered"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.ChallengeEncountered" title="Link to this definition"></a></dt>
+<dd><p>A bot-protection challenge was served instead of content.</p>
+<p>Raised rather than returned so that a challenge can never be mistaken for
+data by a caller that forgot to check. Carries what is needed to decide what
+to do next — and “solve it” is not among the options.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.CurlCffiTransport">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">CurlCffiTransport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">impersonate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'chrome'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/fetchers/http.html#CurlCffiTransport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.CurlCffiTransport" title="Link to this definition"></a></dt>
+<dd><p>Browser-impersonating transport — the default, and where you should start.</p>
+<p>Reproduces a real browser’s TLS ClientHello and HTTP/2 settings, which is what
+makes the difference on origins that fingerprint the client rather than
+reading the User-Agent.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.Fetcher">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">Fetcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#Fetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.Fetcher" title="Link to this definition"></a></dt>
+<dd><p>The dependency-injection seam of the whole package.</p>
+<p>Every transport rung — plain HTTP, impersonating HTTP, browser — is just a
+callable of this shape. This is the generalization of the older
+<cite>acquire_content(uri_to_content, …)</cite> seam.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.FetcherInfo">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">FetcherInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'unknown'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">impersonate_profile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_rung</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#FetcherInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.FetcherInfo" title="Link to this definition"></a></dt>
+<dd><p>Which machinery produced this capture, and at what transport rung.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.HttpFetcher">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">HttpFetcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transport</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/fetchers/http.html#scraped.acquire.fetchers.http.Transport" title="scraped.acquire.fetchers.http.Transport"><span class="pre">Transport</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/policy.html#scraped.acquire.policy.RobotsPolicy" title="scraped.acquire.policy.RobotsPolicy"><span class="pre">RobotsPolicy</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">politeness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/policy.html#scraped.acquire.policy.Politeness" title="scraped.acquire.policy.Politeness"><span class="pre">Politeness</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_attempts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retry_after</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">120.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_on_challenge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/fetchers/http.html#HttpFetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.HttpFetcher" title="Link to this definition"></a></dt>
+<dd><p>A <cite>Fetcher</cite> that turns requests into provenance-bearing captures.</p>
+<p>Owns the concerns that must not be reimplemented per job: robots policy,
+per-host politeness, jittered retries, challenge detection, and the automatic
+state-blob scan that makes the result useful to the extraction layer.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.PolicyOutcome">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">PolicyOutcome</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robots_checked</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robots_allowed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robots_override_reason</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#PolicyOutcome"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.PolicyOutcome" title="Link to this definition"></a></dt>
+<dd><p>Whether policy was consulted, and what it said.</p>
+<p>Recording the override <em>reason</em> is the point: “did we respect robots on this
+capture” becomes a queryable fact rather than an archaeology exercise.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.Politeness">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">Politeness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jitter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_last</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_lock</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">allocate_lock</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/policy.html#Politeness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.Politeness" title="Link to this definition"></a></dt>
+<dd><p>Per-host pacing. Per-host, never global — one slow site must not throttle
+every other one.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pace</span> <span class="o">=</span> <span class="n">Politeness</span><span class="p">(</span><span class="n">min_interval</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pace</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="s2">&quot;https://example.com/a&quot;</span><span class="p">)</span>  <span class="c1"># returns immediately</span>
+<span class="go">0.0</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.Politeness.wait">
+<span class="sig-name descname"><span class="pre">wait</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawl_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/policy.html#Politeness.wait"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.Politeness.wait" title="Link to this definition"></a></dt>
+<dd><p>Sleep as long as politeness requires; return the seconds slept.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.ProbeMarks">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">ProbeMarks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_blob_markers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ld_json_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">truncated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">challenge_vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">challenge_serving</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#ProbeMarks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.ProbeMarks" title="Link to this definition"></a></dt>
+<dd><p>Cheap structural facts noticed at capture time.</p>
+<p>Filled in automatically for HTML captures. This is the seam to the extraction
+layer: it says <em>where the structured data is</em> without extracting anything.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="scraped.acquire.ProbeMarks.challenge_serving">
+<span class="sig-name descname"><span class="pre">challenge_serving</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#scraped.acquire.ProbeMarks.challenge_serving" title="Link to this definition"></a></dt>
+<dd><p>Whether a challenge was served <em>instead of</em> content. A <cite>challenge_vendor</cite>
+without this only records who guards the origin.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="scraped.acquire.ProbeMarks.truncated">
+<span class="sig-name descname"><span class="pre">truncated</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#scraped.acquire.ProbeMarks.truncated" title="Link to this definition"></a></dt>
+<dd><p>a silent corruption that
+otherwise only shows up downstream.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Body shorter than the declared Content-Length</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.Request">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">Request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'GET'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#Request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.Request" title="Link to this definition"></a></dt>
+<dd><p>What we asked for.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.Response">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">Response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redirect_chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_sha256</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#Response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.Response" title="Link to this definition"></a></dt>
+<dd><p>What came back, minus the payload itself.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="scraped.acquire.Response.content_type">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">content_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#scraped.acquire.Response.content_type" title="Link to this definition"></a></dt>
+<dd><p>Lowercased <cite>Content-Type</cite>, or empty string when absent.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="scraped.acquire.Response.is_textual">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_textual</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#scraped.acquire.Response.is_textual" title="Link to this definition"></a></dt>
+<dd><p>Whether the declared content type suggests text rather than binary.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;text/html&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">is_textual</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;image/png&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">is_textual</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="scraped.acquire.RobotsDisallowed">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">RobotsDisallowed</span></span><a class="reference internal" href="../../_modules/scraped/acquire/policy.html#RobotsDisallowed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.RobotsDisallowed" title="Link to this definition"></a></dt>
+<dd><p>The robots policy forbids this URL and no override was given.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.RobotsPolicy">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">RobotsPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">get_robots_txt:</span> <span class="pre">~typing.Callable[[str],</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None],</span> <span class="pre">user_agent:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'scraped/acquire</span> <span class="pre">(+https://github.com/thorwhalen/scraped)',</span> <span class="pre">enabled:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True,</span> <span class="pre">override_reason:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">_cache:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/policy.html#RobotsPolicy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.RobotsPolicy" title="Link to this definition"></a></dt>
+<dd><p>Robots compliance, defaulting to on.</p>
+<p><cite>get_robots_txt</cite> is injected so this module never performs I/O itself — which
+keeps it testable and avoids a circular dependency on the fetchers.</p>
+<p>Set <cite>override_reason</cite> to proceed despite a disallow. The reason is recorded in
+the capture; there is deliberately no way to override <em>silently</em>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.RobotsPolicy.allowed">
+<span class="sig-name descname"><span class="pre">allowed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/policy.html#RobotsPolicy.allowed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.RobotsPolicy.allowed" title="Link to this definition"></a></dt>
+<dd><p>Whether the policy permits this URL. <cite>None</cite> when unknown.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.RobotsPolicy.check">
+<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.PolicyOutcome" title="scraped.acquire.capture.PolicyOutcome"><span class="pre">PolicyOutcome</span></a></span></span><a class="reference internal" href="../../_modules/scraped/acquire/policy.html#RobotsPolicy.check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.RobotsPolicy.check" title="Link to this definition"></a></dt>
+<dd><p>Evaluate the policy, without raising.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.RobotsPolicy.crawl_delay">
+<span class="sig-name descname"><span class="pre">crawl_delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/policy.html#RobotsPolicy.crawl_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.RobotsPolicy.crawl_delay" title="Link to this definition"></a></dt>
+<dd><p>Any <cite>Crawl-delay</cite> the site asks for.</p>
+<p>RFC 9309 deliberately excluded <cite>Crawl-delay</cite> from the standard, but it is
+a widely honored convention and honoring it is free.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.RobotsPolicy.enforce">
+<span class="sig-name descname"><span class="pre">enforce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.PolicyOutcome" title="scraped.acquire.capture.PolicyOutcome"><span class="pre">PolicyOutcome</span></a></span></span><a class="reference internal" href="../../_modules/scraped/acquire/policy.html#RobotsPolicy.enforce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.RobotsPolicy.enforce" title="Link to this definition"></a></dt>
+<dd><p>Evaluate the policy and raise if it forbids the URL.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span> <span class="o">=</span> <span class="n">RobotsPolicy</span><span class="p">(</span><span class="n">get_robots_txt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">h</span><span class="p">:</span> <span class="s2">&quot;User-agent: *</span><span class="se">\n</span><span class="s2">Disallow: /&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span><span class="o">.</span><span class="n">enforce</span><span class="p">(</span><span class="s2">&quot;https://example.com/a&quot;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="w">    </span><span class="o">...</span>
+<span class="gr">scraped.acquire.policy.RobotsDisallowed</span>: <span class="n">robots.txt disallows https://example.com/a</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.SiteProfile">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">SiteProfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robots_allowed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawl_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sitemaps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serves_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_blobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="acquire/blobs.html#scraped.acquire.blobs.StateBlob" title="scraped.acquire.blobs.StateBlob"><span class="pre">StateBlob</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">challenge_vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">challenge_interactive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">challenge_serving</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/probe.html#SiteProfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.SiteProfile" title="Link to this definition"></a></dt>
+<dd><p>What one site will hand over, and how hard it intends to make it.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="scraped.acquire.SiteProfile.best_payload_rung">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">best_payload_rung</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#scraped.acquire.SiteProfile.best_payload_rung" title="Link to this definition"></a></dt>
+<dd><p>The most structured payload available, named.</p>
+<p>This is the recommendation: <cite>api</cite> beats <cite>state_blob</cite> beats <cite>dom</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.SiteProfile.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/probe.html#SiteProfile.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.SiteProfile.summary" title="Link to this definition"></a></dt>
+<dd><p>A few lines a human or an agent can act on directly.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.StateBlob">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">StateBlob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/acquire/blobs.html#StateBlob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.StateBlob" title="Link to this definition"></a></dt>
+<dd><p>One embedded structured-data payload found in an HTML document.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="scraped.acquire.StateBlob.parsed">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">parsed</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#scraped.acquire.StateBlob.parsed" title="Link to this definition"></a></dt>
+<dd><p>Whether the payload was decodable as JSON.</p>
+<p><cite>False</cite> with a non-empty <cite>raw</cite> means the payload needs a format-specific
+parser — React Flight chunks and Nuxt 2 function expressions are the
+common cases.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.UrllibTransport">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">UrllibTransport</span></span><a class="reference internal" href="../../_modules/scraped/acquire/fetchers/http.html#UrllibTransport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.UrllibTransport" title="Link to this definition"></a></dt>
+<dd><p>Stdlib transport. Zero dependencies, maximally detectable.</p>
+<p>Useful for robots.txt, sitemaps, and any origin that does not care — but it
+advertises an OpenSSL TLS fingerprint, so treat a <cite>403</cite> here as uninformative
+until retried on the impersonating rung.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.body_digest">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">body_digest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#body_digest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.body_digest" title="Link to this definition"></a></dt>
+<dd><p>Content address of a payload.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">body_digest</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">)[:</span><span class="mi">8</span><span class="p">]</span>
+<span class="go">&#39;e3b0c442&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.browser_check_requirements">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">browser_check_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#scraped.acquire.browser_check_requirements" title="Link to this definition"></a></dt>
+<dd><p>Report what the browser rung needs and what is actually present.</p>
+<p>Guides rather than fails: this rung is an optional extra, so the useful
+behaviour is to say precisely what to install.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="o">=</span> <span class="n">check_requirements</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">set</span><span class="p">(</span><span class="n">report</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;driver&quot;</span><span class="p">,</span> <span class="s2">&quot;browser_binary&quot;</span><span class="p">,</span> <span class="s2">&quot;ready&quot;</span><span class="p">,</span> <span class="s2">&quot;instructions&quot;</span><span class="p">}</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.cached">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">cached</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">fetcher:</span> <span class="pre">~typing.Callable[[~scraped.acquire.capture.Request],</span> <span class="pre">~scraped.acquire.capture.Capture],</span> <span class="pre">store:</span> <span class="pre">~scraped.acquire.cache.CaptureStore,</span> <span class="pre">*,</span> <span class="pre">revalidate:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">should_cache:</span> <span class="pre">~typing.Callable[[~scraped.acquire.capture.Capture],</span> <span class="pre">bool]</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">&lt;lambda&gt;&gt;</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.Request" title="scraped.acquire.capture.Request"><span class="pre">Request</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.Capture" title="scraped.acquire.capture.Capture"><span class="pre">Capture</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/cache.html#cached"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.cached" title="Link to this definition"></a></dt>
+<dd><p>Wrap a fetcher so repeated requests are served from <cite>store</cite>.</p>
+<p>Two modes:</p>
+<ul class="simple">
+<li><p><strong>fetch-once</strong> (default) — a hit is returned as-is; a re-run costs nothing.</p></li>
+<li><p><strong>revalidate</strong> — a hit’s validators are sent as <cite>If-None-Match</cite> /
+<cite>If-Modified-Since</cite>, and a <cite>304</cite> reuses the stored body. This is what makes
+incremental crawls cheap without going stale.</p></li>
+</ul>
+<p>Only successful captures are cached by default: caching a <cite>403</cite> would make an
+unblocked retry impossible without clearing the store.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.canonicalize_url">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">canonicalize_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_fragment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/url.html#canonicalize_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.canonicalize_url" title="Link to this definition"></a></dt>
+<dd><p>Reduce a URL to a stable identity for deduplication.</p>
+<p>Lowercases scheme and host, drops the default port, normalizes dot segments,
+strips a trailing slash on non-root paths, removes tracking parameters, sorts
+the query, and drops the fragment (which is client-side by definition).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">canonicalize_url</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">)</span>
+<span class="go">&#39;https://example.com/&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canonicalize_url</span><span class="p">(</span><span class="s2">&quot;https://example.com/a/&quot;</span><span class="p">)</span>
+<span class="go">&#39;https://example.com/a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canonicalize_url</span><span class="p">(</span><span class="s2">&quot;https://example.com/a/./b/../c&quot;</span><span class="p">)</span>
+<span class="go">&#39;https://example.com/a/c&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.capture_store">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">capture_store</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rootdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="acquire/cache.html#scraped.acquire.cache.CaptureStore" title="scraped.acquire.cache.CaptureStore"><span class="pre">CaptureStore</span></a></span></span><a class="reference internal" href="../../_modules/scraped/acquire/cache.html#capture_store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.capture_store" title="Link to this definition"></a></dt>
+<dd><p>A directory-backed store, creating the directories it needs.</p>
+<p>Uses <cite>dol</cite> so the same object works over a local directory, S3, or anything
+else with a <cite>Mapping</cite> face.</p>
+<p><cite>~</cite> is expanded and both subdirectories are created up front: <cite>dol.Files</cite>
+does neither, so without this the first write fails with a bare <cite>KeyError</cite>
+from the underlying <cite>open()</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">capture_store</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="s2">&quot;job&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">.capture</span><span class="w"> </span><span class="kn">import</span> <span class="n">Capture</span><span class="p">,</span> <span class="n">Request</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">digest</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/a&quot;</span><span class="p">),</span> <span class="sa">b</span><span class="s2">&quot;hi&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">[</span><span class="n">digest</span><span class="p">]</span><span class="o">.</span><span class="n">body</span>
+<span class="go">b&#39;hi&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.classify">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">classify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/signals.html#classify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.classify" title="Link to this definition"></a></dt>
+<dd><p>One-word verdict driving the escalation decision.</p>
+<p>Returns one of: <cite>ok</cite>, <cite>challenge</cite>, <cite>rate_limited</cite>, <cite>forbidden</cite>, <cite>not_found</cite>,
+<cite>client_error</cite>, <cite>server_error</cite>, <cite>auth_required</cite>, <cite>empty</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">429</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="go">&#39;rate_limited&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="go">&#39;empty&#39;</span>
+</pre></div>
+</div>
+<p>A bare 403 is the most common block there is, and must never read as success:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;nope&quot;</span><span class="p">)</span>
+<span class="go">&#39;forbidden&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">451</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;nope&quot;</span><span class="p">)</span>
+<span class="go">&#39;client_error&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.default_fetcher">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">default_fetcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">robots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="acquire/policy.html#scraped.acquire.policy.RobotsPolicy" title="scraped.acquire.policy.RobotsPolicy"><span class="pre">RobotsPolicy</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="acquire/fetchers/http.html#scraped.acquire.fetchers.http.HttpFetcher" title="scraped.acquire.fetchers.http.HttpFetcher"><span class="pre">HttpFetcher</span></a></span></span><a class="reference internal" href="../../_modules/scraped/acquire/fetchers/http.html#default_fetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.default_fetcher" title="Link to this definition"></a></dt>
+<dd><p>The recommended starting fetcher: impersonating, polite, robots-respecting.</p>
+<p>Robots compliance defaults to <strong>on</strong>, per the design: an override must be a
+deliberate, attributable act. Pass a <cite>RobotsPolicy(override_reason=…)</cite> as
+<cite>robots=</cite> to supply your own — the reason is recorded in every capture — or
+<cite>robots=False</cite> to disable the check entirely.</p>
+<p>Falls back to the stdlib transport when <cite>curl_cffi</cite> is unavailable, so the
+package stays usable and is merely <em>less capable</em> without it.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.detect_challenge">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">detect_challenge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ChallengeVerdict</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/signals.html#detect_challenge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.detect_challenge" title="Link to this definition"></a></dt>
+<dd><p>Identify a bot-protection challenge from cheap signals.</p>
+<p>Checks headers and cookies before the body, since those are harder to fake
+and cheaper to inspect. The body is scanned in full: an earlier version
+truncated it, which hid widgets and challenge markers on large pages — and a
+missed challenge is the expensive direction of this error.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;&lt;html&gt;fine&lt;/html&gt;&quot;</span><span class="p">))</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;cf-mitigated&quot;</span><span class="p">:</span> <span class="s2">&quot;challenge&quot;</span><span class="p">},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">serving</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>A protected site emits vendor headers on successful responses too. That
+identifies the guard; it does not mean you were stopped:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">verdict</span> <span class="o">=</span> <span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;x-datadome&quot;</span><span class="p">:</span> <span class="s2">&quot;protected&quot;</span><span class="p">},</span> <span class="s2">&quot;&lt;html&gt;data&lt;/html&gt;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">verdict</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span> <span class="n">verdict</span><span class="o">.</span><span class="n">serving</span>
+<span class="go">(&#39;datadome&#39;, False)</span>
+</pre></div>
+</div>
+<p>An interactive widget is terminal, not an escalation cue:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s1">&#39;&lt;div class=&quot;cf-turnstile&quot; data-sitekey=&quot;x&quot;&gt;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">interactive</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.fetch">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetcher</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">request_kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.Capture" title="scraped.acquire.capture.Capture"><span class="pre">Capture</span></a></span></span><a class="reference internal" href="../../_modules/scraped/acquire.html#fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.fetch" title="Link to this definition"></a></dt>
+<dd><p>Fetch one URL into a <cite>Capture</cite>, using sensible defaults.</p>
+<p>The simple thing made simple: an impersonating transport, per-host politeness,
+jittered retries, challenge detection, and an automatic state-blob scan — none
+of which you have to name to get.</p>
+<p>For anything beyond one URL, build a fetcher once and reuse it, so politeness
+and caching are shared across the job.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.probe">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">probe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetcher</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.Request" title="scraped.acquire.capture.Request"><span class="pre">Request</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.Capture" title="scraped.acquire.capture.Capture"><span class="pre">Capture</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="acquire/probe.html#scraped.acquire.probe.SiteProfile" title="scraped.acquire.probe.SiteProfile"><span class="pre">SiteProfile</span></a></span></span><a class="reference internal" href="../../_modules/scraped/acquire/probe.html#probe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.probe" title="Link to this definition"></a></dt>
+<dd><p>Reconnoitre a URL: what is available, and what is in the way.</p>
+<p>Performs at most three requests (robots.txt, a JSON-negotiation probe, and the
+page itself) and never raises on a challenge — the whole point is to <em>report</em>
+the obstacle rather than trip over it.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.request_digest">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">request_digest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.Request" title="scraped.acquire.capture.Request"><span class="pre">Request</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">vary_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('accept',</span> <span class="pre">'accept-language',</span> <span class="pre">'authorization',</span> <span class="pre">'cookie')</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#request_digest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.request_digest" title="Link to this definition"></a></dt>
+<dd><p>Cache key for a request: what actually distinguishes one fetch from another.</p>
+<p>Canonicalized URL + method + the subset of headers that plausibly vary the
+response + a hash of any body. Deliberately ignores headers that only add
+noise (User-Agent, tracing ids), because fragmenting the cache on those makes
+re-runs expensive for no correctness gain.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/p?b=2&amp;a=1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/p?a=1&amp;b=2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request_digest</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">==</span> <span class="n">request_digest</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>  <span class="c1"># query order is not meaningful</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/p?a=1&amp;b=2&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="s2">&quot;whatever&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request_digest</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="n">request_digest</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>  <span class="c1"># noise headers ignored</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.robots_sitemaps">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">robots_sitemaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robots_txt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/probe.html#robots_sitemaps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.robots_sitemaps" title="Link to this definition"></a></dt>
+<dd><p>Sitemap URLs declared in a robots.txt.</p>
+<p>The <cite>Sitemap:</cite> directive is independent of any <cite>User-agent</cite> block, which is
+why it is parsed separately from the access rules.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">robots_sitemaps</span><span class="p">(</span><span class="s2">&quot;User-agent: *</span><span class="se">\n</span><span class="s2">Sitemap: https://x.com/sitemap.xml&quot;</span><span class="p">)</span>
+<span class="go">[&#39;https://x.com/sitemap.xml&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.scan_state_blobs">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">scan_state_blobs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_generic_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2048</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_generic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="acquire/blobs.html#scraped.acquire.blobs.StateBlob" title="scraped.acquire.blobs.StateBlob"><span class="pre">StateBlob</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/blobs.html#scan_state_blobs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.scan_state_blobs" title="Link to this definition"></a></dt>
+<dd><p>Find every embedded structured-data payload, largest first.</p>
+<p>Recognizes framework-specific markers (Next.js, Nuxt, Apollo, Redux, Remix,
+Angular TransferState), standardized JSON-LD, and — when <cite>include_generic</cite> —
+any sufficiently large bare JSON script.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">&lt;script type=&quot;application/ld+json&quot;&gt;{&quot;@type&quot;:&quot;Product&quot;}&lt;/script&gt;</span>
+<span class="gp">... </span><span class="s1">&lt;script&gt;window.__APOLLO_STATE__ = {&quot;Product:1&quot;:{&quot;name&quot;:&quot;x&quot;}};&lt;/script&gt;</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">kind</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">))</span>
+<span class="go">[&#39;apollo&#39;, &#39;ld_json&#39;]</span>
+</pre></div>
+</div>
+<p>JSON-LD is worth trying first when present: it is standardized, so it is the
+most stable payload on the web.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">blob</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">)</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;ld_json&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blob</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;@type&#39;</span><span class="p">]</span>
+<span class="go">&#39;Product&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.state_blob_markers">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">state_blob_markers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/blobs.html#state_blob_markers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.state_blob_markers" title="Link to this definition"></a></dt>
+<dd><p>The marker names present, cheapest possible summary for capture metadata.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">state_blob_markers</span><span class="p">(</span><span class="s1">&#39;&lt;script id=&quot;__NEXT_DATA__&quot; type=&quot;application/json&quot;&gt;</span><span class="si">{}</span><span class="s1">&lt;/script&gt;&#39;</span><span class="p">)</span>
+<span class="go">[&#39;__NEXT_DATA__&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.storage_state_headers">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">storage_state_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">url_host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/fetchers/browser.html#storage_state_headers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.storage_state_headers" title="Link to this definition"></a></dt>
+<dd><p>Turn a saved <cite>storage_state</cite> into a <cite>Cookie</cite> header for cheap fetchers.</p>
+<p>This is rung 4, and the reason the browser is worth paying for once: capture
+the session in a browser, then do the actual work with an impersonating HTTP
+client at a fraction of the cost.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">tempfile</span><span class="o">,</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cookies&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="s2">&quot;x.com&quot;</span><span class="p">}]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span> <span class="o">/</span> <span class="s2">&quot;s.json&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">storage_state_headers</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="go">{&#39;Cookie&#39;: &#39;a=1&#39;}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../scraped.html" class="btn btn-neutral float-left" title="scraped" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="acquire/blobs.html" class="btn btn-neutral float-right" title="scraped.acquire.blobs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,549 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.acquire.fetchers.http &mdash; scraped 0.0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/acquire.html">scraped.acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/acquire/blobs.html">scraped.acquire.blobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/acquire/cache.html">scraped.acquire.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/acquire/capture.html">scraped.acquire.capture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/acquire/fetchers.html">scraped.acquire.fetchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/acquire/fetchers/browser.html">scraped.acquire.fetchers.browser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/acquire/fetchers/http.html">scraped.acquire.fetchers.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/acquire/policy.html">scraped.acquire.policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/acquire/probe.html">scraped.acquire.probe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/acquire/signals.html">scraped.acquire.signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/acquire/url.html">scraped.acquire.url</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/tools.html">scraped.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/scraped/util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../acquire.html">scraped.acquire</a></li>
+      <li class="breadcrumb-item active">scraped.acquire.fetchers.http</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scraped.acquire.fetchers.http</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;HTTP transport rungs 1–2: plain and browser-impersonating clients.</span>
+
+<span class="sd">Start at the impersonating client, not a plain one. The marginal cost is a single</span>
+<span class="sd">keyword argument and it removes an entire failure class — TLS (JA3/JA4), HTTP/2</span>
+<span class="sd">and header-order fingerprinting — which otherwise presents as an unexplained</span>
+<span class="sd">`403` on a URL that works fine in a browser.</span>
+
+<span class="sd">Transports sit behind a facade because this corner of the ecosystem churns hard:</span>
+<span class="sd">clients get abandoned, relicensed, and renamed on a yearly cadence. Swapping the</span>
+<span class="sd">transport must never touch calling code.</span>
+
+<span class="sd">&gt;&gt;&gt; fetcher = HttpFetcher(transport=_EchoTransport(b&quot;&lt;html&gt;ok&lt;/html&gt;&quot;))</span>
+<span class="sd">&gt;&gt;&gt; capture = fetcher(Request(&quot;https://example.com&quot;))</span>
+<span class="sd">&gt;&gt;&gt; capture.ok, capture.response.body_len</span>
+<span class="sd">(True, 15)</span>
+<span class="sd">&gt;&gt;&gt; capture.fetcher.transport_rung</span>
+<span class="sd">1</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Protocol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..capture</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Capture</span><span class="p">,</span>
+    <span class="n">FetcherInfo</span><span class="p">,</span>
+    <span class="n">PolicyOutcome</span><span class="p">,</span>
+    <span class="n">ProbeMarks</span><span class="p">,</span>
+    <span class="n">Request</span><span class="p">,</span>
+    <span class="n">Response</span><span class="p">,</span>
+    <span class="n">body_digest</span><span class="p">,</span>
+    <span class="n">utcnow</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..blobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">state_blob_markers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..policy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DFLT_MAX_ATTEMPTS</span><span class="p">,</span>
+    <span class="n">DFLT_USER_AGENT</span><span class="p">,</span>
+    <span class="n">Politeness</span><span class="p">,</span>
+    <span class="n">RobotsPolicy</span><span class="p">,</span>
+    <span class="n">retry_after_seconds</span><span class="p">,</span>
+    <span class="n">retry_delays</span><span class="p">,</span>
+    <span class="n">should_retry</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChallengeEncountered</span><span class="p">,</span> <span class="n">detect_challenge</span><span class="p">,</span> <span class="n">looks_truncated</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;TransportResult&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;robots_reader&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Transport&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;UrllibTransport&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CurlCffiTransport&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;HttpFetcher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;default_fetcher&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">DFLT_TIMEOUT</span> <span class="o">=</span> <span class="mf">30.0</span>
+<span class="n">DFLT_IMPERSONATE</span> <span class="o">=</span> <span class="s2">&quot;chrome&quot;</span>
+<span class="c1"># Honor Retry-After, but not blindly: &#39;Retry-After: 86400&#39; is a polite way of</span>
+<span class="c1"># saying go away, and sleeping on it hangs the job for a day.</span>
+<span class="n">DFLT_MAX_RETRY_AFTER</span> <span class="o">=</span> <span class="mf">120.0</span>
+
+<span class="c1"># Chrome&#39;s own order matters as much as the values: header *ordering* is part of</span>
+<span class="c1"># what is fingerprinted. Impersonating transports set their own; this is the</span>
+<span class="c1"># fallback for the plain one.</span>
+<span class="n">DFLT_HEADERS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="s2">&quot;text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Accept-Language&quot;</span><span class="p">:</span> <span class="s2">&quot;en-US,en;q=0.9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="n">DFLT_USER_AGENT</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="TransportResult">
+<a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.TransportResult">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TransportResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The raw outcome of one network call, before any policy or provenance.&quot;&quot;&quot;</span>
+
+    <span class="n">status</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">bytes</span>
+    <span class="n">final_url</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">redirect_chain</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="Transport">
+<a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.Transport">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Transport</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A client that can perform one HTTP request.</span>
+
+<span class="sd">    The narrow waist of the package: everything above it is policy, provenance,</span>
+<span class="sd">    and diagnosis; everything below it is somebody else&#39;s library.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">rung</span><span class="p">:</span> <span class="nb">int</span>
+
+<div class="viewcode-block" id="Transport.send">
+<a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.Transport.send">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TransportResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform the request.&quot;&quot;&quot;</span>
+        <span class="o">...</span></div>
+</div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_EchoTransport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A transport that returns a fixed body. For doctests and offline tests.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;echo&quot;</span>
+    <span class="n">rung</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_body</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="n">body</span><span class="p">,</span> <span class="n">status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span> <span class="o">=</span> <span class="n">headers</span> <span class="ow">or</span> <span class="p">{</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;text/html; charset=utf-8&quot;</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TransportResult</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">TransportResult</span><span class="p">(</span>
+            <span class="n">status</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">,</span>
+            <span class="n">body</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_body</span><span class="p">,</span>
+            <span class="n">final_url</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="UrllibTransport">
+<a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.UrllibTransport">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UrllibTransport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stdlib transport. Zero dependencies, maximally detectable.</span>
+
+<span class="sd">    Useful for robots.txt, sitemaps, and any origin that does not care — but it</span>
+<span class="sd">    advertises an OpenSSL TLS fingerprint, so treat a `403` here as uninformative</span>
+<span class="sd">    until retried on the impersonating rung.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;urllib&quot;</span>
+    <span class="n">rung</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_TIMEOUT</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TransportResult</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">urllib.error</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
+
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">DFLT_HEADERS</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">)}</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">method</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">TransportResult</span><span class="p">(</span>
+                    <span class="n">status</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                    <span class="n">headers</span><span class="o">=</span><span class="n">_fold_headers</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">),</span>
+                    <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">,</span>
+                    <span class="n">final_url</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+                    <span class="n">redirect_chain</span><span class="o">=</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">,)</span> <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">url</span> <span class="o">!=</span> <span class="n">request</span><span class="o">.</span><span class="n">url</span> <span class="k">else</span> <span class="p">()</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>  <span class="c1"># an HTTP error is still a result</span>
+            <span class="k">return</span> <span class="n">TransportResult</span><span class="p">(</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">error</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">_fold_headers</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span> <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">headers</span> <span class="k">else</span> <span class="p">{},</span>
+                <span class="n">body</span><span class="o">=</span><span class="n">error</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span>
+                <span class="n">final_url</span><span class="o">=</span><span class="n">error</span><span class="o">.</span><span class="n">url</span> <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CurlCffiTransport">
+<a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.CurlCffiTransport">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CurlCffiTransport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Browser-impersonating transport — the default, and where you should start.</span>
+
+<span class="sd">    Reproduces a real browser&#39;s TLS ClientHello and HTTP/2 settings, which is what</span>
+<span class="sd">    makes the difference on origins that fingerprint the client rather than</span>
+<span class="sd">    reading the User-Agent.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;curl_cffi&quot;</span>
+    <span class="n">rung</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">impersonate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_IMPERSONATE</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">impersonate</span> <span class="o">=</span> <span class="n">impersonate</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_TIMEOUT</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TransportResult</span><span class="p">:</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">()</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="n">impersonate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">impersonate</span><span class="p">,</span>
+            <span class="n">allow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">history</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s2">&quot;history&quot;</span><span class="p">,</span> <span class="p">()))</span>
+        <span class="k">return</span> <span class="n">TransportResult</span><span class="p">(</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">),</span>
+            <span class="n">body</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
+            <span class="n">final_url</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">),</span>
+            <span class="n">redirect_chain</span><span class="o">=</span><span class="n">history</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_session</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">curl_cffi</span><span class="w"> </span><span class="kn">import</span> <span class="n">requests</span> <span class="k">as</span> <span class="n">curl_requests</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                <span class="s2">&quot;The impersonating transport needs curl_cffi (a core dependency, so &quot;</span>
+                <span class="s2">&quot;this means a broken install). Reinstall with:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    pip install curl_cffi</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;or fall back to UrllibTransport(), accepting that origins which &quot;</span>
+                <span class="s2">&quot;fingerprint TLS will refuse it.&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+        <span class="k">return</span> <span class="n">curl_requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="HttpFetcher">
+<a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.HttpFetcher">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HttpFetcher</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A `Fetcher` that turns requests into provenance-bearing captures.</span>
+
+<span class="sd">    Owns the concerns that must not be reimplemented per job: robots policy,</span>
+<span class="sd">    per-host politeness, jittered retries, challenge detection, and the automatic</span>
+<span class="sd">    state-blob scan that makes the result useful to the extraction layer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">transport</span><span class="p">:</span> <span class="n">Transport</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">CurlCffiTransport</span><span class="p">)</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_TIMEOUT</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">robots</span><span class="p">:</span> <span class="n">RobotsPolicy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">politeness</span><span class="p">:</span> <span class="n">Politeness</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">max_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DFLT_MAX_ATTEMPTS</span>
+    <span class="n">max_retry_after</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_MAX_RETRY_AFTER</span>
+    <span class="n">raise_on_challenge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;max_attempts must be &gt;= 1, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Capture</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one request, applying policy and recording provenance.&quot;&quot;&quot;</span>
+        <span class="n">policy_outcome</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">robots</span><span class="o">.</span><span class="n">enforce</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">robots</span> <span class="k">else</span> <span class="n">PolicyOutcome</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">politeness</span><span class="p">:</span>
+            <span class="n">crawl_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">robots</span><span class="o">.</span><span class="n">crawl_delay</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">robots</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">politeness</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">crawl_delay</span><span class="o">=</span><span class="n">crawl_delay</span><span class="p">)</span>
+
+        <span class="n">merged</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">)},</span>
+            <span class="n">body</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">result</span><span class="p">,</span> <span class="n">elapsed_ms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_with_retries</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_capture</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">elapsed_ms</span><span class="p">,</span> <span class="n">policy_outcome</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_send_with_retries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">TransportResult</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="n">delays</span> <span class="o">=</span> <span class="n">retry_delays</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span><span class="p">)</span>
+        <span class="n">started</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">last</span><span class="p">:</span> <span class="n">TransportResult</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">last</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">attempt</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delays</span><span class="p">[</span><span class="n">attempt</span><span class="p">])</span>
+                <span class="k">continue</span>
+
+            <span class="n">verdict</span> <span class="o">=</span> <span class="n">detect_challenge</span><span class="p">(</span><span class="n">last</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">last</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="n">_decode</span><span class="p">(</span><span class="n">last</span><span class="o">.</span><span class="n">body</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">should_retry</span><span class="p">(</span>
+                <span class="n">last</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                <span class="n">challenge</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">verdict</span><span class="p">),</span>
+                <span class="n">vendor_guarded</span><span class="o">=</span><span class="n">verdict</span><span class="o">.</span><span class="n">vendor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="n">attempt</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">explicit</span> <span class="o">=</span> <span class="n">retry_after_seconds</span><span class="p">(</span><span class="n">last</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">explicit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">explicit</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retry_after</span><span class="p">:</span>
+                <span class="k">break</span>  <span class="c1"># the site is asking for longer than this job should wait</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">explicit</span> <span class="k">if</span> <span class="n">explicit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">delays</span><span class="p">[</span><span class="n">attempt</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">last</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># unreachable given __post_init__, but never assert:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>  <span class="c1"># `python -O` strips asserts and we&#39;d pass None on</span>
+                <span class="sa">f</span><span class="s2">&quot;no attempt was made for </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">last</span><span class="p">,</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">started</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_capture</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+        <span class="n">result</span><span class="p">:</span> <span class="n">TransportResult</span><span class="p">,</span>
+        <span class="n">elapsed_ms</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">policy_outcome</span><span class="p">:</span> <span class="n">PolicyOutcome</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Capture</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">_decode</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+        <span class="n">verdict</span> <span class="o">=</span> <span class="n">detect_challenge</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verdict</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_on_challenge</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ChallengeEncountered</span><span class="p">(</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">final_url</span><span class="p">,</span>
+                <span class="n">vendor</span><span class="o">=</span><span class="n">verdict</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span>
+                <span class="n">interactive</span><span class="o">=</span><span class="n">verdict</span><span class="o">.</span><span class="n">interactive</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">marks</span> <span class="o">=</span> <span class="n">ProbeMarks</span><span class="p">(</span>
+            <span class="n">state_blob_markers</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">state_blob_markers</span><span class="p">(</span><span class="n">text</span><span class="p">))</span> <span class="k">if</span> <span class="n">text</span> <span class="k">else</span> <span class="p">(),</span>
+            <span class="n">ld_json_count</span><span class="o">=</span><span class="n">text</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;application/ld+json&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">text</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">truncated</span><span class="o">=</span><span class="n">looks_truncated</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">headers</span><span class="p">),</span>
+            <span class="n">challenge_vendor</span><span class="o">=</span><span class="n">verdict</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span>
+            <span class="n">challenge_serving</span><span class="o">=</span><span class="n">verdict</span><span class="o">.</span><span class="n">serving</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">Response</span><span class="p">(</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+            <span class="n">final_url</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">final_url</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">headers</span><span class="p">),</span>
+            <span class="n">redirect_chain</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">redirect_chain</span><span class="p">),</span>
+            <span class="n">body_sha256</span><span class="o">=</span><span class="n">body_digest</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">body</span><span class="p">),</span>
+            <span class="n">body_len</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">body</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">Capture</span><span class="p">(</span>
+            <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
+            <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span>
+            <span class="n">fetched_at</span><span class="o">=</span><span class="n">utcnow</span><span class="p">(),</span>
+            <span class="n">elapsed_ms</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">elapsed_ms</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">fetcher</span><span class="o">=</span><span class="n">FetcherInfo</span><span class="p">(</span>
+                <span class="n">client_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">impersonate_profile</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="p">,</span> <span class="s2">&quot;impersonate&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="n">transport_rung</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">rung</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">policy</span><span class="o">=</span><span class="n">policy_outcome</span><span class="p">,</span>
+            <span class="n">probe</span><span class="o">=</span><span class="n">marks</span><span class="p">,</span>
+            <span class="n">body</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">body</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fold_headers</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Flatten an email.Message-style header set without losing duplicates.</span>
+
+<span class="sd">    `dict(message.items())` keeps only the last value for a repeated name, which</span>
+<span class="sd">    for `Set-Cookie` means dropping every cookie but one — and four of the nine</span>
+<span class="sd">    bot-vendor markers are cookie-based, so a real block can go undetected.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">folded</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">message</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">folded</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">folded</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_decode</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decode a body for text signals.</span>
+
+<span class="sd">    Deliberately not truncated. `__NEXT_DATA__` is emitted near the *end* of a</span>
+<span class="sd">    document, and the script regex needs the closing tag, so a head-limited scan</span>
+<span class="sd">    silently reports no blobs on exactly the large pages where blobs matter most.</span>
+<span class="sd">    Measured cost of a full scan is well under a second on a 20 MB document.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">body</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="robots_reader">
+<a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.robots_reader">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">robots_reader</span><span class="p">(</span><span class="n">transport</span><span class="p">:</span> <span class="n">Transport</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Callable[[str], str | None]&quot;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A `robots.txt` reader that bypasses policy, so checking cannot recurse.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="n">host</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">transport</span><span class="o">.</span><span class="n">send</span><span class="p">(</span>
+                <span class="n">Request</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">host</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">/robots.txt&quot;</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="n">DFLT_TIMEOUT</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">200</span> <span class="o">&lt;=</span> <span class="n">result</span><span class="o">.</span><span class="n">status</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">read</span></div>
+
+
+
+<div class="viewcode-block" id="default_fetcher">
+<a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.default_fetcher">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">default_fetcher</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">robots</span><span class="p">:</span> <span class="s2">&quot;bool | RobotsPolicy&quot;</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpFetcher</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The recommended starting fetcher: impersonating, polite, robots-respecting.</span>
+
+<span class="sd">    Robots compliance defaults to **on**, per the design: an override must be a</span>
+<span class="sd">    deliberate, attributable act. Pass a `RobotsPolicy(override_reason=...)` as</span>
+<span class="sd">    `robots=` to supply your own — the reason is recorded in every capture — or</span>
+<span class="sd">    `robots=False` to disable the check entirely.</span>
+
+<span class="sd">    Falls back to the stdlib transport when `curl_cffi` is unavailable, so the</span>
+<span class="sd">    package stays usable and is merely *less capable* without it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">curl_cffi</span><span class="w"> </span><span class="kn">import</span> <span class="n">requests</span> <span class="k">as</span> <span class="n">_</span>  <span class="c1"># noqa: F401</span>
+
+        <span class="n">transport</span><span class="p">:</span> <span class="n">Transport</span> <span class="o">=</span> <span class="n">CurlCffiTransport</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">transport</span> <span class="o">=</span> <span class="n">UrllibTransport</span><span class="p">()</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;transport&quot;</span><span class="p">,</span> <span class="n">transport</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;politeness&quot;</span><span class="p">,</span> <span class="n">Politeness</span><span class="p">())</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">robots</span><span class="p">,</span> <span class="n">RobotsPolicy</span><span class="p">):</span>
+        <span class="c1"># A caller-supplied policy carries the attributable override reason; an</span>
+        <span class="c1"># earlier version treated `robots` as a bool and silently discarded it.</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;robots&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">robots</span>
+    <span class="k">elif</span> <span class="n">robots</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+            <span class="s2">&quot;robots&quot;</span><span class="p">,</span> <span class="n">RobotsPolicy</span><span class="p">(</span><span class="n">get_robots_txt</span><span class="o">=</span><span class="n">robots_reader</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;transport&quot;</span><span class="p">]))</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">HttpFetcher</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

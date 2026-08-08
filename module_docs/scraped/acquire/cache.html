@@ -1,0 +1,213 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.acquire.cache &mdash; scraped 0.0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="scraped.acquire.capture" href="capture.html" />
+    <link rel="prev" title="scraped.acquire.blobs" href="blobs.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire.html">scraped.acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blobs.html">scraped.acquire.blobs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">scraped.acquire.cache</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.cache.CaptureStore"><code class="docutils literal notranslate"><span class="pre">CaptureStore</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.cache.CaptureStore.add"><code class="docutils literal notranslate"><span class="pre">CaptureStore.add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.acquire.cache.CaptureStore.in_memory"><code class="docutils literal notranslate"><span class="pre">CaptureStore.in_memory()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.cache.cached"><code class="docutils literal notranslate"><span class="pre">cached()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.cache.capture_store"><code class="docutils literal notranslate"><span class="pre">capture_store()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="capture.html">scraped.acquire.capture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fetchers.html">scraped.acquire.fetchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fetchers/browser.html">scraped.acquire.fetchers.browser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fetchers/http.html">scraped.acquire.fetchers.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="policy.html">scraped.acquire.policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="probe.html">scraped.acquire.probe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="signals.html">scraped.acquire.signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="url.html">scraped.acquire.url</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">scraped.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">scraped.acquire.cache</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/module_docs/scraped/acquire/cache.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-scraped.acquire.cache">
+<span id="scraped-acquire-cache"></span><h1>scraped.acquire.cache<a class="headerlink" href="#module-scraped.acquire.cache" title="Link to this heading"></a></h1>
+<p>Caching: make a re-run free, and make change detection fall out for nothing.</p>
+<p>This is what makes iterating on the <em>extraction</em> half tolerable — you should be
+able to re-run an extraction a hundred times without touching the network once.</p>
+<p>The cache is owned here rather than imported because the popular HTTP caches bind
+to a specific client’s transport stack (<cite>requests.Session</cite>, httpx transports) and
+none of them work with an impersonating libcurl-based client. Since cache entries
+must also carry provenance and survive a client swap, the right shape is a plain
+<cite>Mapping</cite> keyed by request digest.</p>
+<p>Bodies are stored separately, keyed by their own SHA-256. That single choice buys
+deduplication (the same payload at five URLs is stored once) and change detection
+(a digest that did not change means the page did not change).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">CaptureStore</span><span class="o">.</span><span class="n">in_memory</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fetcher</span> <span class="o">=</span> <span class="n">cached</span><span class="p">(</span><span class="k">lambda</span> <span class="n">request</span><span class="p">:</span> <span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;hi&quot;</span><span class="p">),</span> <span class="n">store</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first</span> <span class="o">=</span> <span class="n">fetcher</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">second</span> <span class="o">=</span> <span class="n">fetcher</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">))</span>   <span class="c1"># served from the store</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">body_sha256</span> <span class="o">==</span> <span class="n">second</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">body_sha256</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="scraped.acquire.cache.CaptureStore">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.cache.</span></span><span class="sig-name descname"><span class="pre">CaptureStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MutableMapping</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bodies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MutableMapping</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/scraped/acquire/cache.html#CaptureStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.cache.CaptureStore" title="Link to this definition"></a></dt>
+<dd><p>A <cite>Mapping[request_digest, Capture]</cite> over two content stores.</p>
+<p><cite>metadata</cite> and <cite>bodies</cite> are any <cite>MutableMapping</cite> — a dict, a <cite>dol</cite> directory
+store, an S3 store. That is the whole migration story: local-dir to cloud is a
+constructor change and touches no acquisition logic.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.cache.CaptureStore.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="capture.html#scraped.acquire.capture.Capture" title="scraped.acquire.capture.Capture"><span class="pre">Capture</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/cache.html#CaptureStore.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.cache.CaptureStore.add" title="Link to this definition"></a></dt>
+<dd><p>Store a capture under its own request digest; return the digest.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.acquire.cache.CaptureStore.in_memory">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">in_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#scraped.acquire.cache.CaptureStore" title="scraped.acquire.cache.CaptureStore"><span class="pre">CaptureStore</span></a></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/cache.html#CaptureStore.in_memory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.cache.CaptureStore.in_memory" title="Link to this definition"></a></dt>
+<dd><p>A store backed by dicts. For tests and one-shot jobs.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.cache.cached">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.cache.</span></span><span class="sig-name descname"><span class="pre">cached</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">fetcher:</span> <span class="pre">~typing.Callable[[~scraped.acquire.capture.Request],</span> <span class="pre">~scraped.acquire.capture.Capture],</span> <span class="pre">store:</span> <span class="pre">~scraped.acquire.cache.CaptureStore,</span> <span class="pre">*,</span> <span class="pre">revalidate:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">should_cache:</span> <span class="pre">~typing.Callable[[~scraped.acquire.capture.Capture],</span> <span class="pre">bool]</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">&lt;lambda&gt;&gt;</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="capture.html#scraped.acquire.capture.Request" title="scraped.acquire.capture.Request"><span class="pre">Request</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="capture.html#scraped.acquire.capture.Capture" title="scraped.acquire.capture.Capture"><span class="pre">Capture</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/cache.html#cached"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.cache.cached" title="Link to this definition"></a></dt>
+<dd><p>Wrap a fetcher so repeated requests are served from <cite>store</cite>.</p>
+<p>Two modes:</p>
+<ul class="simple">
+<li><p><strong>fetch-once</strong> (default) — a hit is returned as-is; a re-run costs nothing.</p></li>
+<li><p><strong>revalidate</strong> — a hit’s validators are sent as <cite>If-None-Match</cite> /
+<cite>If-Modified-Since</cite>, and a <cite>304</cite> reuses the stored body. This is what makes
+incremental crawls cheap without going stale.</p></li>
+</ul>
+<p>Only successful captures are cached by default: caching a <cite>403</cite> would make an
+unblocked retry impossible without clearing the store.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.cache.capture_store">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.cache.</span></span><span class="sig-name descname"><span class="pre">capture_store</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rootdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#scraped.acquire.cache.CaptureStore" title="scraped.acquire.cache.CaptureStore"><span class="pre">CaptureStore</span></a></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/cache.html#capture_store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.cache.capture_store" title="Link to this definition"></a></dt>
+<dd><p>A directory-backed store, creating the directories it needs.</p>
+<p>Uses <cite>dol</cite> so the same object works over a local directory, S3, or anything
+else with a <cite>Mapping</cite> face.</p>
+<p><cite>~</cite> is expanded and both subdirectories are created up front: <cite>dol.Files</cite>
+does neither, so without this the first write fails with a bare <cite>KeyError</cite>
+from the underlying <cite>open()</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">capture_store</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="s2">&quot;job&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">.capture</span><span class="w"> </span><span class="kn">import</span> <span class="n">Capture</span><span class="p">,</span> <span class="n">Request</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">digest</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/a&quot;</span><span class="p">),</span> <span class="sa">b</span><span class="s2">&quot;hi&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">[</span><span class="n">digest</span><span class="p">]</span><span class="o">.</span><span class="n">body</span>
+<span class="go">b&#39;hi&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="blobs.html" class="btn btn-neutral float-left" title="scraped.acquire.blobs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="capture.html" class="btn btn-neutral float-right" title="scraped.acquire.capture" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.acquire.blobs &mdash; scraped 0.0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire.html">scraped.acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/blobs.html">scraped.acquire.blobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/cache.html">scraped.acquire.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/capture.html">scraped.acquire.capture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/fetchers.html">scraped.acquire.fetchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/fetchers/browser.html">scraped.acquire.fetchers.browser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/fetchers/http.html">scraped.acquire.fetchers.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/policy.html">scraped.acquire.policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/probe.html">scraped.acquire.probe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/signals.html">scraped.acquire.signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/url.html">scraped.acquire.url</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/tools.html">scraped.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../acquire.html">scraped.acquire</a></li>
+      <li class="breadcrumb-item active">scraped.acquire.blobs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scraped.acquire.blobs</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Find the structured data a page already contains, without parsing its DOM.</span>
+
+<span class="sd">Server-rendered sites routinely ship their own object graph inside the HTML —</span>
+<span class="sd">`__NEXT_DATA__`, `__APOLLO_STATE__`, JSON-LD, and friends. Reading that blob is</span>
+<span class="sd">strictly better than scraping the DOM: it is the data rather than a *rendering*</span>
+<span class="sd">of the data, it is complete even when the DOM lazily renders only what is</span>
+<span class="sd">visible, and it survives CSS and markup redesigns.</span>
+
+<span class="sd">This module is the seam to the extraction layer. It does not extract anything; it</span>
+<span class="sd">reports *where the structured data is* and how big it is, and leaves the choosing</span>
+<span class="sd">to the caller.</span>
+
+<span class="sd">&gt;&gt;&gt; html = &#39;&lt;html&gt;&lt;script id=&quot;__NEXT_DATA__&quot; type=&quot;application/json&quot;&gt;{&quot;a&quot;:1}&lt;/script&gt;&lt;/html&gt;&#39;</span>
+<span class="sd">&gt;&gt;&gt; blobs = scan_state_blobs(html)</span>
+<span class="sd">&gt;&gt;&gt; [(b.kind, b.data) for b in blobs]</span>
+<span class="sd">[(&#39;next_data&#39;, {&#39;a&#39;: 1})]</span>
+
+<span class="sd">Lazily-rendered listings are the motivating case: a DOM scrape of a paginated</span>
+<span class="sd">site returned 35/32/29 items on pages that each held 35, while the state blob</span>
+<span class="sd">held all of them on every page.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Sequence</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;StateBlob&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;scan_state_blobs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;state_blob_markers&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;iter_script_texts&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;GLOBAL_ASSIGNMENT_KINDS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SCRIPT_ID_KINDS&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># `window.X = ...` / `self.X = ...` globals, by the framework that writes them.</span>
+<span class="n">GLOBAL_ASSIGNMENT_KINDS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;__NUXT__&quot;</span><span class="p">:</span> <span class="s2">&quot;nuxt&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;__APOLLO_STATE__&quot;</span><span class="p">:</span> <span class="s2">&quot;apollo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;__PRELOADED_STATE__&quot;</span><span class="p">:</span> <span class="s2">&quot;redux&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;__INITIAL_STATE__&quot;</span><span class="p">:</span> <span class="s2">&quot;redux&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;__remixContext&quot;</span><span class="p">:</span> <span class="s2">&quot;remix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;__STATIC_ROUTER_HYDRATION_DATA__&quot;</span><span class="p">:</span> <span class="s2">&quot;react_router&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># `&lt;script id=&quot;...&quot;&gt;` blobs, by the framework that writes them.</span>
+<span class="n">SCRIPT_ID_KINDS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;__NEXT_DATA__&quot;</span><span class="p">:</span> <span class="s2">&quot;next_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;__NUXT_DATA__&quot;</span><span class="p">:</span> <span class="s2">&quot;nuxt_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ng-state&quot;</span><span class="p">:</span> <span class="s2">&quot;angular&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;__remixContext&quot;</span><span class="p">:</span> <span class="s2">&quot;remix&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Below this, a bare JSON-looking script is more likely config than payload.</span>
+<span class="n">DFLT_MIN_GENERIC_SIZE</span> <span class="o">=</span> <span class="mi">2048</span>
+
+<span class="c1"># A commented-out script is stale markup, not page state. Stripping comments</span>
+<span class="c1"># first stops a leftover blob from being reported as the real one.</span>
+<span class="n">_COMMENT_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&lt;!--.*?--&gt;&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+<span class="n">_SCRIPT_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sa">r</span><span class="s2">&quot;&lt;script\b(?P&lt;attrs&gt;[^&gt;]*)&gt;(?P&lt;body&gt;.*?)&lt;/script\s*&gt;&quot;</span><span class="p">,</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># Values may legally be unquoted (`&lt;script type=application/json id=x&gt;`),</span>
+<span class="c1"># and a real page will do it.</span>
+<span class="n">_ATTR_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&quot;&quot;(\w[\w:-]*)\s*=\s*(?:&quot;([^&quot;]*)&quot;|&#39;([^&#39;]*)&#39;|([^\s&quot;&#39;&gt;=`]+))&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="n">_FLIGHT_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?:self|window)\.__next_f\s*\.\s*push\s*\(&quot;</span><span class="p">)</span>
+<span class="n">_JSON_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span> <span class="s2">&quot;application/ld+json&quot;</span><span class="p">)</span>
+
+<span class="n">_decoder</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecoder</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="StateBlob">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/blobs.html#scraped.acquire.StateBlob">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StateBlob</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;One embedded structured-data payload found in an HTML document.&quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">marker</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">raw</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">element_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether the payload was decodable as JSON.</span>
+
+<span class="sd">        `False` with a non-empty `raw` means the payload needs a format-specific</span>
+<span class="sd">        parser — React Flight chunks and Nuxt 2 function expressions are the</span>
+<span class="sd">        common cases.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="iter_script_texts">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/blobs.html#scraped.acquire.iter_script_texts">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">iter_script_texts</span><span class="p">(</span><span class="n">html</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield `(attributes, body)` for every `&lt;script&gt;` element.</span>
+
+<span class="sd">    A regex rather than a DOM parse, deliberately: this must work on truncated,</span>
+<span class="sd">    malformed, and challenge-page HTML where a parser may bail.</span>
+
+<span class="sd">    &gt;&gt;&gt; list(iter_script_texts(&#39;&lt;script type=&quot;x&quot; id=&quot;y&quot;&gt;B&lt;/script&gt;&#39;))</span>
+<span class="sd">    [({&#39;type&#39;: &#39;x&#39;, &#39;id&#39;: &#39;y&#39;}, &#39;B&#39;)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">_SCRIPT_RE</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">_COMMENT_RE</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">html</span><span class="p">)):</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span> <span class="p">(</span><span class="n">double</span> <span class="ow">or</span> <span class="n">single</span> <span class="ow">or</span> <span class="n">bare</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">double</span><span class="p">,</span> <span class="n">single</span><span class="p">,</span> <span class="n">bare</span> <span class="ow">in</span> <span class="n">_ATTR_RE</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;attrs&quot;</span><span class="p">))</span>
+        <span class="p">}</span>
+        <span class="k">yield</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_json_value_at</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decode the JSON value that begins **immediately** at `start`, if any.</span>
+
+<span class="sd">    Uses the stdlib decoder&#39;s `raw_decode` so that braces inside strings and</span>
+<span class="sd">    escapes are handled correctly — a hand-rolled brace counter gets this wrong.</span>
+
+<span class="sd">    The &quot;immediately&quot; is load-bearing. An earlier version searched *forward* for</span>
+<span class="sd">    the next `{` or `[`, which meant an assignment whose right-hand side was not</span>
+<span class="sd">    JSON would happily decode some unrelated object later in the script and</span>
+<span class="sd">    report it as the framework&#39;s state — with `parsed=True` and a `raw` that</span>
+<span class="sd">    disagreed with `data`. Silent wrong data is the worst outcome this package</span>
+<span class="sd">    can produce, so: skip whitespace, and if the next character is not a JSON</span>
+<span class="sd">    container, report nothing.</span>
+
+<span class="sd">    &gt;&gt;&gt; _json_value_at(&#39;window.X = [1,2]; window.Y = {&quot;z&quot;:9}&#39;, len(&quot;window.X = &quot;))</span>
+<span class="sd">    ([1, 2], 16)</span>
+<span class="sd">    &gt;&gt;&gt; _json_value_at(&#39;window.X = &quot;no&quot;; window.Y = {&quot;z&quot;:9}&#39;, len(&quot;window.X = &quot;)) is None</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">start</span>
+    <span class="k">while</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="ow">and</span> <span class="n">text</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="ow">in</span> <span class="s2">&quot; </span><span class="se">\t\r\n</span><span class="s2">&quot;</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="ow">or</span> <span class="n">text</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s2">&quot;{[&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_decoder</span><span class="o">.</span><span class="n">raw_decode</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_blob_from_script_id</span><span class="p">(</span><span class="n">attrs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StateBlob</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">element_id</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">kind</span> <span class="o">=</span> <span class="n">SCRIPT_ID_KINDS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">element_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">StateBlob</span><span class="p">(</span>
+        <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
+        <span class="n">marker</span><span class="o">=</span><span class="n">element_id</span><span class="p">,</span>
+        <span class="n">raw</span><span class="o">=</span><span class="n">body</span><span class="p">,</span>
+        <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">body</span><span class="p">),</span>
+        <span class="n">element_id</span><span class="o">=</span><span class="n">element_id</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_blob_from_json_type</span><span class="p">(</span><span class="n">attrs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StateBlob</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">script_type</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">script_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_JSON_TYPES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kind</span> <span class="o">=</span> <span class="s2">&quot;ld_json&quot;</span> <span class="k">if</span> <span class="n">script_type</span> <span class="o">==</span> <span class="s2">&quot;application/ld+json&quot;</span> <span class="k">else</span> <span class="s2">&quot;json_script&quot;</span>
+    <span class="k">return</span> <span class="n">StateBlob</span><span class="p">(</span>
+        <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
+        <span class="n">marker</span><span class="o">=</span><span class="n">script_type</span><span class="p">,</span>
+        <span class="n">raw</span><span class="o">=</span><span class="n">body</span><span class="p">,</span>
+        <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">body</span><span class="p">),</span>
+        <span class="n">element_id</span><span class="o">=</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">),</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_blobs_from_globals</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">StateBlob</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">kind</span> <span class="ow">in</span> <span class="n">GLOBAL_ASSIGNMENT_KINDS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">marker</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?:window|self)\s*\.\s*&quot;</span> <span class="o">+</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\s*=&quot;</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">marker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">decoded</span> <span class="o">=</span> <span class="n">_json_value_at</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">marker</span><span class="o">.</span><span class="n">end</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">decoded</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># A function expression or other non-JSON RHS (Nuxt 2 does this).</span>
+            <span class="c1"># Report it anyway — knowing it is there is the useful part.</span>
+            <span class="k">yield</span> <span class="n">StateBlob</span><span class="p">(</span>
+                <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
+                <span class="n">marker</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">raw</span><span class="o">=</span><span class="n">body</span><span class="p">[</span><span class="n">marker</span><span class="o">.</span><span class="n">end</span><span class="p">()</span> <span class="p">:],</span>
+                <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">body</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">decoded</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">body</span><span class="p">[</span><span class="n">marker</span><span class="o">.</span><span class="n">end</span><span class="p">()</span> <span class="p">:</span> <span class="n">end</span><span class="p">]</span>
+        <span class="k">yield</span> <span class="n">StateBlob</span><span class="p">(</span>
+            <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="n">raw</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_flight_blob</span><span class="p">(</span><span class="n">html</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StateBlob</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect React Server Component streaming chunks, if present.</span>
+
+<span class="sd">    Next.js App Router streams data as `self.__next_f.push([...])` calls carrying</span>
+<span class="sd">    React Flight wire format — which is *not* JSON. We concatenate the chunks and</span>
+<span class="sd">    report them unparsed; decoding Flight needs a dedicated parser.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="n">_COMMENT_RE</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">html</span><span class="p">)</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">_FLIGHT_RE</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">html</span><span class="p">):</span>
+        <span class="n">decoded</span> <span class="o">=</span> <span class="n">_json_value_at</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">match</span><span class="o">.</span><span class="n">end</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">decoded</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">decoded</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">payload</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">payload</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">chunks</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">StateBlob</span><span class="p">(</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;rsc_flight&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;__next_f&quot;</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="n">raw</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="scan_state_blobs">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/blobs.html#scraped.acquire.scan_state_blobs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">scan_state_blobs</span><span class="p">(</span>
+    <span class="n">html</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">min_generic_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DFLT_MIN_GENERIC_SIZE</span><span class="p">,</span>
+    <span class="n">include_generic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">StateBlob</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find every embedded structured-data payload, largest first.</span>
+
+<span class="sd">    Recognizes framework-specific markers (Next.js, Nuxt, Apollo, Redux, Remix,</span>
+<span class="sd">    Angular TransferState), standardized JSON-LD, and — when `include_generic` —</span>
+<span class="sd">    any sufficiently large bare JSON script.</span>
+
+<span class="sd">    &gt;&gt;&gt; html = &#39;&#39;&#39;</span>
+<span class="sd">    ... &lt;script type=&quot;application/ld+json&quot;&gt;{&quot;@type&quot;:&quot;Product&quot;}&lt;/script&gt;</span>
+<span class="sd">    ... &lt;script&gt;window.__APOLLO_STATE__ = {&quot;Product:1&quot;:{&quot;name&quot;:&quot;x&quot;}};&lt;/script&gt;</span>
+<span class="sd">    ... &#39;&#39;&#39;</span>
+<span class="sd">    &gt;&gt;&gt; sorted(b.kind for b in scan_state_blobs(html))</span>
+<span class="sd">    [&#39;apollo&#39;, &#39;ld_json&#39;]</span>
+
+<span class="sd">    JSON-LD is worth trying first when present: it is standardized, so it is the</span>
+<span class="sd">    most stable payload on the web.</span>
+
+<span class="sd">    &gt;&gt;&gt; blob = next(b for b in scan_state_blobs(html) if b.kind == &#39;ld_json&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; blob.data[&#39;@type&#39;]</span>
+<span class="sd">    &#39;Product&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">found</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">StateBlob</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">body</span> <span class="ow">in</span> <span class="n">iter_script_texts</span><span class="p">(</span><span class="n">html</span><span class="p">):</span>
+        <span class="n">blob</span> <span class="o">=</span> <span class="n">_blob_from_script_id</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_blob_from_json_type</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">blob</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">found</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_blobs_from_globals</span><span class="p">(</span><span class="n">body</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">include_generic</span> <span class="ow">and</span> <span class="n">_looks_like_bare_json</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">min_generic_size</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">StateBlob</span><span class="p">(</span>
+                    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;json_script&quot;</span><span class="p">,</span>
+                    <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;bare-json&quot;</span><span class="p">,</span>
+                    <span class="n">raw</span><span class="o">=</span><span class="n">body</span><span class="p">,</span>
+                    <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">body</span><span class="p">),</span>
+                    <span class="n">element_id</span><span class="o">=</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">),</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="n">flight</span> <span class="o">=</span> <span class="n">_flight_blob</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">flight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flight</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">found</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">blob</span><span class="p">:</span> <span class="n">blob</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_looks_like_bare_json</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">stripped</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">stripped</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">min_size</span> <span class="ow">and</span> <span class="n">stripped</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;[&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="state_blob_markers">
+<a class="viewcode-back" href="../../../module_docs/scraped/acquire/blobs.html#scraped.acquire.state_blob_markers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">state_blob_markers</span><span class="p">(</span><span class="n">html</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The marker names present, cheapest possible summary for capture metadata.</span>
+
+<span class="sd">    &gt;&gt;&gt; state_blob_markers(&#39;&lt;script id=&quot;__NEXT_DATA__&quot; type=&quot;application/json&quot;&gt;{}&lt;/script&gt;&#39;)</span>
+<span class="sd">    [&#39;__NEXT_DATA__&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">blob</span><span class="o">.</span><span class="n">marker</span> <span class="k">for</span> <span class="n">blob</span> <span class="ow">in</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">include_generic</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

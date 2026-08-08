@@ -1,0 +1,4 @@
+scraped.acquire.capture
+=======================
+.. automodule:: scraped.acquire.capture
+   :members:

@@ -1,0 +1,217 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.acquire.signals &mdash; scraped 0.0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="scraped.acquire.url" href="url.html" />
+    <link rel="prev" title="scraped.acquire.probe" href="probe.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire.html">scraped.acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blobs.html">scraped.acquire.blobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">scraped.acquire.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capture.html">scraped.acquire.capture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fetchers.html">scraped.acquire.fetchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fetchers/browser.html">scraped.acquire.fetchers.browser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fetchers/http.html">scraped.acquire.fetchers.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="policy.html">scraped.acquire.policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="probe.html">scraped.acquire.probe</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">scraped.acquire.signals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.signals.ChallengeEncountered"><code class="docutils literal notranslate"><span class="pre">ChallengeEncountered</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.signals.classify"><code class="docutils literal notranslate"><span class="pre">classify()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.signals.detect_challenge"><code class="docutils literal notranslate"><span class="pre">detect_challenge()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.acquire.signals.looks_truncated"><code class="docutils literal notranslate"><span class="pre">looks_truncated()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="url.html">scraped.acquire.url</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">scraped.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">scraped.acquire.signals</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/module_docs/scraped/acquire/signals.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-scraped.acquire.signals">
+<span id="scraped-acquire-signals"></span><h1>scraped.acquire.signals<a class="headerlink" href="#module-scraped.acquire.signals" title="Link to this heading"></a></h1>
+<p>Diagnostic signals: reading what a response is actually telling you.</p>
+<p>The escalation ladder is only useful if you can tell which rung you are on. These
+are the cheap, mechanical tests that turn a response into a <em>move</em>.</p>
+<p>The most expensive failure in acquisition is silent: saving a challenge page as
+if it were data. Detecting that and stopping is worth more than any bypass.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;set-cookie&quot;</span><span class="p">:</span> <span class="s2">&quot;datadome=abc&quot;</span><span class="p">},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="go">&#39;challenge&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;text/html&quot;</span><span class="p">},</span> <span class="s2">&quot;&lt;html&gt;&lt;body&gt;hi&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="p">)</span>
+<span class="go">&#39;ok&#39;</span>
+</pre></div>
+</div>
+<dl class="py exception">
+<dt class="sig sig-object py" id="scraped.acquire.signals.ChallengeEncountered">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.acquire.signals.</span></span><span class="sig-name descname"><span class="pre">ChallengeEncountered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/scraped/acquire/signals.html#ChallengeEncountered"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.signals.ChallengeEncountered" title="Link to this definition"></a></dt>
+<dd><p>A bot-protection challenge was served instead of content.</p>
+<p>Raised rather than returned so that a challenge can never be mistaken for
+data by a caller that forgot to check. Carries what is needed to decide what
+to do next — and “solve it” is not among the options.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.signals.classify">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.signals.</span></span><span class="sig-name descname"><span class="pre">classify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/signals.html#classify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.signals.classify" title="Link to this definition"></a></dt>
+<dd><p>One-word verdict driving the escalation decision.</p>
+<p>Returns one of: <cite>ok</cite>, <cite>challenge</cite>, <cite>rate_limited</cite>, <cite>forbidden</cite>, <cite>not_found</cite>,
+<cite>client_error</cite>, <cite>server_error</cite>, <cite>auth_required</cite>, <cite>empty</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">429</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="go">&#39;rate_limited&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="go">&#39;empty&#39;</span>
+</pre></div>
+</div>
+<p>A bare 403 is the most common block there is, and must never read as success:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;nope&quot;</span><span class="p">)</span>
+<span class="go">&#39;forbidden&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">451</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;nope&quot;</span><span class="p">)</span>
+<span class="go">&#39;client_error&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.signals.detect_challenge">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.signals.</span></span><span class="sig-name descname"><span class="pre">detect_challenge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ChallengeVerdict</span></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/signals.html#detect_challenge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.signals.detect_challenge" title="Link to this definition"></a></dt>
+<dd><p>Identify a bot-protection challenge from cheap signals.</p>
+<p>Checks headers and cookies before the body, since those are harder to fake
+and cheaper to inspect. The body is scanned in full: an earlier version
+truncated it, which hid widgets and challenge markers on large pages — and a
+missed challenge is the expensive direction of this error.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;&lt;html&gt;fine&lt;/html&gt;&quot;</span><span class="p">))</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;cf-mitigated&quot;</span><span class="p">:</span> <span class="s2">&quot;challenge&quot;</span><span class="p">},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">serving</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>A protected site emits vendor headers on successful responses too. That
+identifies the guard; it does not mean you were stopped:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">verdict</span> <span class="o">=</span> <span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;x-datadome&quot;</span><span class="p">:</span> <span class="s2">&quot;protected&quot;</span><span class="p">},</span> <span class="s2">&quot;&lt;html&gt;data&lt;/html&gt;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">verdict</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span> <span class="n">verdict</span><span class="o">.</span><span class="n">serving</span>
+<span class="go">(&#39;datadome&#39;, False)</span>
+</pre></div>
+</div>
+<p>An interactive widget is terminal, not an escalation cue:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s1">&#39;&lt;div class=&quot;cf-turnstile&quot; data-sitekey=&quot;x&quot;&gt;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">interactive</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.acquire.signals.looks_truncated">
+<span class="sig-prename descclassname"><span class="pre">scraped.acquire.signals.</span></span><span class="sig-name descname"><span class="pre">looks_truncated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/signals.html#looks_truncated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.signals.looks_truncated" title="Link to this definition"></a></dt>
+<dd><p>Whether the payload is shorter than the response claimed.</p>
+<p>A <cite>200</cite> carrying a truncated body is a silent corruption that only shows up
+downstream, so it is worth one cheap check here.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">looks_truncated</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;abc&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">:</span> <span class="s2">&quot;3&quot;</span><span class="p">})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">looks_truncated</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;abc&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">:</span> <span class="s2">&quot;99&quot;</span><span class="p">})</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="probe.html" class="btn btn-neutral float-left" title="scraped.acquire.probe" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="url.html" class="btn btn-neutral float-right" title="scraped.acquire.url" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

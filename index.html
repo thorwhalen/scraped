@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to scraped’s documentation! &mdash; scraped 0.0.11 documentation</title>
+  <title>Welcome to scraped’s documentation! &mdash; scraped 0.0.12 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -15,9 +15,9 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=0c446633"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
@@ -49,6 +49,18 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire.html">scraped.acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/blobs.html">scraped.acquire.blobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/cache.html">scraped.acquire.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/capture.html">scraped.acquire.capture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/fetchers.html">scraped.acquire.fetchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/browser.html">scraped.acquire.fetchers.browser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/http.html">scraped.acquire.fetchers.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/policy.html">scraped.acquire.policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/probe.html">scraped.acquire.probe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/signals.html">scraped.acquire.signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/url.html">scraped.acquire.url</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/tests/test_acquire.html">scraped.tests.test_acquire</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/tools.html">scraped.tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/util.html">scraped.util</a></li>
 </ul>
@@ -83,6 +95,128 @@
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire.html">scraped.acquire</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.BrowserArtifacts"><code class="docutils literal notranslate"><span class="pre">BrowserArtifacts</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.BrowserFetcher"><code class="docutils literal notranslate"><span class="pre">BrowserFetcher</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.BrowserSession"><code class="docutils literal notranslate"><span class="pre">BrowserSession</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.Capture"><code class="docutils literal notranslate"><span class="pre">Capture</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.CaptureStore"><code class="docutils literal notranslate"><span class="pre">CaptureStore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.ChallengeEncountered"><code class="docutils literal notranslate"><span class="pre">ChallengeEncountered</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.CurlCffiTransport"><code class="docutils literal notranslate"><span class="pre">CurlCffiTransport</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.Fetcher"><code class="docutils literal notranslate"><span class="pre">Fetcher</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.FetcherInfo"><code class="docutils literal notranslate"><span class="pre">FetcherInfo</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.HttpFetcher"><code class="docutils literal notranslate"><span class="pre">HttpFetcher</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.PolicyOutcome"><code class="docutils literal notranslate"><span class="pre">PolicyOutcome</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.Politeness"><code class="docutils literal notranslate"><span class="pre">Politeness</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.ProbeMarks"><code class="docutils literal notranslate"><span class="pre">ProbeMarks</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.Request"><code class="docutils literal notranslate"><span class="pre">Request</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.Response"><code class="docutils literal notranslate"><span class="pre">Response</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.RobotsDisallowed"><code class="docutils literal notranslate"><span class="pre">RobotsDisallowed</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.RobotsPolicy"><code class="docutils literal notranslate"><span class="pre">RobotsPolicy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.SiteProfile"><code class="docutils literal notranslate"><span class="pre">SiteProfile</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.StateBlob"><code class="docutils literal notranslate"><span class="pre">StateBlob</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.UrllibTransport"><code class="docutils literal notranslate"><span class="pre">UrllibTransport</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.body_digest"><code class="docutils literal notranslate"><span class="pre">body_digest()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.browser_check_requirements"><code class="docutils literal notranslate"><span class="pre">browser_check_requirements()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.cached"><code class="docutils literal notranslate"><span class="pre">cached()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.canonicalize_url"><code class="docutils literal notranslate"><span class="pre">canonicalize_url()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.capture_store"><code class="docutils literal notranslate"><span class="pre">capture_store()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.classify"><code class="docutils literal notranslate"><span class="pre">classify()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.default_fetcher"><code class="docutils literal notranslate"><span class="pre">default_fetcher()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.detect_challenge"><code class="docutils literal notranslate"><span class="pre">detect_challenge()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.fetch"><code class="docutils literal notranslate"><span class="pre">fetch()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.probe"><code class="docutils literal notranslate"><span class="pre">probe()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.request_digest"><code class="docutils literal notranslate"><span class="pre">request_digest()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.robots_sitemaps"><code class="docutils literal notranslate"><span class="pre">robots_sitemaps()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.scan_state_blobs"><code class="docutils literal notranslate"><span class="pre">scan_state_blobs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.state_blob_markers"><code class="docutils literal notranslate"><span class="pre">state_blob_markers()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire.html#scraped.acquire.storage_state_headers"><code class="docutils literal notranslate"><span class="pre">storage_state_headers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/blobs.html">scraped.acquire.blobs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/blobs.html#scraped.acquire.blobs.StateBlob"><code class="docutils literal notranslate"><span class="pre">StateBlob</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/blobs.html#scraped.acquire.blobs.iter_script_texts"><code class="docutils literal notranslate"><span class="pre">iter_script_texts()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/blobs.html#scraped.acquire.blobs.scan_state_blobs"><code class="docutils literal notranslate"><span class="pre">scan_state_blobs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/blobs.html#scraped.acquire.blobs.state_blob_markers"><code class="docutils literal notranslate"><span class="pre">state_blob_markers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/cache.html">scraped.acquire.cache</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/cache.html#scraped.acquire.cache.CaptureStore"><code class="docutils literal notranslate"><span class="pre">CaptureStore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/cache.html#scraped.acquire.cache.cached"><code class="docutils literal notranslate"><span class="pre">cached()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/cache.html#scraped.acquire.cache.capture_store"><code class="docutils literal notranslate"><span class="pre">capture_store()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/capture.html">scraped.acquire.capture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/capture.html#scraped.acquire.capture.Capture"><code class="docutils literal notranslate"><span class="pre">Capture</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/capture.html#scraped.acquire.capture.Fetcher"><code class="docutils literal notranslate"><span class="pre">Fetcher</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/capture.html#scraped.acquire.capture.FetcherInfo"><code class="docutils literal notranslate"><span class="pre">FetcherInfo</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/capture.html#scraped.acquire.capture.PolicyOutcome"><code class="docutils literal notranslate"><span class="pre">PolicyOutcome</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/capture.html#scraped.acquire.capture.ProbeMarks"><code class="docutils literal notranslate"><span class="pre">ProbeMarks</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/capture.html#scraped.acquire.capture.Request"><code class="docutils literal notranslate"><span class="pre">Request</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/capture.html#scraped.acquire.capture.Response"><code class="docutils literal notranslate"><span class="pre">Response</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/capture.html#scraped.acquire.capture.body_digest"><code class="docutils literal notranslate"><span class="pre">body_digest()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/capture.html#scraped.acquire.capture.request_digest"><code class="docutils literal notranslate"><span class="pre">request_digest()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/capture.html#scraped.acquire.capture.utcnow"><code class="docutils literal notranslate"><span class="pre">utcnow()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/fetchers.html">scraped.acquire.fetchers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers.html#scraped.acquire.fetchers.BrowserArtifacts"><code class="docutils literal notranslate"><span class="pre">BrowserArtifacts</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers.html#scraped.acquire.fetchers.BrowserFetcher"><code class="docutils literal notranslate"><span class="pre">BrowserFetcher</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers.html#scraped.acquire.fetchers.BrowserSession"><code class="docutils literal notranslate"><span class="pre">BrowserSession</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers.html#scraped.acquire.fetchers.CurlCffiTransport"><code class="docutils literal notranslate"><span class="pre">CurlCffiTransport</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers.html#scraped.acquire.fetchers.HttpFetcher"><code class="docutils literal notranslate"><span class="pre">HttpFetcher</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers.html#scraped.acquire.fetchers.UrllibTransport"><code class="docutils literal notranslate"><span class="pre">UrllibTransport</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers.html#scraped.acquire.fetchers.browser_check_requirements"><code class="docutils literal notranslate"><span class="pre">browser_check_requirements()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers.html#scraped.acquire.fetchers.default_fetcher"><code class="docutils literal notranslate"><span class="pre">default_fetcher()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers.html#scraped.acquire.fetchers.robots_reader"><code class="docutils literal notranslate"><span class="pre">robots_reader()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers.html#scraped.acquire.fetchers.storage_state_headers"><code class="docutils literal notranslate"><span class="pre">storage_state_headers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/browser.html">scraped.acquire.fetchers.browser</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/browser.html#scraped.acquire.fetchers.browser.BrowserArtifacts"><code class="docutils literal notranslate"><span class="pre">BrowserArtifacts</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/browser.html#scraped.acquire.fetchers.browser.BrowserFetcher"><code class="docutils literal notranslate"><span class="pre">BrowserFetcher</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/browser.html#scraped.acquire.fetchers.browser.BrowserSession"><code class="docutils literal notranslate"><span class="pre">BrowserSession</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/browser.html#scraped.acquire.fetchers.browser.check_requirements"><code class="docutils literal notranslate"><span class="pre">check_requirements()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/browser.html#scraped.acquire.fetchers.browser.storage_state_headers"><code class="docutils literal notranslate"><span class="pre">storage_state_headers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/http.html">scraped.acquire.fetchers.http</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.fetchers.http.CurlCffiTransport"><code class="docutils literal notranslate"><span class="pre">CurlCffiTransport</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.fetchers.http.HttpFetcher"><code class="docutils literal notranslate"><span class="pre">HttpFetcher</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.fetchers.http.Transport"><code class="docutils literal notranslate"><span class="pre">Transport</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.fetchers.http.TransportResult"><code class="docutils literal notranslate"><span class="pre">TransportResult</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.fetchers.http.UrllibTransport"><code class="docutils literal notranslate"><span class="pre">UrllibTransport</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.fetchers.http.default_fetcher"><code class="docutils literal notranslate"><span class="pre">default_fetcher()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.fetchers.http.robots_reader"><code class="docutils literal notranslate"><span class="pre">robots_reader()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/policy.html">scraped.acquire.policy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/policy.html#scraped.acquire.policy.Politeness"><code class="docutils literal notranslate"><span class="pre">Politeness</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/policy.html#scraped.acquire.policy.RobotsDisallowed"><code class="docutils literal notranslate"><span class="pre">RobotsDisallowed</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/policy.html#scraped.acquire.policy.RobotsPolicy"><code class="docutils literal notranslate"><span class="pre">RobotsPolicy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/policy.html#scraped.acquire.policy.retry_delays"><code class="docutils literal notranslate"><span class="pre">retry_delays()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/policy.html#scraped.acquire.policy.should_retry"><code class="docutils literal notranslate"><span class="pre">should_retry()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/probe.html">scraped.acquire.probe</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/probe.html#scraped.acquire.probe.SiteProfile"><code class="docutils literal notranslate"><span class="pre">SiteProfile</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/probe.html#scraped.acquire.probe.probe"><code class="docutils literal notranslate"><span class="pre">probe()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/probe.html#scraped.acquire.probe.robots_sitemaps"><code class="docutils literal notranslate"><span class="pre">robots_sitemaps()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/signals.html">scraped.acquire.signals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/signals.html#scraped.acquire.signals.ChallengeEncountered"><code class="docutils literal notranslate"><span class="pre">ChallengeEncountered</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/signals.html#scraped.acquire.signals.classify"><code class="docutils literal notranslate"><span class="pre">classify()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/signals.html#scraped.acquire.signals.detect_challenge"><code class="docutils literal notranslate"><span class="pre">detect_challenge()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/signals.html#scraped.acquire.signals.looks_truncated"><code class="docutils literal notranslate"><span class="pre">looks_truncated()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/url.html">scraped.acquire.url</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/url.html#scraped.acquire.url.canonicalize_url"><code class="docutils literal notranslate"><span class="pre">canonicalize_url()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/acquire/url.html#scraped.acquire.url.strip_tracking_params"><code class="docutils literal notranslate"><span class="pre">strip_tracking_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/tests/test_acquire.html">scraped.tests.test_acquire</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/tools.html">scraped.tools</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/tools.html#scraped.tools.acquire_content"><code class="docutils literal notranslate"><span class="pre">acquire_content()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/scraped/tools.html#scraped.tools.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
@@ -112,8 +246,8 @@
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-<p>Release: 0.0.11</p>
-<p>Last change: Feb 24, 2026</p>
+<p>Release: 0.0.12</p>
+<p>Last change: Aug 08, 2026</p>
 </section>
 
 
@@ -126,7 +260,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright NO COPYRIGHT.</p>
+    <p></p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

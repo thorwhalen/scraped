@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.acquire &mdash; scraped 0.0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire.html">scraped.acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/blobs.html">scraped.acquire.blobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/cache.html">scraped.acquire.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/capture.html">scraped.acquire.capture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/fetchers.html">scraped.acquire.fetchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/fetchers/browser.html">scraped.acquire.fetchers.browser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/fetchers/http.html">scraped.acquire.fetchers.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/policy.html">scraped.acquire.policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/probe.html">scraped.acquire.probe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/signals.html">scraped.acquire.signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/url.html">scraped.acquire.url</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/tools.html">scraped.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">scraped.acquire</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scraped.acquire</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Raw data acquisition: get the bytes down faithfully, with provenance.</span>
+
+<span class="sd">An information-extraction job splits into three concerns. This package owns only</span>
+<span class="sd">the first, and provides seams for the other two rather than implementing them:</span>
+
+<span class="sd">1. **acquisition** — get the raw bytes, with enough provenance to know where they</span>
+<span class="sd">   came from and whether you were allowed to take them. *This package.*</span>
+<span class="sd">2. **extraction** — pull the target fields out. Hand `Capture` and the located</span>
+<span class="sd">   state blobs to whatever does this (an LLM, a schema, hand-written code).</span>
+<span class="sd">3. **formatting** — shape the result. Downstream entirely.</span>
+
+<span class="sd">## Simple path</span>
+
+<span class="sd">    &gt;&gt;&gt; from scraped.acquire import probe, fetch, scan_state_blobs</span>
+<span class="sd">    &gt;&gt;&gt; profile = probe(&quot;https://example.com&quot;)           # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; print(profile.summary())                         # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; capture = fetch(&quot;https://example.com&quot;)           # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; blobs = scan_state_blobs(capture.text())         # doctest: +SKIP</span>
+
+<span class="sd">## The one idea worth internalizing</span>
+
+<span class="sd">Payload shape and transport are **independent axes**. Optimize payload first:</span>
+
+<span class="sd">    payload:    api &gt; internal api &gt; state blob &gt; sitemap &gt; dom &gt; text &gt; vision</span>
+<span class="sd">    transport:  plain http &gt; impersonating http &gt; +session &gt; browser &gt; headful</span>
+
+<span class="sd">Any payload rung is reachable from any transport rung, and the highest-value cell</span>
+<span class="sd">on the grid — *drive a real browser, then read the embedded state blob* — is the</span>
+<span class="sd">one the usual single-ladder framing hides. Reading a page&#39;s own `__NEXT_DATA__`</span>
+<span class="sd">beats parsing its DOM even when you had to pay for a browser to see it: the blob</span>
+<span class="sd">is the data rather than a rendering of it, and it is complete even when the DOM</span>
+<span class="sd">renders lazily.</span>
+
+<span class="sd">See `misc/docs/acquisition-architecture.md` for the full design.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.blobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateBlob</span><span class="p">,</span> <span class="n">scan_state_blobs</span><span class="p">,</span> <span class="n">state_blob_markers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">CaptureStore</span><span class="p">,</span> <span class="n">cached</span><span class="p">,</span> <span class="n">capture_store</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.capture</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Capture</span><span class="p">,</span>
+    <span class="n">Fetcher</span><span class="p">,</span>
+    <span class="n">FetcherInfo</span><span class="p">,</span>
+    <span class="n">PolicyOutcome</span><span class="p">,</span>
+    <span class="n">ProbeMarks</span><span class="p">,</span>
+    <span class="n">Request</span><span class="p">,</span>
+    <span class="n">Response</span><span class="p">,</span>
+    <span class="n">body_digest</span><span class="p">,</span>
+    <span class="n">request_digest</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.fetchers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BrowserArtifacts</span><span class="p">,</span>
+    <span class="n">BrowserFetcher</span><span class="p">,</span>
+    <span class="n">BrowserSession</span><span class="p">,</span>
+    <span class="n">CurlCffiTransport</span><span class="p">,</span>
+    <span class="n">HttpFetcher</span><span class="p">,</span>
+    <span class="n">UrllibTransport</span><span class="p">,</span>
+    <span class="n">browser_check_requirements</span><span class="p">,</span>
+    <span class="n">default_fetcher</span><span class="p">,</span>
+    <span class="n">storage_state_headers</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Politeness</span><span class="p">,</span> <span class="n">RobotsDisallowed</span><span class="p">,</span> <span class="n">RobotsPolicy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.probe</span><span class="w"> </span><span class="kn">import</span> <span class="n">SiteProfile</span><span class="p">,</span> <span class="n">probe</span><span class="p">,</span> <span class="n">robots_sitemaps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChallengeEncountered</span><span class="p">,</span> <span class="n">classify</span><span class="p">,</span> <span class="n">detect_challenge</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.url</span><span class="w"> </span><span class="kn">import</span> <span class="n">canonicalize_url</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># simple path</span>
+    <span class="s2">&quot;probe&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;fetch&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;scan_state_blobs&quot;</span><span class="p">,</span>
+    <span class="c1"># records</span>
+    <span class="s2">&quot;Capture&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Request&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Response&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SiteProfile&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;StateBlob&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FetcherInfo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PolicyOutcome&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ProbeMarks&quot;</span><span class="p">,</span>
+    <span class="c1"># seams</span>
+    <span class="s2">&quot;Fetcher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;HttpFetcher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CurlCffiTransport&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;UrllibTransport&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;default_fetcher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BrowserFetcher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BrowserSession&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BrowserArtifacts&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;browser_check_requirements&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;storage_state_headers&quot;</span><span class="p">,</span>
+    <span class="c1"># policy</span>
+    <span class="s2">&quot;RobotsPolicy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RobotsDisallowed&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Politeness&quot;</span><span class="p">,</span>
+    <span class="c1"># caching</span>
+    <span class="s2">&quot;CaptureStore&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;capture_store&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cached&quot;</span><span class="p">,</span>
+    <span class="c1"># diagnostics</span>
+    <span class="s2">&quot;ChallengeEncountered&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;detect_challenge&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;classify&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;state_blob_markers&quot;</span><span class="p">,</span>
+    <span class="c1"># utilities</span>
+    <span class="s2">&quot;canonicalize_url&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;request_digest&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;body_digest&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;robots_sitemaps&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="fetch">
+<a class="viewcode-back" href="../../module_docs/scraped/acquire.html#scraped.acquire.fetch">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fetcher</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">request_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Capture</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch one URL into a `Capture`, using sensible defaults.</span>
+
+<span class="sd">    The simple thing made simple: an impersonating transport, per-host politeness,</span>
+<span class="sd">    jittered retries, challenge detection, and an automatic state-blob scan — none</span>
+<span class="sd">    of which you have to name to get.</span>
+
+<span class="sd">    For anything beyond one URL, build a fetcher once and reuse it, so politeness</span>
+<span class="sd">    and caching are shared across the job.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fetcher</span> <span class="o">=</span> <span class="n">fetcher</span> <span class="ow">or</span> <span class="n">default_fetcher</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fetcher</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">request_kwargs</span><span class="p">))</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
