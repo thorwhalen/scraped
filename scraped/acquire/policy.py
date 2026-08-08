@@ -161,20 +161,27 @@ class Politeness:
         return delay
 
 
-def should_retry(status: int | None, *, challenge: bool = False) -> bool:
+def should_retry(
+    status: int | None, *, challenge: bool = False, vendor_guarded: bool = False
+) -> bool:
     """Whether another attempt is warranted.
 
     A challenge is never retried — the answer will not change, and repeating it
-    confirms automation.
+    confirms automation. Neither is a retriable-looking status on an origin known
+    to be behind a bot manager: a `503` from a guarded origin is far more likely
+    to be an interstitial than a genuine overload, and that is precisely the case
+    where hammering does the most damage.
 
     >>> should_retry(503)
     True
+    >>> should_retry(503, vendor_guarded=True)
+    False
     >>> should_retry(403)
     False
     >>> should_retry(429, challenge=True)
     False
     """
-    if challenge:
+    if challenge or vendor_guarded:
         return False
     if status is None:  # connection error / timeout
         return True

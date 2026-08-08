@@ -16,6 +16,11 @@ So the rule this module enforces:
 optional. Every fetch returns a `Capture` plus paths to artifacts on the real
 filesystem, and the HAR doubles as the discovery input for the internal-API rung.
 
+**Caveat on provenance at this rung:** a `Capture.body` here is
+`page.content()` — a re-serialized DOM, not the bytes the server sent — so
+`body_sha256` hashes a *rendering*. The package-wide 'raw bytes, never decoded
+text' invariant holds at the HTTP rungs; here the HAR is the byte-exact record.
+
 Two traps worth knowing before reading the code:
 
 - **Patched drivers run `page.evaluate` in an isolated world**, which cannot see
@@ -306,9 +311,12 @@ class BrowserFetcher:
             response = page.goto(request.url, wait_until=self.wait_until)
             if self.settle_ms:
                 page.wait_for_timeout(self.settle_ms)
-            # Read the blob out of the HTML *source*: a patched driver's
-            # page.evaluate runs in an isolated world and cannot see
-            # window.__NEXT_DATA__ at all.
+            # page.content() is documentElement.outerHTML — a re-serialized
+            # post-script DOM, NOT the wire bytes. It is still the right source
+            # for state blobs (a patched driver's page.evaluate runs in an
+            # isolated world and cannot see window.__NEXT_DATA__ at all), but it
+            # means body_sha256 at this rung hashes a rendering: use the HAR for
+            # byte-exact provenance and cross-run change detection.
             html = page.content()
             status = response.status if response else 0
             headers = dict(response.headers) if response else {}

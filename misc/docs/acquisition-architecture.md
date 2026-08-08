@@ -37,9 +37,18 @@ Two adjacent formal concepts we deliberately borrow from:
 
 - **WARC (ISO 28500)** is the only standardized container that stores *request and
   response together with headers and timestamps*. It is the reference model for
-  "faithful, with provenance". Our `Capture` is isomorphic to a WARC
-  request/response pair so that emitting real WARC later is a serialization
-  change, not a redesign.
+  "faithful, with provenance", and `Capture` is **modelled on** a WARC
+  request/response pair.
+
+  Be precise about how far that goes: it is a deliberate design target, **not a
+  present capability**. A valid WARC `request` record cannot be emitted from a
+  `Capture` today, because `Request.headers` holds what the caller asked for, not
+  what went on the wire — an impersonating client sets its own headers (and their
+  order, which is itself fingerprint-relevant) inside the native library, where we
+  never see them. There is also no HTTP version or raw status line, and
+  `Response.headers` is a flattened dict, so repeated headers do not survive as
+  separate values. Closing that gap means capturing wire-level data, which is what
+  a recording proxy is for.
 - **Content negotiation** (RFC 9110 proactive negotiation) is an acquisition
   *strategy*, not protocol trivia: the same URL frequently serves JSON to an
   `Accept: application/json` request and HTML to a browser. It costs one header
@@ -280,6 +289,11 @@ accept a human-in-the-loop step.
 
 ## 6. Cross-cutting concerns this layer owns
 
+> **Status:** politeness, retries, duplicate detection, and robots policy are
+> implemented. Checkpointing, canary URLs, and byte-level drift diffing are
+> **designed but not built** — they arrive with the multi-page frontier. They are
+> stated here because they belong to this layer, not because they exist yet.
+
 - **Politeness** — per-host token bucket, not global. 1–3 concurrent per host,
   0.5–3 s spacing with jitter, honor `Retry-After` exactly, honor `Crawl-delay`
   when present even though RFC 9309 deliberately excluded it from the standard.
@@ -293,6 +307,10 @@ accept a human-in-the-loop step.
   explicit override.
 - **Duplicates** — URL canonicalization into the frontier's dedup key, plus
   content-hash dedup at the store (which also gives free change detection).
+  Canonicalization drops the fragment, which is correct at the HTTP rungs (the
+  server never sees it) but **collapses distinct pages at the browser rung**,
+  where `#!/page/1` and `#!/page/2` are different content. Pass
+  `keep_fragment=True` when caching browser fetches of a fragment-routed app.
 - **Data drift** — the worst failure class, because everything reports success.
   Three controls belong *here* even though they look like extraction concerns:
   canary URLs with known values asserted every run; shape assertions on the raw

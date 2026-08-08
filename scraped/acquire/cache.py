@@ -25,6 +25,7 @@ True
 
 from __future__ import annotations
 
+import base64
 import json
 from collections.abc import MutableMapping
 from dataclasses import dataclass, field
@@ -44,16 +45,41 @@ from .capture import (
 __all__ = ["CaptureStore", "cached", "capture_store"]
 
 
+def _as_text(value) -> str:
+    """Stores may hand back bytes or str; both are fine."""
+    return value.decode("utf-8") if isinstance(value, (bytes, bytearray)) else value
+
+
 def _capture_from(metadata: dict, body: bytes) -> Capture:
-    """Rebuild a `Capture` from its persisted metadata and body."""
+    """Rebuild a `Capture` from its persisted metadata and body.
+
+    Restores the two things JSON cannot represent on its own: a `bytes` request
+    body (base64 on the way out) and tuple-typed fields (JSON only has arrays).
+    Both matter for round-trip equality — a restored capture that merely *looks*
+    like the original will pass a shallow test and fail a re-digest.
+    """
+    request_fields = dict(metadata["request"])
+    if request_fields.pop("body_is_base64", False) and request_fields.get("body"):
+        request_fields["body"] = base64.b64decode(request_fields["body"])
+
+    response_fields = dict(metadata["response"])
+    response_fields["redirect_chain"] = tuple(
+        response_fields.get("redirect_chain") or ()
+    )
+
+    probe_fields = dict(metadata.get("probe", {}))
+    probe_fields["state_blob_markers"] = tuple(
+        probe_fields.get("state_blob_markers") or ()
+    )
+
     return Capture(
-        request=Request(**metadata["request"]),
-        response=Response(**metadata["response"]),
+        request=Request(**request_fields),
+        response=Response(**response_fields),
         fetched_at=datetime.fromisoformat(metadata["fetched_at"]),
         elapsed_ms=metadata.get("elapsed_ms", 0.0),
         fetcher=FetcherInfo(**metadata.get("fetcher", {})),
         policy=PolicyOutcome(**metadata.get("policy", {})),
-        probe=ProbeMarks(**metadata.get("probe", {})),
+        probe=ProbeMarks(**probe_fields),
         body=body,
     )
 
@@ -76,14 +102,14 @@ class CaptureStore(MutableMapping):
         return cls(metadata={}, bodies={})
 
     def __getitem__(self, digest: str) -> Capture:
-        meta = json.loads(self.metadata[digest])
+        meta = json.loads(_as_text(self.metadata[digest]))
         body = self.bodies.get(meta["response"]["body_sha256"], b"")
         return _capture_from(meta, body)
 
     def __setitem__(self, digest: str, capture: Capture) -> None:
         if capture.body:
             self.bodies[capture.response.body_sha256] = capture.body
-        self.metadata[digest] = capture.to_json()
+        self.metadata[digest] = capture.to_json().encode("utf-8")
 
     def __delitem__(self, digest: str) -> None:
         del self.metadata[digest]
@@ -102,16 +128,34 @@ class CaptureStore(MutableMapping):
 
 
 def capture_store(rootdir: str) -> CaptureStore:
-    """A directory-backed store.
+    """A directory-backed store, creating the directories it needs.
 
     Uses `dol` so the same object works over a local directory, S3, or anything
     else with a `Mapping` face.
+
+    `~` is expanded and both subdirectories are created up front: `dol.Files`
+    does neither, so without this the first write fails with a bare `KeyError`
+    from the underlying `open()`.
+
+    >>> import tempfile, os
+    >>> store = capture_store(os.path.join(tempfile.mkdtemp(), "job"))
+    >>> from .capture import Capture, Request
+    >>> digest = store.add(Capture.from_body(Request("https://x.com/a"), b"hi"))
+    >>> store[digest].body
+    b'hi'
     """
+    from pathlib import Path
+
     from dol import Files
 
+    root = Path(rootdir).expanduser()
+    metadata_dir = root / "metadata"
+    bodies_dir = root / "bodies"
+    metadata_dir.mkdir(parents=True, exist_ok=True)
+    bodies_dir.mkdir(parents=True, exist_ok=True)
+
     return CaptureStore(
-        metadata=Files(f"{rootdir.rstrip('/')}/metadata/"),
-        bodies=Files(f"{rootdir.rstrip('/')}/bodies/"),
+        metadata=Files(f"{metadata_dir}/"), bodies=Files(f"{bodies_dir}/")
     )
 
 

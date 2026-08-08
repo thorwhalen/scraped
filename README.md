@@ -56,8 +56,10 @@ markup changed — because the blob *is* the data rather than a rendering of it.
 
 - **Impersonating transport by default.** A plain client gets `403` from origins
   that fingerprint TLS; the marginal cost of not being one is a single argument.
-- **Robots compliance on by default**, with overrides recorded in the capture, so
-  "were we allowed to take this" is a queryable fact.
+- **Robots compliance on by default** via `default_fetcher()` (and therefore
+  `fetch`/`probe`), with overrides recorded in the capture, so "were we allowed to
+  take this" is a queryable fact. Constructing `HttpFetcher()` directly opts out —
+  pass `robots=RobotsPolicy(...)` if you build your own.
 - **Per-host politeness and full-jitter retries** — and a challenge is *never*
   retried, because the answer will not change and repeating it confirms automation.
 - **Challenges detected and raised**, never silently saved as if they were data.

@@ -26,6 +26,8 @@ True
 
 from __future__ import annotations
 
+import base64
+import codecs
 import hashlib
 import json
 from dataclasses import asdict, dataclass, field, replace
@@ -146,6 +148,9 @@ class ProbeMarks:
 
     state_blob_markers: Sequence[str] = ()
     ld_json_count: int = 0
+    #: Body shorter than the declared Content-Length: a silent corruption that
+    #: otherwise only shows up downstream.
+    truncated: bool = False
     challenge_vendor: str | None = None
     #: Whether a challenge was served *instead of* content. A `challenge_vendor`
     #: without this only records who guards the origin.
@@ -208,24 +213,50 @@ class Capture:
         return self.body.decode(encoding or self._declared_encoding(), errors=errors)
 
     def _declared_encoding(self) -> str:
+        """The charset the server claimed, if Python actually has that codec.
+
+        `errors="replace"` protects against bad *bytes*, not a bad codec *name*:
+        `charset=utf8mb4` (MySQL-backed CMSes) raises `LookupError`. Servers
+        declare nonexistent charsets often enough that this must never propagate.
+        """
         content_type = self.response.content_type
         if "charset=" in content_type:
-            return content_type.split("charset=", 1)[1].split(";")[0].strip()
+            declared = content_type.split("charset=", 1)[1].split(";")[0].strip()
+            declared = declared.strip("\"'")
+            try:
+                codecs.lookup(declared)
+                return declared
+            except (LookupError, ValueError):
+                pass
         return "utf-8"
 
     def metadata(self) -> dict:
         """Everything except the payload, JSON-ready.
 
         This is what a store persists alongside the content-addressed body.
+
+        A `bytes` request body is base64-encoded rather than stringified. JSON's
+        `default=str` turns bytes into their *repr*, which round-trips to a
+        corrupted `str` with no error at write time — and rung (b), calling a
+        site's internal JSON/GraphQL API, is POST-shaped by definition, so this
+        is the common case rather than an exotic one.
         """
         as_dict = asdict(self)
         as_dict.pop("body")
         as_dict["fetched_at"] = self.fetched_at.isoformat()
+        request_body = as_dict["request"].get("body")
+        if isinstance(request_body, (bytes, bytearray)):
+            as_dict["request"]["body"] = base64.b64encode(request_body).decode("ascii")
+            as_dict["request"]["body_is_base64"] = True
         return as_dict
 
     def to_json(self, **kwargs: Any) -> str:
-        """Serialize the metadata."""
-        return json.dumps(self.metadata(), default=str, **kwargs)
+        """Serialize the metadata.
+
+        Deliberately no `default=` fallback: an unserializable field should fail
+        loudly here rather than be silently stringified into the store.
+        """
+        return json.dumps(self.metadata(), **kwargs)
 
 
 @runtime_checkable
@@ -260,8 +291,16 @@ def request_digest(
     >>> request_digest(b) == request_digest(c)  # noise headers ignored
     True
     """
-    lowered = {k.lower(): v for k, v in request.headers.items()}
-    significant = {k: lowered[k] for k in sorted(vary_headers) if k in lowered}
+    # Fold case deterministically: with both "Accept" and "accept" present, a
+    # plain dict comprehension would let insertion order decide the digest.
+    lowered: dict[str, list[str]] = {}
+    for key, value in request.headers.items():
+        lowered.setdefault(key.lower(), []).append(value)
+    significant = {
+        key: ", ".join(sorted(lowered[key]))
+        for key in sorted(vary_headers)
+        if key in lowered
+    }
     parts = [
         request.method.upper(),
         canonicalize_url(request.url),

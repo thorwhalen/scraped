@@ -22,6 +22,8 @@ dependencies = [
     "html2text",
     "lkj",
     "argh",
+    "requests",   # imported at module scope by tools.py/util.py; was only
+                  # resolving transitively via tldextract
     # acquisition core
     "curl_cffi",  # browser-impersonating transport (rung 2) - the default
     "protego",    # RFC 9309 robots.txt; stdlib robotparser gets wildcards wrong

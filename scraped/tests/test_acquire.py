@@ -391,3 +391,256 @@ def test_artifacts_truthiness_reflects_evidence(tmp_path):
 
     assert not BrowserArtifacts()
     assert BrowserArtifacts(har_path=tmp_path / "a.har.zip")
+
+
+# ==========================================================================
+# Regressions from the adversarial review. Each of these passed before the
+# fix by producing plausible-but-wrong output, which is the failure mode this
+# package most needs to be defended against.
+# ==========================================================================
+
+
+@pytest.mark.parametrize(
+    "html,kind",
+    [
+        # RHS is a JSON array, but an unrelated object follows on the same line
+        ('<script>window.__APOLLO_STATE__=[1,2,3];window.o={"z":9}</script>', "apollo"),
+        # RHS is a string: nothing should be decoded at all
+        (
+            '<script>window.__PRELOADED_STATE__="no";window.c={"secret":1}</script>',
+            "redux",
+        ),
+        # Nuxt 2 function expression containing a JSON array in its body
+        (
+            '<script>window.__NUXT__=(function(a){return {d:[{"total":0}]}}(0));</script>',
+            "nuxt",
+        ),
+        # empty function braces must not parse as "the state is {}"
+        ("<script>window.__NUXT__=(function(){})()</script>", "nuxt"),
+    ],
+)
+def test_global_rhs_is_never_taken_from_elsewhere_in_the_script(html, kind):
+    """A blob's `data` must come from its own right-hand side or not at all.
+
+    The original `_json_value_at` searched *forward* for the next `{` or `[`, so a
+    non-JSON RHS silently adopted an unrelated object from later in the script and
+    reported `parsed=True`. Silent wrong data is the worst thing this package can
+    emit.
+    """
+    (blob,) = [b for b in scan_state_blobs(html) if b.kind == kind]
+    assert blob.data in (None, [1, 2, 3]), f"adopted a foreign value: {blob.data!r}"
+    if blob.data is not None:
+        assert blob.raw.startswith("["), "raw and data must agree"
+
+
+def test_flight_detection_survives_later_json_in_the_page():
+    """Every real App Router page has other `{` in it."""
+    html = '<script>self.__next_f.push([1,"chunk-a"])</script><script>var c={"a":1}</script>'
+    (blob,) = [b for b in scan_state_blobs(html) if b.kind == "rsc_flight"]
+    assert blob.raw == "chunk-a"
+
+
+def test_unquoted_script_attributes_are_parsed():
+    """`<script type=application/json id=x>` is legal HTML and appears in the wild."""
+    html = '<script type=application/json id=__NEXT_DATA__>{"a":1}</script>'
+    assert [(b.kind, b.data) for b in scan_state_blobs(html)] == [
+        ("next_data", {"a": 1})
+    ]
+
+
+def test_commented_out_blobs_are_not_reported():
+    """Stale markup must not masquerade as page state."""
+    html = '<!-- <script id="__NEXT_DATA__" type="application/json">{"stale":1}</script> -->'
+    assert scan_state_blobs(html) == []
+
+
+def test_challenge_at_503_is_detected_and_not_retried():
+    """Interstitials are historically served at 503.
+
+    Before the fix this was classified as a transient server error, retried
+    max_attempts times, and returned as if it were data.
+    """
+    transport = FakeTransport(
+        html_result("just a moment", status=503, headers={"cf-mitigated": "challenge"})
+    )
+    fetcher = HttpFetcher(transport=transport, max_attempts=3)
+    with pytest.raises(ChallengeEncountered):
+        fetcher(Request("https://example.com/page"))
+    assert len(transport.requests) == 1
+
+
+def test_retriable_status_on_a_guarded_origin_is_not_retried():
+    """Where hammering does the most damage."""
+    transport = FakeTransport(
+        html_result("later", status=503, headers={"x-datadome": "protected"})
+    )
+    HttpFetcher(transport=transport, max_attempts=4, raise_on_challenge=False)(
+        Request("https://example.com/page")
+    )
+    assert len(transport.requests) == 1
+
+
+def test_interactive_marker_beyond_any_truncation_point_is_seen():
+    body = "x" * 300_000 + '<div class="cf-turnstile" data-sitekey="k">'
+    assert detect_challenge(200, {}, body).interactive is True
+
+
+def test_state_blobs_are_found_at_the_end_of_a_large_document():
+    """__NEXT_DATA__ is emitted near the end; a head-limited scan misses it."""
+    page = (
+        "<html><body><div>"
+        + "z" * 600_000
+        + '</div><script id="__NEXT_DATA__" type="application/json">{"a":[1,2]}</script></body></html>'
+    )
+    capture = HttpFetcher(transport=FakeTransport(html_result(page)))(
+        Request("https://example.com/page")
+    )
+    assert "__NEXT_DATA__" in capture.probe.state_blob_markers
+
+
+def test_classify_never_calls_a_4xx_ok():
+    assert classify(403, {}, "nope") == "forbidden"
+    for status in (400, 402, 405, 410, 451):
+        assert classify(status, {}, "nope") != "ok"
+
+
+def test_caller_supplied_robots_policy_is_not_discarded():
+    """The override reason is the attribution; dropping it defeats the design."""
+    from scraped.acquire import default_fetcher
+
+    mine = RobotsPolicy(
+        get_robots_txt=lambda host: "User-agent: *\nDisallow: /",
+        override_reason="site owner granted access by email",
+    )
+    fetcher = default_fetcher(transport=FakeTransport(html_result("ok")), robots=mine)
+    assert fetcher.robots is mine
+    capture = fetcher(Request("https://example.com/page"))
+    assert capture.policy.robots_override_reason == "site owner granted access by email"
+
+
+def test_bytes_request_body_survives_the_store_round_trip():
+    """Rung (b) — calling a site's internal API — is POST-shaped by definition."""
+    store = CaptureStore.in_memory()
+    body = b'{"query":"{me{id}}"}'
+    request = Request("https://api.example.com/graphql", method="POST", body=body)
+    digest = store.add(Capture.from_body(request, b"resp"))
+    restored = store[digest].request
+    assert restored.body == body
+    assert request_digest(restored) == digest  # re-keyable, so replayable
+
+
+def test_binary_request_body_is_not_stringified():
+    store = CaptureStore.in_memory()
+    body = b"\x89PNG\r\n\x1a\n\xff"
+    digest = store.add(
+        Capture.from_body(Request("https://x.com/u", method="POST", body=body), b"ok")
+    )
+    assert store[digest].request.body == body
+
+
+def test_persistent_store_actually_writes(tmp_path):
+    """The README's headline caching example, which had never been executed."""
+    from scraped.acquire import capture_store
+
+    store = capture_store(str(tmp_path / "job"))
+    digest = store.add(Capture.from_body(Request("https://x.com/a"), b"hello"))
+    assert store[digest].body == b"hello"
+    assert len(store) == 1
+    reopened = capture_store(str(tmp_path / "job"))
+    assert reopened[digest].body == b"hello"  # survives a fresh handle
+
+
+def test_persistent_store_expands_user(tmp_path, monkeypatch):
+    from scraped.acquire import capture_store
+
+    monkeypatch.setenv("HOME", str(tmp_path))
+    capture_store("~/acq-selftest")
+    assert (tmp_path / "acq-selftest" / "metadata").is_dir()
+
+
+def test_tuple_fields_round_trip_as_tuples():
+    store = CaptureStore.in_memory()
+    capture = HttpFetcher(transport=FakeTransport(html_result(NEXT_DATA_PAGE)))(
+        Request("https://example.com/page")
+    )
+    restored = store[store.add(capture)]
+    assert isinstance(restored.probe.state_blob_markers, tuple)
+    assert isinstance(restored.response.redirect_chain, tuple)
+
+
+def test_unknown_declared_charset_does_not_raise():
+    """`charset=utf8mb4` is a real thing MySQL-backed CMSes emit."""
+    capture = Capture.from_body(
+        Request("https://x.com/a"),
+        "héllo".encode(),
+        headers={"Content-Type": "text/html; charset=utf8mb4"},
+    )
+    assert "h" in capture.text()
+
+
+def test_probe_is_not_blinded_by_its_own_robots_policy():
+    """A Disallow:/ site must still yield its robots facts, named correctly."""
+    from scraped.acquire import probe
+
+    robots = "User-agent: *\nDisallow: /\nCrawl-delay: 5\nSitemap: https://x.com/s.xml"
+
+    class T:
+        name, rung = "fake", 1
+
+        def send(self, request, *, timeout=None):
+            if request.url.endswith("/robots.txt"):
+                return TransportResult(
+                    200, {"Content-Type": "text/plain"}, robots.encode(), request.url
+                )
+            return TransportResult(200, {}, b"<html></html>", request.url)
+
+    fetcher = HttpFetcher(
+        transport=T(),
+        robots=RobotsPolicy(get_robots_txt=lambda host: robots),
+        raise_on_challenge=False,
+    )
+    profile = probe("https://x.com/a", fetcher=fetcher)
+    assert profile.robots_allowed is False
+    assert profile.crawl_delay == 5.0
+    assert profile.sitemaps == ("https://x.com/s.xml",)
+    assert any("robots disallows" in note for note in profile.notes)
+
+
+def test_duplicate_set_cookie_headers_are_preserved():
+    """Four of nine vendor markers are cookie-based; losing one can hide a block."""
+    from email.message import Message
+
+    from scraped.acquire.fetchers.http import _fold_headers
+
+    message = Message()
+    message["Set-Cookie"] = "datadome=abc"
+    message["Set-Cookie"] = "sessid=1"
+    folded = _fold_headers(message)
+    assert "datadome=abc" in folded["Set-Cookie"]
+    assert detect_challenge(403, folded, "").vendor == "datadome"
+
+
+def test_absurd_retry_after_does_not_hang_the_job():
+    import time as _time
+
+    transport = FakeTransport(
+        html_result("later", status=429, headers={"Retry-After": "86400"})
+    )
+    started = _time.monotonic()
+    HttpFetcher(transport=transport, max_attempts=3, raise_on_challenge=False)(
+        Request("https://example.com/page")
+    )
+    assert _time.monotonic() - started < 5
+
+
+def test_max_attempts_is_validated():
+    with pytest.raises(ValueError):
+        HttpFetcher(transport=FakeTransport(html_result("x")), max_attempts=0)
+
+
+def test_truncated_body_is_flagged():
+    transport = FakeTransport(
+        TransportResult(200, {"Content-Length": "9999"}, b"short", "https://x.com/a")
+    )
+    capture = HttpFetcher(transport=transport)(Request("https://x.com/a"))
+    assert capture.probe.truncated is True

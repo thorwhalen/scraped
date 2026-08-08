@@ -20,7 +20,14 @@ from typing import Mapping
 
 # Statuses at which a vendor marker means "you were stopped" rather than
 # "this origin is guarded".
-BLOCKED_STATUSES = frozenset({401, 403, 429})
+#
+# 503 and Cloudflare's 52x range belong here even though they read as server
+# errors: interstitial challenge pages are historically served at 503, and
+# several vendors use it for load-shedding. Leaving it out meant a challenge
+# was classified as a transient error, retried, and then returned as data.
+BLOCKED_STATUSES = frozenset(
+    {401, 403, 429, 503, 520, 521, 522, 523, 524, 525, 526, 527}
+)
 
 __all__ = [
     "ChallengeEncountered",
@@ -119,7 +126,9 @@ def detect_challenge(
     """Identify a bot-protection challenge from cheap signals.
 
     Checks headers and cookies before the body, since those are harder to fake
-    and cheaper to inspect.
+    and cheaper to inspect. The body is scanned in full: an earlier version
+    truncated it, which hid widgets and challenge markers on large pages — and a
+    missed challenge is the expensive direction of this error.
 
     >>> bool(detect_challenge(200, {}, "<html>fine</html>"))
     False
@@ -140,7 +149,7 @@ def detect_challenge(
     """
     header_blob = " ".join(f"{k}: {v}" for k, v in headers.items()).lower()
     cookie_blob = _joined_cookies(headers).lower()
-    lowered_body = body[:200_000].lower()
+    lowered_body = body.lower()
 
     for name, pattern in INTERACTIVE_MARKERS:
         if re.search(pattern, lowered_body):
@@ -186,13 +195,20 @@ def looks_truncated(body: bytes, headers: Mapping[str, str]) -> bool:
 def classify(status: int, headers: Mapping[str, str], body: str = "") -> str:
     """One-word verdict driving the escalation decision.
 
-    Returns one of: `ok`, `challenge`, `rate_limited`, `not_found`, `server_error`,
-    `auth_required`, `empty`.
+    Returns one of: `ok`, `challenge`, `rate_limited`, `forbidden`, `not_found`,
+    `client_error`, `server_error`, `auth_required`, `empty`.
 
     >>> classify(429, {}, "")
     'rate_limited'
     >>> classify(200, {}, "")
     'empty'
+
+    A bare 403 is the most common block there is, and must never read as success:
+
+    >>> classify(403, {}, "nope")
+    'forbidden'
+    >>> classify(451, {}, "nope")
+    'client_error'
     """
     if detect_challenge(status, headers, body):
         return "challenge"
@@ -202,8 +218,12 @@ def classify(status: int, headers: Mapping[str, str], body: str = "") -> str:
         return "auth_required"
     if status == 404:
         return "not_found"
+    if status == 403:
+        return "forbidden"
     if status >= 500:
         return "server_error"
+    if 400 <= status < 500:
+        return "client_error"
     if 200 <= status < 300 and not body.strip():
         return "empty"
     return "ok"

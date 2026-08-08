@@ -44,7 +44,7 @@ from ..policy import (
     retry_delays,
     should_retry,
 )
-from ..signals import ChallengeEncountered, detect_challenge
+from ..signals import ChallengeEncountered, detect_challenge, looks_truncated
 
 __all__ = [
     "TransportResult",
@@ -58,6 +58,9 @@ __all__ = [
 
 DFLT_TIMEOUT = 30.0
 DFLT_IMPERSONATE = "chrome"
+# Honor Retry-After, but not blindly: 'Retry-After: 86400' is a polite way of
+# saying go away, and sleeping on it hangs the job for a day.
+DFLT_MAX_RETRY_AFTER = 120.0
 
 # Chrome's own order matters as much as the values: header *ordering* is part of
 # what is fingerprinted. Impersonating transports set their own; this is the
@@ -140,7 +143,7 @@ class UrllibTransport:
                 body = response.read()
                 return TransportResult(
                     status=response.status,
-                    headers=dict(response.headers.items()),
+                    headers=_fold_headers(response.headers),
                     body=body,
                     final_url=response.url,
                     redirect_chain=(
@@ -150,7 +153,7 @@ class UrllibTransport:
         except urllib.error.HTTPError as error:  # an HTTP error is still a result
             return TransportResult(
                 status=error.code,
-                headers=dict(error.headers.items()) if error.headers else {},
+                headers=_fold_headers(error.headers) if error.headers else {},
                 body=error.read(),
                 final_url=error.url or request.url,
             )
@@ -222,7 +225,12 @@ class HttpFetcher:
     robots: RobotsPolicy | None = None
     politeness: Politeness | None = None
     max_attempts: int = DFLT_MAX_ATTEMPTS
+    max_retry_after: float = DFLT_MAX_RETRY_AFTER
     raise_on_challenge: bool = True
+
+    def __post_init__(self):
+        if self.max_attempts < 1:
+            raise ValueError(f"max_attempts must be >= 1, got {self.max_attempts}")
 
     def __call__(self, request: Request) -> Capture:
         """Fetch one request, applying policy and recording provenance."""
@@ -256,17 +264,24 @@ class HttpFetcher:
                 time.sleep(delays[attempt])
                 continue
 
-            challenged = bool(
-                detect_challenge(last.status, last.headers, _peek(last.body))
-            )
-            if not should_retry(last.status, challenge=challenged):
+            verdict = detect_challenge(last.status, last.headers, _decode(last.body))
+            if not should_retry(
+                last.status,
+                challenge=bool(verdict),
+                vendor_guarded=verdict.vendor is not None,
+            ):
                 break
             if attempt == self.max_attempts - 1:
                 break
             explicit = retry_after_seconds(last.headers)
+            if explicit is not None and explicit > self.max_retry_after:
+                break  # the site is asking for longer than this job should wait
             time.sleep(explicit if explicit is not None else delays[attempt])
 
-        assert last is not None  # loop either returns a result or raises
+        if last is None:  # unreachable given __post_init__, but never assert:
+            raise RuntimeError(  # `python -O` strips asserts and we'd pass None on
+                f"no attempt was made for {request.url}"
+            )
         return last, (time.perf_counter() - started) * 1000
 
     def _to_capture(
@@ -276,7 +291,7 @@ class HttpFetcher:
         elapsed_ms: float,
         policy_outcome: PolicyOutcome,
     ) -> Capture:
-        text = _peek(result.body)
+        text = _decode(result.body)
         verdict = detect_challenge(result.status, result.headers, text)
 
         if verdict and self.raise_on_challenge:
@@ -290,6 +305,7 @@ class HttpFetcher:
         marks = ProbeMarks(
             state_blob_markers=tuple(state_blob_markers(text)) if text else (),
             ld_json_count=text.count("application/ld+json") if text else 0,
+            truncated=looks_truncated(result.body, result.headers),
             challenge_vendor=verdict.vendor,
             challenge_serving=verdict.serving,
         )
@@ -317,9 +333,28 @@ class HttpFetcher:
         )
 
 
-def _peek(body: bytes, limit: int = 500_000) -> str:
-    """Decode enough of a body to run cheap text signals over it."""
-    return body[:limit].decode("utf-8", errors="replace")
+def _fold_headers(message) -> dict[str, str]:
+    """Flatten an email.Message-style header set without losing duplicates.
+
+    `dict(message.items())` keeps only the last value for a repeated name, which
+    for `Set-Cookie` means dropping every cookie but one — and four of the nine
+    bot-vendor markers are cookie-based, so a real block can go undetected.
+    """
+    folded: dict[str, list[str]] = {}
+    for key, value in message.items():
+        folded.setdefault(key, []).append(value)
+    return {key: ", ".join(values) for key, values in folded.items()}
+
+
+def _decode(body: bytes) -> str:
+    """Decode a body for text signals.
+
+    Deliberately not truncated. `__NEXT_DATA__` is emitted near the *end* of a
+    document, and the script regex needs the closing tag, so a head-limited scan
+    silently reports no blobs on exactly the large pages where blobs matter most.
+    Measured cost of a full scan is well under a second on a 20 MB document.
+    """
+    return body.decode("utf-8", errors="replace")
 
 
 def robots_reader(transport: Transport) -> "Callable[[str], str | None]":
@@ -339,13 +374,13 @@ def robots_reader(transport: Transport) -> "Callable[[str], str | None]":
     return read
 
 
-def default_fetcher(*, robots: bool = True, **kwargs) -> HttpFetcher:
+def default_fetcher(*, robots: "bool | RobotsPolicy" = True, **kwargs) -> HttpFetcher:
     """The recommended starting fetcher: impersonating, polite, robots-respecting.
 
     Robots compliance defaults to **on**, per the design: an override must be a
-    deliberate, attributable act. Pass `robots=False` only with a
-    `RobotsPolicy(override_reason=...)` of your own if you need the outcome
-    recorded.
+    deliberate, attributable act. Pass a `RobotsPolicy(override_reason=...)` as
+    `robots=` to supply your own — the reason is recorded in every capture — or
+    `robots=False` to disable the check entirely.
 
     Falls back to the stdlib transport when `curl_cffi` is unavailable, so the
     package stays usable and is merely *less capable* without it.
@@ -358,8 +393,12 @@ def default_fetcher(*, robots: bool = True, **kwargs) -> HttpFetcher:
         transport = UrllibTransport()
     kwargs.setdefault("transport", transport)
     kwargs.setdefault("politeness", Politeness())
-    if robots and "robots" not in kwargs:
-        kwargs["robots"] = RobotsPolicy(
-            get_robots_txt=robots_reader(kwargs["transport"])
+    if isinstance(robots, RobotsPolicy):
+        # A caller-supplied policy carries the attributable override reason; an
+        # earlier version treated `robots` as a bool and silently discarded it.
+        kwargs["robots"] = robots
+    elif robots:
+        kwargs.setdefault(
+            "robots", RobotsPolicy(get_robots_txt=robots_reader(kwargs["transport"]))
         )
     return HttpFetcher(**kwargs)

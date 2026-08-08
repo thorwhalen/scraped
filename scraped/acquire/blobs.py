@@ -57,11 +57,16 @@ SCRIPT_ID_KINDS = {
 # Below this, a bare JSON-looking script is more likely config than payload.
 DFLT_MIN_GENERIC_SIZE = 2048
 
+# A commented-out script is stale markup, not page state. Stripping comments
+# first stops a leftover blob from being reported as the real one.
+_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 _SCRIPT_RE = re.compile(
     r"<script\b(?P<attrs>[^>]*)>(?P<body>.*?)</script\s*>",
     re.IGNORECASE | re.DOTALL,
 )
-_ATTR_RE = re.compile(r"""(\w[\w:-]*)\s*=\s*["']([^"']*)["']""")
+# Values may legally be unquoted (`<script type=application/json id=x>`),
+# and a real page will do it.
+_ATTR_RE = re.compile(r"""(\w[\w:-]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>=`]+))""")
 _FLIGHT_RE = re.compile(r"(?:self|window)\.__next_f\s*\.\s*push\s*\(")
 _JSON_TYPES = ("application/json", "application/ld+json")
 
@@ -99,28 +104,42 @@ def iter_script_texts(html: str) -> Iterator[tuple[dict[str, str], str]]:
     >>> list(iter_script_texts('<script type="x" id="y">B</script>'))
     [({'type': 'x', 'id': 'y'}, 'B')]
     """
-    for match in _SCRIPT_RE.finditer(html):
+    for match in _SCRIPT_RE.finditer(_COMMENT_RE.sub("", html)):
         attrs = {
-            key.lower(): value for key, value in _ATTR_RE.findall(match.group("attrs"))
+            key.lower(): (double or single or bare)
+            for key, double, single, bare in _ATTR_RE.findall(match.group("attrs"))
         }
         yield attrs, match.group("body")
 
 
 def _json_value_at(text: str, start: int) -> tuple[Any, int] | None:
-    """Decode the JSON value beginning at or after `start`, if there is one.
+    """Decode the JSON value that begins **immediately** at `start`, if any.
 
     Uses the stdlib decoder's `raw_decode` so that braces inside strings and
     escapes are handled correctly — a hand-rolled brace counter gets this wrong.
+
+    The "immediately" is load-bearing. An earlier version searched *forward* for
+    the next `{` or `[`, which meant an assignment whose right-hand side was not
+    JSON would happily decode some unrelated object later in the script and
+    report it as the framework's state — with `parsed=True` and a `raw` that
+    disagreed with `data`. Silent wrong data is the worst outcome this package
+    can produce, so: skip whitespace, and if the next character is not a JSON
+    container, report nothing.
+
+    >>> _json_value_at('window.X = [1,2]; window.Y = {"z":9}', len("window.X = "))
+    ([1, 2], 16)
+    >>> _json_value_at('window.X = "no"; window.Y = {"z":9}', len("window.X = ")) is None
+    True
     """
-    for opener in ("{", "["):
-        index = text.find(opener, start)
-        if index == -1:
-            continue
-        try:
-            return _decoder.raw_decode(text, index)
-        except ValueError:
-            continue
-    return None
+    index = start
+    while index < len(text) and text[index] in " \t\r\n":
+        index += 1
+    if index >= len(text) or text[index] not in "{[":
+        return None
+    try:
+        return _decoder.raw_decode(text, index)
+    except ValueError:
+        return None
 
 
 def _blob_from_script_id(attrs: dict[str, str], body: str) -> StateBlob | None:
@@ -191,9 +210,10 @@ def _flight_blob(html: str) -> StateBlob | None:
     React Flight wire format — which is *not* JSON. We concatenate the chunks and
     report them unparsed; decoding Flight needs a dedicated parser.
     """
+    html = _COMMENT_RE.sub("", html)
     chunks: list[str] = []
     for match in _FLIGHT_RE.finditer(html):
-        decoded = _json_value_at(html, match.end() - 1)
+        decoded = _json_value_at(html, match.end())
         if decoded is None:
             continue
         payload = decoded[0]

@@ -25,6 +25,7 @@ from urllib.parse import urljoin, urlsplit
 
 from .blobs import StateBlob, scan_state_blobs
 from .capture import Capture, Request
+from .policy import RobotsDisallowed
 from .signals import detect_challenge
 
 __all__ = ["SiteProfile", "probe", "robots_sitemaps"]
@@ -142,14 +143,18 @@ def probe(
     page itself) and never raises on a challenge — the whole point is to *report*
     the obstacle rather than trip over it.
     """
-    from .fetchers.http import default_fetcher
+    from .fetchers.http import default_fetcher, robots_reader
 
     fetcher = fetcher or default_fetcher(raise_on_challenge=False)
     split = urlsplit(url)
     host = f"{split.scheme}://{split.netloc}"
     notes: list[str] = []
 
-    robots_txt = _safe_text(fetcher, urljoin(host, "/robots.txt"))
+    # robots.txt and sitemaps are fetched *below* the policy layer. Routing them
+    # through a robots-respecting fetcher means a `Disallow: /` site blinds the
+    # probe to every fact it exists to report — including the fact that robots
+    # disallows, which would then read as "unknown" under a misleading note.
+    robots_txt = _robots_text(fetcher, host)
     sitemaps = robots_sitemaps(robots_txt) if robots_txt else []
     robots_allowed, crawl_delay = _robots_verdict(robots_txt, url)
 
@@ -166,8 +171,13 @@ def probe(
                     "no HTML parsing needed"
                 )
 
-    capture = _safe_capture(fetcher, Request(url))
+    capture, fetch_error = _safe_capture_or_error(fetcher, Request(url))
     if capture is None:
+        notes.append(
+            "robots disallows this URL for our user-agent"
+            if isinstance(fetch_error, RobotsDisallowed)
+            else f"page fetch failed: {type(fetch_error).__name__}"
+        )
         return SiteProfile(
             url=url,
             host=host,
@@ -175,10 +185,10 @@ def probe(
             crawl_delay=crawl_delay,
             sitemaps=tuple(sitemaps),
             serves_json=serves_json,
-            notes=tuple(notes + ["page fetch failed"]),
+            notes=tuple(notes),
         )
 
-    text = capture.text() if capture.response.is_textual else ""
+    text = _safe_text_of(capture)
     verdict = detect_challenge(capture.response.status, capture.response.headers, text)
     blobs = tuple(scan_state_blobs(text)) if text else ()
 
@@ -226,12 +236,34 @@ def _robots_verdict(robots_txt: str, url: str) -> tuple[bool | None, float | Non
 
 
 def _safe_capture(fetcher, request: Request) -> Capture | None:
+    return _safe_capture_or_error(fetcher, request)[0]
+
+
+def _safe_capture_or_error(
+    fetcher, request: Request
+) -> tuple[Capture | None, Exception | None]:
+    """Fetch without raising, but keep *why* it failed — the reason is the finding."""
     try:
-        return fetcher(request)
+        return fetcher(request), None
+    except Exception as error:
+        return None, error
+
+
+def _safe_text_of(capture: Capture) -> str:
+    if not capture.response.is_textual:
+        return ""
+    try:
+        return capture.text()
     except Exception:
-        return None
+        return ""
 
 
-def _safe_text(fetcher, url: str) -> str:
-    capture = _safe_capture(fetcher, Request(url))
-    return capture.text() if capture is not None and capture.ok else ""
+def _robots_text(fetcher, host: str) -> str:
+    """Read robots.txt below the policy layer, so the probe is never self-blinded."""
+    from .fetchers.http import UrllibTransport, robots_reader
+
+    transport = getattr(fetcher, "transport", None) or UrllibTransport()
+    try:
+        return robots_reader(transport)(host) or ""
+    except Exception:
+        return ""
