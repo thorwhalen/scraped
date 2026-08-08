@@ -4,6 +4,105 @@ Tools for scraping.
 
 To install:	```pip install scraped```
 
+---
+
+## `scraped.acquire` — get the bytes down, faithfully
+
+Acquisition is one of three separable concerns in any information-extraction job:
+**acquire** the raw bytes, **extract** the target fields, **format** the result.
+This package owns the first and gives the other two a seam to hook into.
+
+```python
+from scraped.acquire import probe, fetch, scan_state_blobs
+
+print(probe("https://example.com").summary())   # what will this site hand over?
+capture = fetch("https://example.com")          # impersonating, polite, robots-aware
+blobs = scan_state_blobs(capture.text())        # where is the structured data?
+```
+
+`probe` costs about three requests and usually decides the whole job:
+
+```
+  status          200
+  robots          allowed=True delay=None
+  sitemaps        1
+  serves JSON     False
+  generator       next.js (pages router)
+  best payload    state_blob
+  state blobs     next_data(445784B)
+  guarded by      datadome (not blocking; use an impersonating transport)
+```
+
+### The one idea worth internalizing
+
+Payload shape and transport are **independent axes**, and you optimize payload first:
+
+```
+payload:    api > internal api > state blob > sitemap > dom > text > vision
+transport:  plain http > impersonating http > +session > browser > headful
+```
+
+Any payload rung is reachable from any transport rung. The highest-value cell on
+the grid — *drive a real browser, then read the page's embedded state blob* — is
+the one a single cheap-to-expensive ladder hides, because it makes browser
+automation look like the bottom rather than an orthogonal cost.
+
+This matters concretely. Scraping the DOM of a lazily-rendered listing returned
+35/32/29 rows from pages that each held 35. Reading the same pages'
+`__NEXT_DATA__` returned all of them, on every page, and kept working when the
+markup changed — because the blob *is* the data rather than a rendering of it.
+
+### What you get without asking for it
+
+- **Impersonating transport by default.** A plain client gets `403` from origins
+  that fingerprint TLS; the marginal cost of not being one is a single argument.
+- **Robots compliance on by default** via `default_fetcher()` (and therefore
+  `fetch`/`probe`), with overrides recorded in the capture, so "were we allowed to
+  take this" is a queryable fact. Constructing `HttpFetcher()` directly opts out —
+  pass `robots=RobotsPolicy(...)` if you build your own.
+- **Per-host politeness and full-jitter retries** — and a challenge is *never*
+  retried, because the answer will not change and repeating it confirms automation.
+- **Challenges detected and raised**, never silently saved as if they were data.
+- **Provenance on every capture** — WARC-isomorphic, with the body content-addressed
+  so deduplication, change detection, and free re-runs all fall out of one choice.
+
+```python
+from scraped.acquire import default_fetcher, cached, capture_store, Request
+
+fetcher = cached(default_fetcher(), capture_store("~/.cache/my-job"))
+capture = fetcher(Request(url))   # second run costs no network at all
+```
+
+### Browser rung (optional)
+
+```bash
+pip install 'scraped[browser]' && patchright install chromium
+```
+
+```python
+from scraped.acquire import BrowserSession, BrowserFetcher, Request
+
+with BrowserSession(artifact_dir="~/runs/job") as session:
+    capture = BrowserFetcher(session=session)(Request(url))
+    session.save_storage_state()        # then work at HTTP speed from here
+    print(session.artifacts().har_path) # every byte, on disk
+```
+
+The rule this rung enforces: **the browser writes to disk; you read the file
+path.** HAR and download paths are set at context creation and are not optional.
+Getting a payload *out* of an automated browser is its own expensive failure
+class — see [`misc/docs/browser-result-exfiltration.md`](misc/docs/browser-result-exfiltration.md).
+
+### Design docs
+
+[`misc/docs/`](misc/docs/) — [architecture](misc/docs/acquisition-architecture.md)
+(terminology, the two-axis model, the escalation ladder and its diagnostic signal
+table), [tooling survey](misc/docs/acquisition-tooling-survey.md) (what to use,
+what is abandoned, and why), and
+[browser exfiltration](misc/docs/browser-result-exfiltration.md).
+
+---
+
 
 # Showcase of main functionalities
 
