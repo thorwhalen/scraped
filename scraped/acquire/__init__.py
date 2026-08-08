@@ -47,7 +47,17 @@ from .capture import (
     body_digest,
     request_digest,
 )
-from .fetchers import CurlCffiTransport, HttpFetcher, UrllibTransport, default_fetcher
+from .fetchers import (
+    BrowserArtifacts,
+    BrowserFetcher,
+    BrowserSession,
+    CurlCffiTransport,
+    HttpFetcher,
+    UrllibTransport,
+    browser_check_requirements,
+    default_fetcher,
+    storage_state_headers,
+)
 from .policy import Politeness, RobotsDisallowed, RobotsPolicy
 from .probe import SiteProfile, probe, robots_sitemaps
 from .signals import ChallengeEncountered, classify, detect_challenge
@@ -73,6 +83,11 @@ __all__ = [
     "CurlCffiTransport",
     "UrllibTransport",
     "default_fetcher",
+    "BrowserFetcher",
+    "BrowserSession",
+    "BrowserArtifacts",
+    "browser_check_requirements",
+    "storage_state_headers",
     # policy
     "RobotsPolicy",
     "RobotsDisallowed",

@@ -319,3 +319,75 @@ def test_capture_survives_a_store_round_trip():
 )
 def test_canonicalize_url(raw, expected):
     assert canonicalize_url(raw) == expected
+
+
+# --------------------------------------------------------------------------
+# browser rung — the contract is "artifacts to disk", not "payload to caller"
+
+
+def test_check_requirements_guides_rather_than_raises():
+    from scraped.acquire import browser_check_requirements
+
+    report = browser_check_requirements(verbose=False)
+    assert set(report) == {"driver", "browser_binary", "ready", "instructions"}
+    assert isinstance(report["instructions"], list)
+
+
+def test_browser_module_imports_without_a_driver():
+    """The rung must be importable so check_requirements can explain itself.
+
+    An ImportError at module scope would make the guidance unreachable.
+    """
+    import importlib
+
+    module = importlib.import_module("scraped.acquire.fetchers.browser")
+    assert hasattr(module, "BrowserFetcher")
+
+
+def test_session_forces_disk_artifacts(tmp_path):
+    """HAR and downloads paths are set at construction, not left to the caller.
+
+    This is the fix for the failure class that motivated the design: a payload
+    must never need to travel through the caller's context.
+    """
+    from scraped.acquire import BrowserSession
+
+    session = BrowserSession(artifact_dir=tmp_path)
+    assert (tmp_path / "downloads").is_dir()
+    assert (tmp_path / "json").is_dir()
+    assert session._har_path is not None
+    assert str(session._har_path).endswith(".har.zip")
+
+
+def test_har_recording_can_be_disabled_but_is_on_by_default(tmp_path):
+    from scraped.acquire import BrowserSession
+
+    assert BrowserSession(artifact_dir=tmp_path)._har_path is not None
+    assert BrowserSession(artifact_dir=tmp_path, record_har=False)._har_path is None
+
+
+def test_storage_state_becomes_cookie_header_for_cheap_rungs(tmp_path):
+    """Rung 4: pay for the browser once, then work at HTTP speed."""
+    from scraped.acquire import storage_state_headers
+
+    state = tmp_path / "state.json"
+    state.write_text(
+        json.dumps(
+            {
+                "cookies": [
+                    {"name": "sid", "value": "abc", "domain": ".example.com"},
+                    {"name": "other", "value": "z", "domain": ".elsewhere.com"},
+                ]
+            }
+        )
+    )
+    assert storage_state_headers(state) == {"Cookie": "sid=abc; other=z"}
+    scoped = storage_state_headers(state, url_host="www.example.com")
+    assert scoped == {"Cookie": "sid=abc"}
+
+
+def test_artifacts_truthiness_reflects_evidence(tmp_path):
+    from scraped.acquire import BrowserArtifacts
+
+    assert not BrowserArtifacts()
+    assert BrowserArtifacts(har_path=tmp_path / "a.har.zip")
