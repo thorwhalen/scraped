@@ -83,9 +83,9 @@ def acquire_content(
     store = _ensure_store_func(store)
 
     if uris is None:
-        assert callable(
-            uri_to_content
-        ), "uri_to_content must be a callable if uris is None"
+        assert callable(uri_to_content), (
+            "uri_to_content must be a callable if uris is None"
+        )
         return partial(acquire_content, uri_to_content, store=store)
 
     # Loop through uris and store the processed content

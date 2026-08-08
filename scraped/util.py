@@ -454,9 +454,9 @@ def markdown_of_site(
     if not dir_to_save_page_slurps:
         dir_to_save_page_slurps = TemporaryDirectory(prefix="scraped_").name
     else:
-        assert os.path.isdir(
-            dir_to_save_page_slurps
-        ), f"dir_to_save_page_slurps must be a directory: {dir_to_save_page_slurps}"
+        assert os.path.isdir(dir_to_save_page_slurps), (
+            f"dir_to_save_page_slurps must be a directory: {dir_to_save_page_slurps}"
+        )
 
     # download the site to the temporary directory
     _url_to_localpath = partial(url_to_localpath, rootdir=dir_to_save_page_slurps)

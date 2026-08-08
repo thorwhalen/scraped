@@ -15,9 +15,9 @@ This package owns the first and gives the other two a seam to hook into.
 ```python
 from scraped.acquire import probe, fetch, scan_state_blobs
 
-print(probe("https://example.com").summary())   # what will this site hand over?
-capture = fetch("https://example.com")          # impersonating, polite, robots-aware
-blobs = scan_state_blobs(capture.text())        # where is the structured data?
+print(probe("https://example.com").summary())  # what will this site hand over?
+capture = fetch("https://example.com")  # impersonating, polite, robots-aware
+blobs = scan_state_blobs(capture.text())  # where is the structured data?
 ```
 
 `probe` costs about three requests and usually decides the whole job:
@@ -70,7 +70,7 @@ markup changed — because the blob *is* the data rather than a rendering of it.
 from scraped.acquire import default_fetcher, cached, capture_store, Request
 
 fetcher = cached(default_fetcher(), capture_store("~/.cache/my-job"))
-capture = fetcher(Request(url))   # second run costs no network at all
+capture = fetcher(Request(url))  # second run costs no network at all
 ```
 
 ### Browser rung (optional)
@@ -84,8 +84,8 @@ from scraped.acquire import BrowserSession, BrowserFetcher, Request
 
 with BrowserSession(artifact_dir="~/runs/job") as session:
     capture = BrowserFetcher(session=session)(Request(url))
-    session.save_storage_state()        # then work at HTTP speed from here
-    print(session.artifacts().har_path) # every byte, on disk
+    session.save_storage_state()  # then work at HTTP speed from here
+    print(session.artifacts().har_path)  # every byte, on disk
 ```
 
 The rule this rung enforces: **the browser writes to disk; you read the file
@@ -184,7 +184,7 @@ str of length 626439
 ## download_site
 
 ```python
-download_site('http://www.example.com')
+download_site("http://www.example.com")
 ```
 
 will just download the page the url points to, storing it in the default rootdir, 
@@ -195,7 +195,7 @@ The `depth` argument will enable you to download more content starting from the 
 
 
 ```python
-download_site('http://www.example.com', depth=3)
+download_site("http://www.example.com", depth=3)
 ```
 
 And there's more arguments:
