@@ -22,6 +22,10 @@ dependencies = [
     "html2text",
     "lkj",
     "argh",
+    # acquisition core
+    "curl_cffi",  # browser-impersonating transport (rung 2) - the default
+    "protego",    # RFC 9309 robots.txt; stdlib robotparser gets wildcards wrong
+    "dol",        # Mapping-shaped stores, so local-dir -> S3 is a constructor change
 ]
 
 
@@ -29,6 +33,12 @@ dependencies = [
 Homepage = "https://github.com/thorwhalen/scraped"
 
 [project.optional-dependencies]
+browser = [
+    "patchright",  # patched Playwright; transport rungs 4-5
+]
+dom = [
+    "selectolax",  # only needed when you must actually parse the DOM (rung e)
+]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",

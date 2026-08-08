@@ -16,13 +16,27 @@ Core (light, always installed):
 | Library | Role |
 |---|---|
 | `curl_cffi` | impersonating HTTP client — the default fetcher |
-| `selectolax` | fast HTML/CSS when the DOM must be touched |
 | `protego` | robots.txt policy |
-| `tenacity` | retries with full jitter |
+| `dol` | `Mapping`-shaped stores, so local-dir → S3 is a constructor change |
 
-Optional `[browser]` extra: `patchright`.
+Optional extras: `[browser]` → `patchright` (rungs 4–5); `[dom]` → `selectolax`,
+needed only when you genuinely must parse the DOM (rung e).
+
 Optional, per-job: `parsel` (XPath + CSS + JMESPath in one object), `warcio` (real
 WARC output), `pywb` (recording proxy, separate venv).
+
+Two libraries an earlier draft of this survey listed as core were dropped once the
+code was written, and the reasons generalize:
+
+- **`tenacity`** — the retry policy this package needs is *not* generic. It must
+  never retry a challenge, must honor an explicit `Retry-After`, and must apply
+  full jitter. That is about twenty lines, and expressing it directly keeps the
+  policy readable at the point where correctness matters.
+- **`selectolax`** — the script-tag scan that finds state blobs uses a regex
+  rather than a DOM parse, deliberately: it must keep working on truncated,
+  malformed, and challenge-page HTML, exactly the inputs where a parser bails.
+  DOM parsing is rung (e), which the design treats as the fallback, so its
+  dependency is an extra rather than core.
 
 Unchanged and untouched: `scrapy`, which continues to back `download_site` /
 `markdown_of_site`.
