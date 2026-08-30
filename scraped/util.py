@@ -2,7 +2,8 @@
 
 import os
 from functools import partial
-from typing import Optional, Union, Tuple, List, Dict
+from itertools import chain
+from typing import Optional, Union, Tuple, List, Dict, Iterator
 from collections.abc import Iterable, Mapping, Callable
 import multiprocessing
 import re
@@ -14,7 +15,8 @@ import scrapy
 from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
 
-import html2text
+from bs4 import BeautifulSoup
+from markdownify import MarkdownConverter
 from config2py import get_app_config_folder, process_path
 from graze.base import url_to_localpath as graze_url_to_localpath
 
@@ -239,6 +241,135 @@ def is_html_content(content: str | bytes) -> bool:
     return False
 
 
+#: Tags whose *content* is never part of the document text. ``markdownify``
+#: already drops ``script``/``style``, but not ``<title>``, so the whole head is
+#: removed before conversion (``html2text``, which this replaced, ignored it too).
+NON_CONTENT_TAGS = ("head", "script", "style", "noscript")
+
+#: Defaults for the HTML->Markdown conversion. Override any of them by passing
+#: the same keyword to :func:`html_to_markdown`.
+HTML_TO_MARKDOWN_DEFAULTS = {
+    "heading_style": "ATX",  # "# Title", not the underlined setext form
+    "bullets": "*",
+    "escape_underscores": False,  # keeps identifiers like ``foo_bar`` readable
+    "escape_asterisks": False,
+}
+
+#: An opening (or closing) fence of a fenced code block, allowing markdown's
+#: three spaces of leading indentation.
+_CODE_FENCE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
+
+
+def _outside_code_fences(markdown: str) -> Iterator[Tuple[bool, str]]:
+    """Split *markdown* into ``(is_fenced_code, text)`` chunks.
+
+    An unterminated fence keeps everything after it marked as code, which is the
+    conservative choice: whitespace inside code is content.
+
+    >>> list(_outside_code_fences("a\\n```\\nb\\n```\\nc\\n"))
+    [(False, 'a\\n'), (True, '```\\nb\\n```\\n'), (False, 'c\\n')]
+    """
+    chunk: list = []
+    fence = ""
+    for line in markdown.splitlines(keepends=True):
+        match = _CODE_FENCE_RE.match(line)
+        if not fence:
+            if match:
+                yield False, "".join(chunk)
+                chunk, fence = [line], match.group(1)[0] * 3
+            else:
+                chunk.append(line)
+        else:
+            chunk.append(line)
+            if match and match.group(1)[0] * 3 == fence:
+                yield True, "".join(chunk)
+                chunk, fence = [], ""
+    yield bool(fence), "".join(chunk)
+
+
+def _collapse_blank_runs(markdown: str) -> str:
+    """Collapse runs of blank lines to a single one, *outside code blocks*.
+
+    Two blank lines between top-level ``def``s is PEP 8, so a global
+    ``re.sub(r"\\n{3,}", "\\n\\n", ...)`` would silently rewrite the source code
+    on every technical page scraped. Fenced regions pass through untouched.
+
+    >>> _collapse_blank_runs("a\\n\\n\\n\\nb\\n")
+    'a\\n\\nb\\n'
+    >>> _collapse_blank_runs("```\\na\\n\\n\\n\\nb\\n```\\n")
+    '```\\na\\n\\n\\n\\nb\\n```\\n'
+    """
+    return "".join(
+        text if is_code else re.sub(r"\n{3,}", "\n\n", text)
+        for is_code, text in _outside_code_fences(markdown)
+    )
+
+
+def _resolve_markdownify_options(overrides: Mapping) -> dict:
+    """Merge *overrides* over :data:`HTML_TO_MARKDOWN_DEFAULTS`, validating names.
+
+    ``MarkdownConverter`` silently ignores options it does not know, so a typo --
+    or an option name carried over from ``html2text``, which this module used
+    before -- would be a quiet no-op rather than an error. Raise instead.
+    """
+    known = {k for k in vars(MarkdownConverter.DefaultOptions) if not k.startswith("_")}
+    unknown = sorted(set(overrides) - known)
+    if unknown:
+        raise TypeError(
+            f"Unknown markdownify option(s): {', '.join(unknown)}. "
+            "These are `markdownify.MarkdownConverter` options; the `html2text` "
+            "options this function used to accept (body_width, ignore_links, "
+            "unicode_snob, ...) no longer apply. "
+            f"Valid options are: {', '.join(sorted(known))}."
+        )
+    return {**HTML_TO_MARKDOWN_DEFAULTS, **overrides}
+
+
+def _convert_html(converter: MarkdownConverter, html: str) -> str:
+    """Convert one HTML string to Markdown, dropping non-content tags first."""
+    soup = BeautifulSoup(html, "html.parser")
+    for tag in soup.find_all(NON_CONTENT_TAGS):
+        tag.decompose()
+    return _collapse_blank_runs(converter.convert_soup(soup)).strip() + "\n"
+
+
+def _could_be_a_path(string: str) -> bool:
+    """Whether *string* is worth handing to the filesystem at all.
+
+    Markup and newlines never appear in the paths this module deals with, and a
+    long-enough string makes ``Path.is_dir`` raise ``OSError: File name too
+    long`` rather than return ``False``.
+
+    >>> _could_be_a_path("a/b.html"), _could_be_a_path("<p>hi</p>")
+    (True, False)
+    """
+    return len(string) < 1000 and "\n" not in string and "<" not in string
+
+
+def _html_contents_of(html_or_path: str) -> Iterator[bytes | str]:
+    """Yield the HTML content(s) *html_or_path* denotes.
+
+    One string can mean three things, and this is the single place that decides
+    which: an ``.html`` file path, a directory to walk recursively, or a literal
+    HTML string.
+
+    >>> list(_html_contents_of("<p>hi</p>"))
+    ['<p>hi</p>']
+    """
+    if _could_be_a_path(html_or_path):
+        if html_or_path.endswith(".html"):
+            yield Path(html_or_path).read_bytes()
+            return
+        # TODO: Handle directories better, in such a way that they can be
+        #   captured and produce their own markdown content, which will then
+        #   be combined with the rest of the markdown content.
+        if Path(html_or_path).is_dir():
+            for filepath in filter(Path.is_file, Path(html_or_path).rglob("*")):
+                yield filepath.read_bytes()
+            return
+    yield html_or_path
+
+
 # TODO: Replace this by a version that uses dol.store_aggregate
 def html_to_markdown(
     htmls: str | Iterable[str] | Mapping[str, str],
@@ -247,14 +378,16 @@ def html_to_markdown(
     content_filt=is_html_content,
     markdown_contents_aggregator: Callable = "\n\n".join,
     prefixes=None,
-    **html2text_options,
+    **markdownify_options,
 ):
     """
     Convert one or several HTML files into a single Markdown file or return the
     Markdown string(s).
 
-    :param htmls: A single file path, an iterable of file paths, or a mapping of
-        names to file paths.
+    :param htmls: A string, an iterable of strings, or a mapping of names to
+        HTML contents. Each string is dispatched by :func:`_html_contents_of`:
+        a path ending in ``.html`` is read, an existing directory is walked
+        recursively, and anything else is taken as literal HTML.
     :param save_filepath: The file path where the combined Markdown will be saved,
         or the folder path where it should be saved (a name will be generated based
         on the url).
@@ -263,8 +396,11 @@ def html_to_markdown(
     :param markdown_contents_aggregator: A function to aggregate the Markdown strings.
     :param prefixes: A list of prefixes to be woven with to each Markdown string
         (there must be the same number of prefixes as HTML files).
-    :param html2text_options: Options to pass to the html2text.HTML2Text()
-        converter.
+    :param markdownify_options: Options overriding
+        :data:`HTML_TO_MARKDOWN_DEFAULTS`, passed to ``markdownify``'s
+        ``MarkdownConverter``. Unknown option names raise ``TypeError`` -- in
+        particular the ``html2text`` options this function accepted before
+        (``body_width``, ``ignore_links``, ...) are no longer valid.
     :return: Combined Markdown string if save_filepath is None, otherwise returns the
         path where the Markdown file was saved.
 
@@ -274,37 +410,21 @@ def html_to_markdown(
         and `markdown_contents_aggregator=list`.
     """
 
-    def read_html_file(filepath):
-        return Path(filepath).read_bytes()
-
     if isinstance(htmls, Mapping):
         html_contents = filter(content_filt, htmls.values())
+    elif isinstance(htmls, str):
+        html_contents = _html_contents_of(htmls)
+    elif isinstance(htmls, Iterable):
+        # Each item gets the same path/directory/raw-HTML dispatch a lone string
+        # gets, so a list of N items behaves like N single-item calls.
+        html_contents = chain.from_iterable(map(_html_contents_of, htmls))
     else:
-        if isinstance(htmls, str):
-            if htmls.endswith(".html"):
-                html_contents = [read_html_file(htmls)]
-            elif len(htmls) < 1000 and Path(htmls).is_dir():
-                # TODO: Handle this better, and in such a way that directories can be
-                #   captured and produce their own markdown content, which will then
-                #   be combined with the rest of the markdown content.
+        raise TypeError(
+            f"htmls must be a string, an iterable of strings, or a mapping, "
+            f"not {type(htmls).__name__}"
+        )
 
-                # For now though:
-                # Recursively find all HTML files in the directory
-                html_contents = map(
-                    read_html_file, filter(Path.is_file, Path(htmls).rglob("*"))
-                )
-            else:
-                html_contents = [htmls]
-        if not isinstance(htmls, Iterable):
-            raise TypeError(
-                f"htmls must be an iterable of file paths or a mapping, not {htmls}"
-            )
-        # html_contents = map(read_html_file, htmls)
-
-    # Initialize the html2text converter with options
-    converter = html2text.HTML2Text()
-    for key, value in html2text_options.items():
-        setattr(converter, key, value)
+    converter = MarkdownConverter(**_resolve_markdownify_options(markdownify_options))
 
     # Convert HTML contents to Markdown
     def _markdown_contents(html_contents):
@@ -312,7 +432,7 @@ def html_to_markdown(
             try:
                 if isinstance(html_content, bytes):
                     html_content = html_content.decode()
-                yield converter.handle(html_content)
+                yield _convert_html(converter, html_content)
             except UnicodeDecodeError:
                 print(f"Failed to decode HTML content: {html_content[:30]=}")
                 # TODO: Give more control to the user to decide what to do in this case
