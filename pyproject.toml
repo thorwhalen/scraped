@@ -19,7 +19,7 @@ dependencies = [
     "graze",
     "scrapy",
     "config2py",
-    "markdownify",  # MIT HTML->Markdown; replaced html2text (GPL-3.0-or-later)
+    "markdownify>=1.0",  # MIT HTML->Markdown; replaced html2text (GPL-3.0-or-later)
     "beautifulsoup4",  # imported by util.py to strip non-content tags pre-convert
     "lkj",
     "argh",
