@@ -14,7 +14,8 @@ import scrapy
 from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
 
-import html2text
+from bs4 import BeautifulSoup
+from markdownify import MarkdownConverter
 from config2py import get_app_config_folder, process_path
 from graze.base import url_to_localpath as graze_url_to_localpath
 
@@ -239,6 +240,29 @@ def is_html_content(content: str | bytes) -> bool:
     return False
 
 
+#: Tags whose *content* is never part of the document text. ``markdownify``
+#: already drops ``script``/``style``, but not ``<title>``, so the whole head is
+#: removed before conversion (``html2text``, which this replaced, ignored it too).
+NON_CONTENT_TAGS = ("head", "script", "style", "noscript")
+
+#: Defaults for the HTML->Markdown conversion. Override any of them by passing
+#: the same keyword to :func:`html_to_markdown`.
+HTML_TO_MARKDOWN_DEFAULTS = {
+    "heading_style": "ATX",  # "# Title", not the underlined setext form
+    "bullets": "*",
+    "escape_underscores": False,  # keeps identifiers like ``foo_bar`` readable
+    "escape_asterisks": False,
+}
+
+
+def _convert_html(converter: MarkdownConverter, html: str) -> str:
+    """Convert one HTML string to Markdown, dropping non-content tags first."""
+    soup = BeautifulSoup(html, "html.parser")
+    for tag in soup.find_all(NON_CONTENT_TAGS):
+        tag.decompose()
+    return re.sub(r"\n{3,}", "\n\n", converter.convert_soup(soup)).strip() + "\n"
+
+
 # TODO: Replace this by a version that uses dol.store_aggregate
 def html_to_markdown(
     htmls: str | Iterable[str] | Mapping[str, str],
@@ -247,7 +271,7 @@ def html_to_markdown(
     content_filt=is_html_content,
     markdown_contents_aggregator: Callable = "\n\n".join,
     prefixes=None,
-    **html2text_options,
+    **markdownify_options,
 ):
     """
     Convert one or several HTML files into a single Markdown file or return the
@@ -263,8 +287,9 @@ def html_to_markdown(
     :param markdown_contents_aggregator: A function to aggregate the Markdown strings.
     :param prefixes: A list of prefixes to be woven with to each Markdown string
         (there must be the same number of prefixes as HTML files).
-    :param html2text_options: Options to pass to the html2text.HTML2Text()
-        converter.
+    :param markdownify_options: Options overriding
+        :data:`HTML_TO_MARKDOWN_DEFAULTS`, passed to ``markdownify``'s
+        ``MarkdownConverter``.
     :return: Combined Markdown string if save_filepath is None, otherwise returns the
         path where the Markdown file was saved.
 
@@ -301,10 +326,9 @@ def html_to_markdown(
             )
         # html_contents = map(read_html_file, htmls)
 
-    # Initialize the html2text converter with options
-    converter = html2text.HTML2Text()
-    for key, value in html2text_options.items():
-        setattr(converter, key, value)
+    converter = MarkdownConverter(
+        **{**HTML_TO_MARKDOWN_DEFAULTS, **markdownify_options}
+    )
 
     # Convert HTML contents to Markdown
     def _markdown_contents(html_contents):
@@ -312,7 +336,7 @@ def html_to_markdown(
             try:
                 if isinstance(html_content, bytes):
                     html_content = html_content.decode()
-                yield converter.handle(html_content)
+                yield _convert_html(converter, html_content)
             except UnicodeDecodeError:
                 print(f"Failed to decode HTML content: {html_content[:30]=}")
                 # TODO: Give more control to the user to decide what to do in this case
