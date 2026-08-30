@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.acquire.fetchers.browser &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.acquire.fetchers.browser &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -89,13 +89,13 @@
            <div itemprop="articleBody">
              
   <h1>Source code for scraped.acquire.fetchers.browser</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Transport rungs 4–5: a real browser, with disk-first defaults.</span>
+<span></span><span class="sd">"""Transport rungs 4–5: a real browser, with disk-first defaults.</span>
 
 <span class="sd">The design constraint here is **not** stealth. It is that a payload must never</span>
-<span class="sd">travel through the caller&#39;s context. Getting results *out* of an automated</span>
+<span class="sd">travel through the caller's context. Getting results *out* of an automated</span>
 <span class="sd">browser is a distinct and expensive failure class — three independent gates (the</span>
-<span class="sd">agent harness&#39;s tool-output cap, the 1 MB CDP frame limit, and Chrome&#39;s Local</span>
-<span class="sd">Network Access enforcement, which makes a page&#39;s `fetch` to `127.0.0.1` stall</span>
+<span class="sd">agent harness's tool-output cap, the 1 MB CDP frame limit, and Chrome's Local</span>
+<span class="sd">Network Access enforcement, which makes a page's `fetch` to `127.0.0.1` stall</span>
 <span class="sd">*silently*) block the obvious routes. See</span>
 <span class="sd">`misc/docs/browser-result-exfiltration.md`.</span>
 
@@ -109,8 +109,8 @@
 
 <span class="sd">**Caveat on provenance at this rung:** a `Capture.body` here is</span>
 <span class="sd">`page.content()` — a re-serialized DOM, not the bytes the server sent — so</span>
-<span class="sd">`body_sha256` hashes a *rendering*. The package-wide &#39;raw bytes, never decoded</span>
-<span class="sd">text&#39; invariant holds at the HTTP rungs; here the HAR is the byte-exact record.</span>
+<span class="sd">`body_sha256` hashes a *rendering*. The package-wide 'raw bytes, never decoded</span>
+<span class="sd">text' invariant holds at the HTTP rungs; here the HAR is the byte-exact record.</span>
 
 <span class="sd">Two traps worth knowing before reading the code:</span>
 
@@ -121,7 +121,7 @@
 <span class="sd">- **Paying for a browser once is the point.** Capture `storage_state` and hand it</span>
 <span class="sd">  back to a cheap HTTP fetcher (rung 4) rather than driving the browser for every</span>
 <span class="sd">  page.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -146,37 +146,37 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChallengeEncountered</span><span class="p">,</span> <span class="n">detect_challenge</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;BrowserArtifacts&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;BrowserFetcher&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;BrowserSession&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;check_requirements&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;storage_state_headers&quot;</span><span class="p">,</span>
+    <span class="s2">"BrowserArtifacts"</span><span class="p">,</span>
+    <span class="s2">"BrowserFetcher"</span><span class="p">,</span>
+    <span class="s2">"BrowserSession"</span><span class="p">,</span>
+    <span class="s2">"check_requirements"</span><span class="p">,</span>
+    <span class="s2">"storage_state_headers"</span><span class="p">,</span>
 <span class="p">]</span>
 
-<span class="n">DFLT_WAIT_UNTIL</span> <span class="o">=</span> <span class="s2">&quot;domcontentloaded&quot;</span>
+<span class="n">DFLT_WAIT_UNTIL</span> <span class="o">=</span> <span class="s2">"domcontentloaded"</span>
 <span class="n">DFLT_NAV_TIMEOUT_MS</span> <span class="o">=</span> <span class="mi">45_000</span>
-<span class="n">DFLT_ARTIFACT_DIR</span> <span class="o">=</span> <span class="s2">&quot;~/.config/scraped/browser-runs&quot;</span>
+<span class="n">DFLT_ARTIFACT_DIR</span> <span class="o">=</span> <span class="s2">"~/.config/scraped/browser-runs"</span>
 
 <span class="c1"># Captured API responses are the prize; filter to keep the HAR usable.</span>
-<span class="n">DFLT_JSON_CONTENT_HINTS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span> <span class="s2">&quot;text/json&quot;</span><span class="p">,</span> <span class="s2">&quot;+json&quot;</span><span class="p">)</span>
+<span class="n">DFLT_JSON_CONTENT_HINTS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"application/json"</span><span class="p">,</span> <span class="s2">"text/json"</span><span class="p">,</span> <span class="s2">"+json"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="check_requirements">
 <a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/browser.html#scraped.acquire.check_requirements">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">check_requirements</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Report what the browser rung needs and what is actually present.</span>
+<span class="w">    </span><span class="sd">"""Report what the browser rung needs and what is actually present.</span>
 
 <span class="sd">    Guides rather than fails: this rung is an optional extra, so the useful</span>
 <span class="sd">    behaviour is to say precisely what to install.</span>
 
 <span class="sd">    &gt;&gt;&gt; report = check_requirements(verbose=False)</span>
-<span class="sd">    &gt;&gt;&gt; set(report) == {&quot;driver&quot;, &quot;browser_binary&quot;, &quot;ready&quot;, &quot;instructions&quot;}</span>
+<span class="sd">    &gt;&gt;&gt; set(report) == {"driver", "browser_binary", "ready", "instructions"}</span>
 <span class="sd">    True</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">driver</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;patchright&quot;</span><span class="p">,</span> <span class="s2">&quot;playwright&quot;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"patchright"</span><span class="p">,</span> <span class="s2">"playwright"</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="nb">__import__</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">candidate</span><span class="si">}</span><span class="s2">.sync_api&quot;</span><span class="p">)</span>
+            <span class="nb">__import__</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">candidate</span><span class="si">}</span><span class="s2">.sync_api"</span><span class="p">)</span>
             <span class="n">driver</span> <span class="o">=</span> <span class="n">candidate</span>
             <span class="k">break</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -185,35 +185,35 @@
     <span class="n">instructions</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">driver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">instructions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="s2">&quot;pip install &#39;scraped[browser]&#39;   # patchright: patched Playwright&quot;</span>
+            <span class="s2">"pip install 'scraped[browser]'   # patchright: patched Playwright"</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;playwright&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">"playwright"</span><span class="p">:</span>
         <span class="n">instructions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="s2">&quot;pip install patchright   # preferred: plain Playwright is detectable &quot;</span>
-            <span class="s2">&quot;via the Runtime.enable CDP signal&quot;</span>
+            <span class="s2">"pip install patchright   # preferred: plain Playwright is detectable "</span>
+            <span class="s2">"via the Runtime.enable CDP signal"</span>
         <span class="p">)</span>
     <span class="n">binary_present</span> <span class="o">=</span> <span class="n">driver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_browser_binary_present</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">driver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">binary_present</span><span class="p">:</span>
-        <span class="n">instructions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">driver</span><span class="si">}</span><span class="s2"> install chromium   # the browser itself&quot;</span><span class="p">)</span>
+        <span class="n">instructions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">driver</span><span class="si">}</span><span class="s2"> install chromium   # the browser itself"</span><span class="p">)</span>
 
     <span class="n">report</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;driver&quot;</span><span class="p">:</span> <span class="n">driver</span><span class="p">,</span>
-        <span class="s2">&quot;browser_binary&quot;</span><span class="p">:</span> <span class="n">binary_present</span><span class="p">,</span>
-        <span class="s2">&quot;ready&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">driver</span> <span class="ow">and</span> <span class="n">binary_present</span><span class="p">),</span>
-        <span class="s2">&quot;instructions&quot;</span><span class="p">:</span> <span class="n">instructions</span><span class="p">,</span>
+        <span class="s2">"driver"</span><span class="p">:</span> <span class="n">driver</span><span class="p">,</span>
+        <span class="s2">"browser_binary"</span><span class="p">:</span> <span class="n">binary_present</span><span class="p">,</span>
+        <span class="s2">"ready"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">driver</span> <span class="ow">and</span> <span class="n">binary_present</span><span class="p">),</span>
+        <span class="s2">"instructions"</span><span class="p">:</span> <span class="n">instructions</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>  <span class="c1"># pragma: no cover - human-facing</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;driver:         </span><span class="si">{</span><span class="n">driver</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;MISSING&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;browser binary: </span><span class="si">{</span><span class="s1">&#39;present&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">binary_present</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;MISSING&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"driver:         </span><span class="si">{</span><span class="n">driver</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'MISSING'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"browser binary: </span><span class="si">{</span><span class="s1">'present'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">binary_present</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'MISSING'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">instructions</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  -&gt; </span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  -&gt; </span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">report</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_browser_binary_present</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">driver</span><span class="si">}</span><span class="s2">.sync_api&quot;</span><span class="p">,</span> <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sync_playwright&quot;</span><span class="p">])</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">driver</span><span class="si">}</span><span class="s2">.sync_api"</span><span class="p">,</span> <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="s2">"sync_playwright"</span><span class="p">])</span>
         <span class="k">with</span> <span class="n">module</span><span class="o">.</span><span class="n">sync_playwright</span><span class="p">()</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">chromium</span><span class="o">.</span><span class="n">executable_path</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
@@ -221,20 +221,20 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_driver</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Import the best available driver, preferring the patched one.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;patchright&quot;</span><span class="p">,</span> <span class="s2">&quot;playwright&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Import the best available driver, preferring the patched one."""</span>
+    <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"patchright"</span><span class="p">,</span> <span class="s2">"playwright"</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span>
-                <span class="nb">__import__</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">candidate</span><span class="si">}</span><span class="s2">.sync_api&quot;</span><span class="p">,</span> <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sync_playwright&quot;</span><span class="p">]),</span>
+                <span class="nb">__import__</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">candidate</span><span class="si">}</span><span class="s2">.sync_api"</span><span class="p">,</span> <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="s2">"sync_playwright"</span><span class="p">]),</span>
                 <span class="n">candidate</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="k">continue</span>
     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-        <span class="s2">&quot;The browser rung needs a Playwright-compatible driver.</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    pip install &#39;scraped[browser]&#39;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    patchright install chromium</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;Run scraped.acquire.fetchers.browser.check_requirements() for details.&quot;</span>
+        <span class="s2">"The browser rung needs a Playwright-compatible driver.</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    pip install 'scraped[browser]'</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    patchright install chromium</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"Run scraped.acquire.fetchers.browser.check_requirements() for details."</span>
     <span class="p">)</span>
 
 
@@ -242,12 +242,12 @@
 <a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/browser.html#scraped.acquire.BrowserArtifacts">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BrowserArtifacts</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Where this fetch&#39;s evidence landed on disk.</span>
+<span class="w">    </span><span class="sd">"""Where this fetch's evidence landed on disk.</span>
 
 <span class="sd">    Paths, never payloads. The HAR in particular is both the safety net (every</span>
 <span class="sd">    byte the page received is on disk regardless of what the page did with it)</span>
 <span class="sd">    and the input to internal-API discovery.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">har_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">downloads_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -263,11 +263,11 @@
 <a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/browser.html#scraped.acquire.BrowserSession">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BrowserSession</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A browser context configured so results cannot be lost.</span>
+<span class="w">    </span><span class="sd">"""A browser context configured so results cannot be lost.</span>
 
 <span class="sd">    Use as a context manager. Artifacts go to `artifact_dir`; nothing of</span>
 <span class="sd">    consequence is returned through memory alone.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">artifact_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">Path</span><span class="p">(</span><span class="n">DFLT_ARTIFACT_DIR</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
@@ -283,38 +283,38 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">artifact_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">artifact_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">artifact_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_downloads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">artifact_dir</span> <span class="o">/</span> <span class="s2">&quot;downloads&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_downloads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">artifact_dir</span> <span class="o">/</span> <span class="s2">"downloads"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_downloads</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_json_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">artifact_dir</span> <span class="o">/</span> <span class="s2">&quot;json&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_json_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">artifact_dir</span> <span class="o">/</span> <span class="s2">"json"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_json_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_har_path</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">artifact_dir</span> <span class="o">/</span> <span class="s2">&quot;session.har.zip&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_har</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">artifact_dir</span> <span class="o">/</span> <span class="s2">"session.har.zip"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_har</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_captured</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_stack</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BrowserSession&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"BrowserSession"</span><span class="p">:</span>
         <span class="n">api</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver_name</span> <span class="o">=</span> <span class="n">_driver</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pw</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">sync_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="n">launch_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;headless&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">headless</span><span class="p">,</span>
-            <span class="s2">&quot;downloads_path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_downloads</span><span class="p">),</span>
+            <span class="s2">"headless"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">headless</span><span class="p">,</span>
+            <span class="s2">"downloads_path"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_downloads</span><span class="p">),</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">:</span>
-            <span class="n">launch_kwargs</span><span class="p">[</span><span class="s2">&quot;channel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span>
+            <span class="n">launch_kwargs</span><span class="p">[</span><span class="s2">"channel"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pw</span><span class="o">.</span><span class="n">chromium</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="o">**</span><span class="n">launch_kwargs</span><span class="p">)</span>
 
-        <span class="n">context_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;accept_downloads&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+        <span class="n">context_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"accept_downloads"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_har_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">context_kwargs</span><span class="p">[</span><span class="s2">&quot;record_har_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_har_path</span><span class="p">)</span>
+            <span class="n">context_kwargs</span><span class="p">[</span><span class="s2">"record_har_path"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_har_path</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">har_url_filter</span><span class="p">:</span>
-                <span class="n">context_kwargs</span><span class="p">[</span><span class="s2">&quot;record_har_url_filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">har_url_filter</span>
+                <span class="n">context_kwargs</span><span class="p">[</span><span class="s2">"record_har_url_filter"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">har_url_filter</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_state</span><span class="p">:</span>
-            <span class="n">context_kwargs</span><span class="p">[</span><span class="s2">&quot;storage_state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage_state</span><span class="p">)</span>
+            <span class="n">context_kwargs</span><span class="p">[</span><span class="s2">"storage_state"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage_state</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewport</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">context_kwargs</span><span class="p">[</span><span class="s2">&quot;no_viewport&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">context_kwargs</span><span class="p">[</span><span class="s2">"no_viewport"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">context_kwargs</span><span class="p">[</span><span class="s2">&quot;viewport&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewport</span><span class="p">)</span>
+            <span class="n">context_kwargs</span><span class="p">[</span><span class="s2">"viewport"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewport</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="o">**</span><span class="n">context_kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="o">.</span><span class="n">set_default_navigation_timeout</span><span class="p">(</span><span class="n">DFLT_NAV_TIMEOUT_MS</span><span class="p">)</span>
@@ -322,10 +322,10 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc_info</span><span class="p">):</span>
         <span class="c1"># Closing the context is what flushes the HAR. Do it even on failure —</span>
-        <span class="c1"># a failed run&#39;s evidence is the most valuable kind.</span>
+        <span class="c1"># a failed run's evidence is the most valuable kind.</span>
         <span class="k">for</span> <span class="n">closer</span> <span class="ow">in</span> <span class="p">(</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_context&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_browser&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_context"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_browser"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         <span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">closer</span> <span class="ow">and</span> <span class="n">closer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -340,45 +340,45 @@
 <div class="viewcode-block" id="BrowserSession.save_storage_state">
 <a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/browser.html#scraped.acquire.BrowserSession.save_storage_state">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">save_storage_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Persist cookies and origin storage so cheap rungs can reuse this session.</span>
+<span class="w">        </span><span class="sd">"""Persist cookies and origin storage so cheap rungs can reuse this session.</span>
 
 <span class="sd">        **Treat the result as a credential.** It carries live session cookies:</span>
 <span class="sd">        never commit it, and scope its lifetime deliberately.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">artifact_dir</span> <span class="o">/</span> <span class="s2">&quot;storage_state.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+<span class="sd">        """</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">artifact_dir</span> <span class="o">/</span> <span class="s2">"storage_state.json"</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="o">.</span><span class="n">storage_state</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">target</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_watch_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write every JSON response to disk as it arrives.</span>
+<span class="w">        </span><span class="sd">"""Write every JSON response to disk as it arrives.</span>
 
-<span class="sd">        This is the highest-value pattern in the module: it yields the site&#39;s own</span>
+<span class="sd">        This is the highest-value pattern in the module: it yields the site's own</span>
 <span class="sd">        API payloads — a top-rung *payload* at browser *transport* cost — and it</span>
 <span class="sd">        works even when the app consumes and discards the response.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">on_response</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">content_type</span> <span class="o">=</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content-type&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="n">content_type</span> <span class="o">=</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"content-type"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">hint</span> <span class="ow">in</span> <span class="n">content_type</span> <span class="k">for</span> <span class="n">hint</span> <span class="ow">in</span> <span class="n">DFLT_JSON_CONTENT_HINTS</span><span class="p">):</span>
                     <span class="k">return</span>
                 <span class="n">body</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">()</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">body</span><span class="p">:</span>
                     <span class="k">return</span>
-                <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">body_digest</span><span class="p">(</span><span class="n">body</span><span class="p">)[:</span><span class="mi">16</span><span class="p">]</span><span class="si">}</span><span class="s2">.json&quot;</span>
+                <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">body_digest</span><span class="p">(</span><span class="n">body</span><span class="p">)[:</span><span class="mi">16</span><span class="p">]</span><span class="si">}</span><span class="s2">.json"</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
                     <span class="n">target</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_captured</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># a discarded response is normal; never fail the run</span>
                 <span class="k">pass</span>
 
-        <span class="n">page</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="n">on_response</span><span class="p">)</span>
+        <span class="n">page</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">"response"</span><span class="p">,</span> <span class="n">on_response</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BrowserSession.artifacts">
 <a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/browser.html#scraped.acquire.BrowserSession.artifacts">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">artifacts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BrowserArtifacts</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Where everything landed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Where everything landed."""</span>
         <span class="k">return</span> <span class="n">BrowserArtifacts</span><span class="p">(</span>
             <span class="n">har_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_har_path</span><span class="p">,</span>
             <span class="n">downloads_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_downloads</span><span class="p">,</span>
@@ -392,11 +392,11 @@
 <a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/browser.html#scraped.acquire.BrowserFetcher">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BrowserFetcher</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A `Fetcher` that drives a real browser and writes its evidence to disk.</span>
+<span class="w">    </span><span class="sd">"""A `Fetcher` that drives a real browser and writes its evidence to disk.</span>
 
 <span class="sd">    Same callable shape as the HTTP rungs, so callers do not know or care which</span>
 <span class="sd">    transport is underneath.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">session</span><span class="p">:</span> <span class="n">BrowserSession</span>
     <span class="n">wait_until</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_WAIT_UNTIL</span>
@@ -406,7 +406,7 @@
     <span class="n">rung</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Capture</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Navigate to the request&#39;s URL and capture the rendered document.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Navigate to the request's URL and capture the rendered document."""</span>
         <span class="n">policy_outcome</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">robots</span><span class="o">.</span><span class="n">enforce</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">robots</span> <span class="k">else</span> <span class="n">PolicyOutcome</span><span class="p">()</span>
         <span class="p">)</span>
@@ -421,7 +421,7 @@
                 <span class="n">page</span><span class="o">.</span><span class="n">wait_for_timeout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settle_ms</span><span class="p">)</span>
             <span class="c1"># page.content() is documentElement.outerHTML — a re-serialized</span>
             <span class="c1"># post-script DOM, NOT the wire bytes. It is still the right source</span>
-            <span class="c1"># for state blobs (a patched driver&#39;s page.evaluate runs in an</span>
+            <span class="c1"># for state blobs (a patched driver's page.evaluate runs in an</span>
             <span class="c1"># isolated world and cannot see window.__NEXT_DATA__ at all), but it</span>
             <span class="c1"># means body_sha256 at this rung hashes a rendering: use the HAR for</span>
             <span class="c1"># byte-exact provenance and cross-run change detection.</span>
@@ -433,7 +433,7 @@
             <span class="n">elapsed_ms</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">started</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
             <span class="n">page</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-        <span class="n">body</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span>
         <span class="n">verdict</span> <span class="o">=</span> <span class="n">detect_challenge</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">html</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">verdict</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_on_challenge</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ChallengeEncountered</span><span class="p">(</span>
@@ -455,13 +455,13 @@
             <span class="n">fetched_at</span><span class="o">=</span><span class="n">utcnow</span><span class="p">(),</span>
             <span class="n">elapsed_ms</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">elapsed_ms</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
             <span class="n">fetcher</span><span class="o">=</span><span class="n">FetcherInfo</span><span class="p">(</span>
-                <span class="n">client_name</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="s2">&quot;driver_name&quot;</span><span class="p">,</span> <span class="s2">&quot;browser&quot;</span><span class="p">),</span>
+                <span class="n">client_name</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="s2">"driver_name"</span><span class="p">,</span> <span class="s2">"browser"</span><span class="p">),</span>
                 <span class="n">transport_rung</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rung</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">policy</span><span class="o">=</span><span class="n">policy_outcome</span><span class="p">,</span>
             <span class="n">probe</span><span class="o">=</span><span class="n">ProbeMarks</span><span class="p">(</span>
                 <span class="n">state_blob_markers</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">state_blob_markers</span><span class="p">(</span><span class="n">html</span><span class="p">)),</span>
-                <span class="n">ld_json_count</span><span class="o">=</span><span class="n">html</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;application/ld+json&quot;</span><span class="p">),</span>
+                <span class="n">ld_json_count</span><span class="o">=</span><span class="n">html</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"application/ld+json"</span><span class="p">),</span>
                 <span class="n">challenge_vendor</span><span class="o">=</span><span class="n">verdict</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span>
                 <span class="n">challenge_serving</span><span class="o">=</span><span class="n">verdict</span><span class="o">.</span><span class="n">serving</span><span class="p">,</span>
             <span class="p">),</span>
@@ -473,28 +473,28 @@
 <div class="viewcode-block" id="storage_state_headers">
 <a class="viewcode-back" href="../../../../module_docs/scraped/acquire/fetchers/browser.html#scraped.acquire.storage_state_headers">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">storage_state_headers</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">url_host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Turn a saved `storage_state` into a `Cookie` header for cheap fetchers.</span>
+<span class="w">    </span><span class="sd">"""Turn a saved `storage_state` into a `Cookie` header for cheap fetchers.</span>
 
 <span class="sd">    This is rung 4, and the reason the browser is worth paying for once: capture</span>
 <span class="sd">    the session in a browser, then do the actual work with an impersonating HTTP</span>
 <span class="sd">    client at a fraction of the cost.</span>
 
 <span class="sd">    &gt;&gt;&gt; import json, tempfile, pathlib</span>
-<span class="sd">    &gt;&gt;&gt; state = {&quot;cookies&quot;: [{&quot;name&quot;: &quot;a&quot;, &quot;value&quot;: &quot;1&quot;, &quot;domain&quot;: &quot;x.com&quot;}]}</span>
-<span class="sd">    &gt;&gt;&gt; path = pathlib.Path(tempfile.mkdtemp()) / &quot;s.json&quot;</span>
+<span class="sd">    &gt;&gt;&gt; state = {"cookies": [{"name": "a", "value": "1", "domain": "x.com"}]}</span>
+<span class="sd">    &gt;&gt;&gt; path = pathlib.Path(tempfile.mkdtemp()) / "s.json"</span>
 <span class="sd">    &gt;&gt;&gt; _ = path.write_text(json.dumps(state))</span>
 <span class="sd">    &gt;&gt;&gt; storage_state_headers(path)</span>
-<span class="sd">    {&#39;Cookie&#39;: &#39;a=1&#39;}</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    {'Cookie': 'a=1'}</span>
+<span class="sd">    """</span>
     <span class="n">state</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
-    <span class="n">cookies</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cookies&quot;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">cookies</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cookies"</span><span class="p">,</span> <span class="p">[])</span>
     <span class="k">if</span> <span class="n">url_host</span><span class="p">:</span>
         <span class="n">cookies</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cookies</span> <span class="k">if</span> <span class="n">url_host</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;domain&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
+            <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cookies</span> <span class="k">if</span> <span class="n">url_host</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"domain"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">"."</span><span class="p">))</span>
         <span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">cookies</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{}</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;Cookie&quot;</span><span class="p">:</span> <span class="s2">&quot;; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cookies</span><span class="p">)}</span></div>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"Cookie"</span><span class="p">:</span> <span class="s2">"; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="s1">'value'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cookies</span><span class="p">)}</span></div>
 
 </pre></div>
 

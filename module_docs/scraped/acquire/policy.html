@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.acquire.policy &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.acquire.policy &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -113,10 +113,10 @@
 in every <cite>Capture</cite>. That is the whole point: “did we respect robots on this
 capture” becomes a queryable fact rather than an archaeology exercise, and an
 override is a deliberate, attributable act rather than a forgotten flag.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span> <span class="o">=</span> <span class="n">RobotsPolicy</span><span class="p">(</span><span class="n">get_robots_txt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">host</span><span class="p">:</span> <span class="s2">&quot;User-agent: *</span><span class="se">\n</span><span class="s2">Disallow: /x&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;https://example.com/ok&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">robots_allowed</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span> <span class="o">=</span> <span class="n">RobotsPolicy</span><span class="p">(</span><span class="n">get_robots_txt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">host</span><span class="p">:</span> <span class="s2">"User-agent: *</span><span class="se">\n</span><span class="s2">Disallow: /x"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">"https://example.com/ok"</span><span class="p">)</span><span class="o">.</span><span class="n">robots_allowed</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;https://example.com/x/1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">robots_allowed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">"https://example.com/x/1"</span><span class="p">)</span><span class="o">.</span><span class="n">robots_allowed</span>
 <span class="go">False</span>
 </pre></div>
 </div>
@@ -126,7 +126,7 @@ override is a deliberate, attributable act rather than a forgotten flag.</p>
 <dd><p>Per-host pacing. Per-host, never global — one slow site must not throttle
 every other one.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pace</span> <span class="o">=</span> <span class="n">Politeness</span><span class="p">(</span><span class="n">min_interval</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pace</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="s2">&quot;https://example.com/a&quot;</span><span class="p">)</span>  <span class="c1"># returns immediately</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pace</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="s2">"https://example.com/a"</span><span class="p">)</span>  <span class="c1"># returns immediately</span>
 <span class="go">0.0</span>
 </pre></div>
 </div>
@@ -176,8 +176,8 @@ a widely honored convention and honoring it is free.</p>
 <dt class="sig sig-object py" id="scraped.acquire.policy.RobotsPolicy.enforce">
 <span class="sig-name descname"><span class="pre">enforce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="capture.html#scraped.acquire.capture.PolicyOutcome" title="scraped.acquire.capture.PolicyOutcome"><span class="pre">PolicyOutcome</span></a></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/policy.html#RobotsPolicy.enforce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.policy.RobotsPolicy.enforce" title="Link to this definition"></a></dt>
 <dd><p>Evaluate the policy and raise if it forbids the URL.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span> <span class="o">=</span> <span class="n">RobotsPolicy</span><span class="p">(</span><span class="n">get_robots_txt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">h</span><span class="p">:</span> <span class="s2">&quot;User-agent: *</span><span class="se">\n</span><span class="s2">Disallow: /&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span><span class="o">.</span><span class="n">enforce</span><span class="p">(</span><span class="s2">&quot;https://example.com/a&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span> <span class="o">=</span> <span class="n">RobotsPolicy</span><span class="p">(</span><span class="n">get_robots_txt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">h</span><span class="p">:</span> <span class="s2">"User-agent: *</span><span class="se">\n</span><span class="s2">Disallow: /"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span><span class="o">.</span><span class="n">enforce</span><span class="p">(</span><span class="s2">"https://example.com/a"</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="w">    </span><span class="o">...</span>
 <span class="gr">scraped.acquire.policy.RobotsDisallowed</span>: <span class="n">robots.txt disallows https://example.com/a</span>

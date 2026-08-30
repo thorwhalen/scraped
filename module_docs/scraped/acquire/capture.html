@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.acquire.capture &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.acquire.capture &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -134,7 +134,7 @@ explicit about the encoding it chose.</p></li>
 which buys deduplication, change detection, and cheap re-runs together.</p></li>
 </ul>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">capture</span> <span class="o">=</span> <span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">),</span> <span class="sa">b</span><span class="s2">&quot;&lt;html&gt;&lt;/html&gt;&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span>
+<span class="gp">... </span>    <span class="n">Request</span><span class="p">(</span><span class="s2">"https://example.com"</span><span class="p">),</span> <span class="sa">b</span><span class="s2">"&lt;html&gt;&lt;/html&gt;"</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">capture</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status</span>
 <span class="go">200</span>
@@ -187,8 +187,8 @@ is the common case rather than an exotic one.</p>
 <dd><p>Decode the body, explicitly.</p>
 <p>Decoding is the extraction layer’s concern; this is a convenience, and it
 is deliberate about the fact that a choice is being made.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">),</span> <span class="sa">b</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
-<span class="go">&#39;hi&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">"u"</span><span class="p">),</span> <span class="sa">b</span><span class="s2">"hi"</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+<span class="go">'hi'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -273,9 +273,9 @@ otherwise only shows up downstream.</p>
 <dt class="sig sig-object py" id="scraped.acquire.capture.Response.is_textual">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_textual</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#scraped.acquire.capture.Response.is_textual" title="Link to this definition"></a></dt>
 <dd><p>Whether the declared content type suggests text rather than binary.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;text/html&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">is_textual</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">"u"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"Content-Type"</span><span class="p">:</span> <span class="s2">"text/html"</span><span class="p">})</span><span class="o">.</span><span class="n">is_textual</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;image/png&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">is_textual</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">"u"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"Content-Type"</span><span class="p">:</span> <span class="s2">"image/png"</span><span class="p">})</span><span class="o">.</span><span class="n">is_textual</span>
 <span class="go">False</span>
 </pre></div>
 </div>
@@ -287,8 +287,8 @@ otherwise only shows up downstream.</p>
 <dt class="sig sig-object py" id="scraped.acquire.capture.body_digest">
 <span class="sig-prename descclassname"><span class="pre">scraped.acquire.capture.</span></span><span class="sig-name descname"><span class="pre">body_digest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/capture.html#body_digest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.capture.body_digest" title="Link to this definition"></a></dt>
 <dd><p>Content address of a payload.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">body_digest</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">)[:</span><span class="mi">8</span><span class="p">]</span>
-<span class="go">&#39;e3b0c442&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">body_digest</span><span class="p">(</span><span class="sa">b</span><span class="s2">""</span><span class="p">)[:</span><span class="mi">8</span><span class="p">]</span>
+<span class="go">'e3b0c442'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -301,11 +301,11 @@ otherwise only shows up downstream.</p>
 response + a hash of any body. Deliberately ignores headers that only add
 noise (User-Agent, tracing ids), because fragmenting the cache on those makes
 re-runs expensive for no correctness gain.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/p?b=2&amp;a=1&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/p?a=1&amp;b=2&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">"https://x.com/p?b=2&amp;a=1"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">"https://x.com/p?a=1&amp;b=2"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">request_digest</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">==</span> <span class="n">request_digest</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>  <span class="c1"># query order is not meaningful</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/p?a=1&amp;b=2&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="s2">&quot;whatever&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">"https://x.com/p?a=1&amp;b=2"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"User-Agent"</span><span class="p">:</span> <span class="s2">"whatever"</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">request_digest</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="n">request_digest</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>  <span class="c1"># noise headers ignored</span>
 <span class="go">True</span>
 </pre></div>

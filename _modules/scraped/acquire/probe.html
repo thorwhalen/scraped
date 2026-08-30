@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.acquire.probe &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.acquire.probe &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -89,7 +89,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for scraped.acquire.probe</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Rung 0: reconnaissance. The highest-return two minutes of any acquisition job.</span>
+<span></span><span class="sd">"""Rung 0: reconnaissance. The highest-return two minutes of any acquisition job.</span>
 
 <span class="sd">Before writing a single selector, ask the site what it will simply hand over.</span>
 <span class="sd">Most of the time something on this list makes the rest of the job trivial, and</span>
@@ -106,7 +106,7 @@
 
 <span class="sd">The result is a `SiteProfile`: a small, printable summary that tells you which</span>
 <span class="sd">rung of the ladder you are on.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -119,19 +119,19 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">RobotsDisallowed</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">detect_challenge</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SiteProfile&quot;</span><span class="p">,</span> <span class="s2">&quot;probe&quot;</span><span class="p">,</span> <span class="s2">&quot;robots_sitemaps&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"SiteProfile"</span><span class="p">,</span> <span class="s2">"probe"</span><span class="p">,</span> <span class="s2">"robots_sitemaps"</span><span class="p">]</span>
 
-<span class="n">DFLT_JSON_ACCEPT</span> <span class="o">=</span> <span class="s2">&quot;application/json, text/json;q=0.9, */*;q=0.1&quot;</span>
+<span class="n">DFLT_JSON_ACCEPT</span> <span class="o">=</span> <span class="s2">"application/json, text/json;q=0.9, */*;q=0.1"</span>
 
 <span class="c1"># Generator fingerprints worth naming, since each implies a known payload rung.</span>
 <span class="n">_GENERATOR_HINTS</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="p">(</span><span class="s2">&quot;__NEXT_DATA__&quot;</span><span class="p">,</span> <span class="s2">&quot;next.js (pages router)&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;__next_f&quot;</span><span class="p">,</span> <span class="s2">&quot;next.js (app router / rsc)&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;__NUXT__&quot;</span><span class="p">,</span> <span class="s2">&quot;nuxt 2&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;__NUXT_DATA__&quot;</span><span class="p">,</span> <span class="s2">&quot;nuxt 3&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;__APOLLO_STATE__&quot;</span><span class="p">,</span> <span class="s2">&quot;apollo client&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;__remixContext&quot;</span><span class="p">,</span> <span class="s2">&quot;remix&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;ng-state&quot;</span><span class="p">,</span> <span class="s2">&quot;angular universal&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"__NEXT_DATA__"</span><span class="p">,</span> <span class="s2">"next.js (pages router)"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"__next_f"</span><span class="p">,</span> <span class="s2">"next.js (app router / rsc)"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"__NUXT__"</span><span class="p">,</span> <span class="s2">"nuxt 2"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"__NUXT_DATA__"</span><span class="p">,</span> <span class="s2">"nuxt 3"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"__APOLLO_STATE__"</span><span class="p">,</span> <span class="s2">"apollo client"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"__remixContext"</span><span class="p">,</span> <span class="s2">"remix"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"ng-state"</span><span class="p">,</span> <span class="s2">"angular universal"</span><span class="p">),</span>
 <span class="p">)</span>
 
 
@@ -139,12 +139,12 @@
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/probe.html#scraped.acquire.SiteProfile">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SiteProfile</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;What one site will hand over, and how hard it intends to make it.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""What one site will hand over, and how hard it intends to make it."""</span>
 
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">host</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">status</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
     <span class="n">robots_allowed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">crawl_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">sitemaps</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
@@ -158,48 +158,48 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">best_payload_rung</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The most structured payload available, named.</span>
+<span class="w">        </span><span class="sd">"""The most structured payload available, named.</span>
 
 <span class="sd">        This is the recommendation: `api` beats `state_blob` beats `dom`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serves_json</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;api&quot;</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">blob</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;ld_json&quot;</span> <span class="k">for</span> <span class="n">blob</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_blobs</span><span class="p">):</span>
-            <span class="k">return</span> <span class="s2">&quot;ld_json&quot;</span>
+            <span class="k">return</span> <span class="s2">"api"</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">blob</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"ld_json"</span> <span class="k">for</span> <span class="n">blob</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_blobs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">"ld_json"</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_blobs</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;state_blob&quot;</span>
-        <span class="k">return</span> <span class="s2">&quot;dom&quot;</span>
+            <span class="k">return</span> <span class="s2">"state_blob"</span>
+        <span class="k">return</span> <span class="s2">"dom"</span>
 
 <div class="viewcode-block" id="SiteProfile.summary">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/probe.html#scraped.acquire.SiteProfile.summary">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A few lines a human or an agent can act on directly.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""A few lines a human or an agent can act on directly."""</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;  status          </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;  robots          allowed=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">robots_allowed</span><span class="si">}</span><span class="s2"> delay=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">crawl_delay</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;  sitemaps        </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sitemaps</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;  serves JSON     </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">serves_json</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;  generator       </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;  best payload    </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">best_payload_rung</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"  status          </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"  robots          allowed=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">robots_allowed</span><span class="si">}</span><span class="s2"> delay=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">crawl_delay</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"  sitemaps        </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sitemaps</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"  serves JSON     </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">serves_json</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"  generator       </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'unknown'</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"  best payload    </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">best_payload_rung</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_blobs</span><span class="p">:</span>
-            <span class="n">blobs</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">blob</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">blob</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">B)&quot;</span> <span class="k">for</span> <span class="n">blob</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_blobs</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+            <span class="n">blobs</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">blob</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">blob</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">B)"</span> <span class="k">for</span> <span class="n">blob</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_blobs</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
             <span class="p">)</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  state blobs     </span><span class="si">{</span><span class="n">blobs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  state blobs     </span><span class="si">{</span><span class="n">blobs</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">challenge_serving</span><span class="p">:</span>
             <span class="n">kind</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">&quot;interactive challenge&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">challenge_interactive</span> <span class="k">else</span> <span class="s2">&quot;challenge&quot;</span>
+                <span class="s2">"interactive challenge"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">challenge_interactive</span> <span class="k">else</span> <span class="s2">"challenge"</span>
             <span class="p">)</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  BLOCKED         </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">challenge_vendor</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  BLOCKED         </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">challenge_vendor</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">challenge_vendor</span><span class="p">:</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;  guarded by      </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">challenge_vendor</span><span class="si">}</span><span class="s2"> (not blocking; &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;use an impersonating transport)&quot;</span>
+                <span class="sa">f</span><span class="s2">"  guarded by      </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">challenge_vendor</span><span class="si">}</span><span class="s2"> (not blocking; "</span>
+                <span class="sa">f</span><span class="s2">"use an impersonating transport)"</span>
             <span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  note            </span><span class="si">{</span><span class="n">note</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">note</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">notes</span><span class="p">)</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  note            </span><span class="si">{</span><span class="n">note</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">note</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">notes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 </div>
 
 
@@ -207,18 +207,18 @@
 <div class="viewcode-block" id="robots_sitemaps">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/probe.html#scraped.acquire.robots_sitemaps">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">robots_sitemaps</span><span class="p">(</span><span class="n">robots_txt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sitemap URLs declared in a robots.txt.</span>
+<span class="w">    </span><span class="sd">"""Sitemap URLs declared in a robots.txt.</span>
 
 <span class="sd">    The `Sitemap:` directive is independent of any `User-agent` block, which is</span>
 <span class="sd">    why it is parsed separately from the access rules.</span>
 
-<span class="sd">    &gt;&gt;&gt; robots_sitemaps(&quot;User-agent: *\\nSitemap: https://x.com/sitemap.xml&quot;)</span>
-<span class="sd">    [&#39;https://x.com/sitemap.xml&#39;]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; robots_sitemaps("User-agent: *\\nSitemap: https://x.com/sitemap.xml")</span>
+<span class="sd">    ['https://x.com/sitemap.xml']</span>
+<span class="sd">    """</span>
     <span class="n">found</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">robots_txt</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
-        <span class="n">name</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;sitemap&quot;</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">":"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"sitemap"</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
             <span class="n">found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">found</span></div>
 
@@ -239,23 +239,23 @@
     <span class="n">fetcher</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Request</span><span class="p">],</span> <span class="n">Capture</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">check_json</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SiteProfile</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reconnoitre a URL: what is available, and what is in the way.</span>
+<span class="w">    </span><span class="sd">"""Reconnoitre a URL: what is available, and what is in the way.</span>
 
 <span class="sd">    Performs at most three requests (robots.txt, a JSON-negotiation probe, and the</span>
 <span class="sd">    page itself) and never raises on a challenge — the whole point is to *report*</span>
 <span class="sd">    the obstacle rather than trip over it.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.fetchers.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_fetcher</span><span class="p">,</span> <span class="n">robots_reader</span>
 
     <span class="n">fetcher</span> <span class="o">=</span> <span class="n">fetcher</span> <span class="ow">or</span> <span class="n">default_fetcher</span><span class="p">(</span><span class="n">raise_on_challenge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">split</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    <span class="n">host</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s2">://</span><span class="si">{</span><span class="n">split</span><span class="o">.</span><span class="n">netloc</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">split</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s2">://</span><span class="si">{</span><span class="n">split</span><span class="o">.</span><span class="n">netloc</span><span class="si">}</span><span class="s2">"</span>
     <span class="n">notes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="c1"># robots.txt and sitemaps are fetched *below* the policy layer. Routing them</span>
     <span class="c1"># through a robots-respecting fetcher means a `Disallow: /` site blinds the</span>
     <span class="c1"># probe to every fact it exists to report — including the fact that robots</span>
-    <span class="c1"># disallows, which would then read as &quot;unknown&quot; under a misleading note.</span>
+    <span class="c1"># disallows, which would then read as "unknown" under a misleading note.</span>
     <span class="n">robots_txt</span> <span class="o">=</span> <span class="n">_robots_text</span><span class="p">(</span><span class="n">fetcher</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
     <span class="n">sitemaps</span> <span class="o">=</span> <span class="n">robots_sitemaps</span><span class="p">(</span><span class="n">robots_txt</span><span class="p">)</span> <span class="k">if</span> <span class="n">robots_txt</span> <span class="k">else</span> <span class="p">[]</span>
     <span class="n">robots_allowed</span><span class="p">,</span> <span class="n">crawl_delay</span> <span class="o">=</span> <span class="n">_robots_verdict</span><span class="p">(</span><span class="n">robots_txt</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
@@ -263,22 +263,22 @@
     <span class="n">serves_json</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">check_json</span><span class="p">:</span>
         <span class="n">json_capture</span> <span class="o">=</span> <span class="n">_safe_capture</span><span class="p">(</span>
-            <span class="n">fetcher</span><span class="p">,</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="n">DFLT_JSON_ACCEPT</span><span class="p">})</span>
+            <span class="n">fetcher</span><span class="p">,</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"Accept"</span><span class="p">:</span> <span class="n">DFLT_JSON_ACCEPT</span><span class="p">})</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">json_capture</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">json_capture</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
-            <span class="n">serves_json</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span> <span class="ow">in</span> <span class="n">json_capture</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">content_type</span>
+            <span class="n">serves_json</span> <span class="o">=</span> <span class="s2">"json"</span> <span class="ow">in</span> <span class="n">json_capture</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">content_type</span>
             <span class="k">if</span> <span class="n">serves_json</span><span class="p">:</span>
                 <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="s2">&quot;same URL serves JSON under content negotiation - &quot;</span>
-                    <span class="s2">&quot;no HTML parsing needed&quot;</span>
+                    <span class="s2">"same URL serves JSON under content negotiation - "</span>
+                    <span class="s2">"no HTML parsing needed"</span>
                 <span class="p">)</span>
 
     <span class="n">capture</span><span class="p">,</span> <span class="n">fetch_error</span> <span class="o">=</span> <span class="n">_safe_capture_or_error</span><span class="p">(</span><span class="n">fetcher</span><span class="p">,</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">capture</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="s2">&quot;robots disallows this URL for our user-agent&quot;</span>
+            <span class="s2">"robots disallows this URL for our user-agent"</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fetch_error</span><span class="p">,</span> <span class="n">RobotsDisallowed</span><span class="p">)</span>
-            <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;page fetch failed: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">fetch_error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">else</span> <span class="sa">f</span><span class="s2">"page fetch failed: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">fetch_error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">SiteProfile</span><span class="p">(</span>
             <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
@@ -295,12 +295,12 @@
     <span class="n">blobs</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">text</span><span class="p">))</span> <span class="k">if</span> <span class="n">text</span> <span class="k">else</span> <span class="p">()</span>
 
     <span class="k">if</span> <span class="n">verdict</span><span class="o">.</span><span class="n">interactive</span><span class="p">:</span>
-        <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;interactive challenge - a human must complete this; do not retry&quot;</span><span class="p">)</span>
+        <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"interactive challenge - a human must complete this; do not retry"</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">verdict</span><span class="o">.</span><span class="n">serving</span><span class="p">:</span>
-        <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;challenge served - escalate transport, do not retry as-is&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">blobs</span> <span class="ow">and</span> <span class="n">capture</span><span class="o">.</span><span class="n">ok</span> <span class="ow">and</span> <span class="n">text</span> <span class="ow">and</span> <span class="s2">&quot;&lt;div&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+        <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"challenge served - escalate transport, do not retry as-is"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">blobs</span> <span class="ow">and</span> <span class="n">capture</span><span class="o">.</span><span class="n">ok</span> <span class="ow">and</span> <span class="n">text</span> <span class="ow">and</span> <span class="s2">"&lt;div"</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
         <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="s2">&quot;no state blob found - may be client-rendered; look for an XHR API&quot;</span>
+            <span class="s2">"no state blob found - may be client-rendered; look for an XHR API"</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">SiteProfile</span><span class="p">(</span>
@@ -345,7 +345,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_safe_capture_or_error</span><span class="p">(</span>
     <span class="n">fetcher</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Capture</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="ne">Exception</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch without raising, but keep *why* it failed — the reason is the finding.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Fetch without raising, but keep *why* it failed — the reason is the finding."""</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">fetcher</span><span class="p">(</span><span class="n">request</span><span class="p">),</span> <span class="kc">None</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
@@ -354,22 +354,22 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_safe_text_of</span><span class="p">(</span><span class="n">capture</span><span class="p">:</span> <span class="n">Capture</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">capture</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">is_textual</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">""</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">capture</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">""</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_robots_text</span><span class="p">(</span><span class="n">fetcher</span><span class="p">,</span> <span class="n">host</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read robots.txt below the policy layer, so the probe is never self-blinded.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Read robots.txt below the policy layer, so the probe is never self-blinded."""</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.fetchers.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">UrllibTransport</span><span class="p">,</span> <span class="n">robots_reader</span>
 
-    <span class="n">transport</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fetcher</span><span class="p">,</span> <span class="s2">&quot;transport&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">UrllibTransport</span><span class="p">()</span>
+    <span class="n">transport</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fetcher</span><span class="p">,</span> <span class="s2">"transport"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">UrllibTransport</span><span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">robots_reader</span><span class="p">(</span><span class="n">transport</span><span class="p">)(</span><span class="n">host</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">robots_reader</span><span class="p">(</span><span class="n">transport</span><span class="p">)(</span><span class="n">host</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">""</span>
 </pre></div>
 
            </div>

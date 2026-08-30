@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.acquire.cache &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.acquire.cache &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -89,13 +89,13 @@
            <div itemprop="articleBody">
              
   <h1>Source code for scraped.acquire.cache</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Caching: make a re-run free, and make change detection fall out for nothing.</span>
+<span></span><span class="sd">"""Caching: make a re-run free, and make change detection fall out for nothing.</span>
 
 <span class="sd">This is what makes iterating on the *extraction* half tolerable — you should be</span>
 <span class="sd">able to re-run an extraction a hundred times without touching the network once.</span>
 
 <span class="sd">The cache is owned here rather than imported because the popular HTTP caches bind</span>
-<span class="sd">to a specific client&#39;s transport stack (`requests.Session`, httpx transports) and</span>
+<span class="sd">to a specific client's transport stack (`requests.Session`, httpx transports) and</span>
 <span class="sd">none of them work with an impersonating libcurl-based client. Since cache entries</span>
 <span class="sd">must also carry provenance and survive a client swap, the right shape is a plain</span>
 <span class="sd">`Mapping` keyed by request digest.</span>
@@ -105,14 +105,14 @@
 <span class="sd">(a digest that did not change means the page did not change).</span>
 
 <span class="sd">&gt;&gt;&gt; store = CaptureStore.in_memory()</span>
-<span class="sd">&gt;&gt;&gt; fetcher = cached(lambda request: Capture.from_body(request, b&quot;hi&quot;), store)</span>
-<span class="sd">&gt;&gt;&gt; first = fetcher(Request(&quot;https://example.com&quot;))</span>
-<span class="sd">&gt;&gt;&gt; second = fetcher(Request(&quot;https://example.com&quot;))   # served from the store</span>
+<span class="sd">&gt;&gt;&gt; fetcher = cached(lambda request: Capture.from_body(request, b"hi"), store)</span>
+<span class="sd">&gt;&gt;&gt; first = fetcher(Request("https://example.com"))</span>
+<span class="sd">&gt;&gt;&gt; second = fetcher(Request("https://example.com"))   # served from the store</span>
 <span class="sd">&gt;&gt;&gt; first.response.body_sha256 == second.response.body_sha256</span>
 <span class="sd">True</span>
 <span class="sd">&gt;&gt;&gt; len(store)</span>
 <span class="sd">1</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -133,43 +133,43 @@
     <span class="n">request_digest</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CaptureStore&quot;</span><span class="p">,</span> <span class="s2">&quot;cached&quot;</span><span class="p">,</span> <span class="s2">&quot;capture_store&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"CaptureStore"</span><span class="p">,</span> <span class="s2">"cached"</span><span class="p">,</span> <span class="s2">"capture_store"</span><span class="p">]</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_as_text</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stores may hand back bytes or str; both are fine.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">))</span> <span class="k">else</span> <span class="n">value</span>
+<span class="w">    </span><span class="sd">"""Stores may hand back bytes or str; both are fine."""</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">))</span> <span class="k">else</span> <span class="n">value</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_capture_from</span><span class="p">(</span><span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Capture</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rebuild a `Capture` from its persisted metadata and body.</span>
+<span class="w">    </span><span class="sd">"""Rebuild a `Capture` from its persisted metadata and body.</span>
 
 <span class="sd">    Restores the two things JSON cannot represent on its own: a `bytes` request</span>
 <span class="sd">    body (base64 on the way out) and tuple-typed fields (JSON only has arrays).</span>
 <span class="sd">    Both matter for round-trip equality — a restored capture that merely *looks*</span>
 <span class="sd">    like the original will pass a shallow test and fail a re-digest.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">request_fields</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="n">request_fields</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;body_is_base64&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="n">request_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">):</span>
-        <span class="n">request_fields</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">request_fields</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">])</span>
+<span class="sd">    """</span>
+    <span class="n">request_fields</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"request"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">request_fields</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"body_is_base64"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="n">request_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"body"</span><span class="p">):</span>
+        <span class="n">request_fields</span><span class="p">[</span><span class="s2">"body"</span><span class="p">]</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">request_fields</span><span class="p">[</span><span class="s2">"body"</span><span class="p">])</span>
 
-    <span class="n">response_fields</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">])</span>
-    <span class="n">response_fields</span><span class="p">[</span><span class="s2">&quot;redirect_chain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
-        <span class="n">response_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;redirect_chain&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">()</span>
+    <span class="n">response_fields</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"response"</span><span class="p">])</span>
+    <span class="n">response_fields</span><span class="p">[</span><span class="s2">"redirect_chain"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+        <span class="n">response_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"redirect_chain"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">()</span>
     <span class="p">)</span>
 
-    <span class="n">probe_fields</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;probe&quot;</span><span class="p">,</span> <span class="p">{}))</span>
-    <span class="n">probe_fields</span><span class="p">[</span><span class="s2">&quot;state_blob_markers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
-        <span class="n">probe_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;state_blob_markers&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">()</span>
+    <span class="n">probe_fields</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"probe"</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="n">probe_fields</span><span class="p">[</span><span class="s2">"state_blob_markers"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+        <span class="n">probe_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"state_blob_markers"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">()</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Capture</span><span class="p">(</span>
         <span class="n">request</span><span class="o">=</span><span class="n">Request</span><span class="p">(</span><span class="o">**</span><span class="n">request_fields</span><span class="p">),</span>
         <span class="n">response</span><span class="o">=</span><span class="n">Response</span><span class="p">(</span><span class="o">**</span><span class="n">response_fields</span><span class="p">),</span>
-        <span class="n">fetched_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;fetched_at&quot;</span><span class="p">]),</span>
-        <span class="n">elapsed_ms</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;elapsed_ms&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
-        <span class="n">fetcher</span><span class="o">=</span><span class="n">FetcherInfo</span><span class="p">(</span><span class="o">**</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fetcher&quot;</span><span class="p">,</span> <span class="p">{})),</span>
-        <span class="n">policy</span><span class="o">=</span><span class="n">PolicyOutcome</span><span class="p">(</span><span class="o">**</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;policy&quot;</span><span class="p">,</span> <span class="p">{})),</span>
+        <span class="n">fetched_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"fetched_at"</span><span class="p">]),</span>
+        <span class="n">elapsed_ms</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"elapsed_ms"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="n">fetcher</span><span class="o">=</span><span class="n">FetcherInfo</span><span class="p">(</span><span class="o">**</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"fetcher"</span><span class="p">,</span> <span class="p">{})),</span>
+        <span class="n">policy</span><span class="o">=</span><span class="n">PolicyOutcome</span><span class="p">(</span><span class="o">**</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"policy"</span><span class="p">,</span> <span class="p">{})),</span>
         <span class="n">probe</span><span class="o">=</span><span class="n">ProbeMarks</span><span class="p">(</span><span class="o">**</span><span class="n">probe_fields</span><span class="p">),</span>
         <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">,</span>
     <span class="p">)</span>
@@ -179,12 +179,12 @@
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/cache.html#scraped.acquire.CaptureStore">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CaptureStore</span><span class="p">(</span><span class="n">MutableMapping</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A `Mapping[request_digest, Capture]` over two content stores.</span>
+<span class="w">    </span><span class="sd">"""A `Mapping[request_digest, Capture]` over two content stores.</span>
 
 <span class="sd">    `metadata` and `bodies` are any `MutableMapping` — a dict, a `dol` directory</span>
 <span class="sd">    store, an S3 store. That is the whole migration story: local-dir to cloud is a</span>
 <span class="sd">    constructor change and touches no acquisition logic.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">metadata</span><span class="p">:</span> <span class="n">MutableMapping</span>
     <span class="n">bodies</span><span class="p">:</span> <span class="n">MutableMapping</span>
@@ -192,20 +192,20 @@
 <div class="viewcode-block" id="CaptureStore.in_memory">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/cache.html#scraped.acquire.CaptureStore.in_memory">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">in_memory</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CaptureStore&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A store backed by dicts. For tests and one-shot jobs.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">in_memory</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CaptureStore"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""A store backed by dicts. For tests and one-shot jobs."""</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{},</span> <span class="n">bodies</span><span class="o">=</span><span class="p">{})</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digest</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Capture</span><span class="p">:</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_as_text</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">digest</span><span class="p">]))</span>
-        <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bodies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">][</span><span class="s2">&quot;body_sha256&quot;</span><span class="p">],</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bodies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">"response"</span><span class="p">][</span><span class="s2">"body_sha256"</span><span class="p">],</span> <span class="sa">b</span><span class="s2">""</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_capture_from</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digest</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">capture</span><span class="p">:</span> <span class="n">Capture</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">capture</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bodies</span><span class="p">[</span><span class="n">capture</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">body_sha256</span><span class="p">]</span> <span class="o">=</span> <span class="n">capture</span><span class="o">.</span><span class="n">body</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">digest</span><span class="p">]</span> <span class="o">=</span> <span class="n">capture</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">digest</span><span class="p">]</span> <span class="o">=</span> <span class="n">capture</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digest</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">digest</span><span class="p">]</span>
@@ -219,7 +219,7 @@
 <div class="viewcode-block" id="CaptureStore.add">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/cache.html#scraped.acquire.CaptureStore.add">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">capture</span><span class="p">:</span> <span class="n">Capture</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Store a capture under its own request digest; return the digest.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Store a capture under its own request digest; return the digest."""</span>
         <span class="n">digest</span> <span class="o">=</span> <span class="n">request_digest</span><span class="p">(</span><span class="n">capture</span><span class="o">.</span><span class="n">request</span><span class="p">)</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">digest</span><span class="p">]</span> <span class="o">=</span> <span class="n">capture</span>
         <span class="k">return</span> <span class="n">digest</span></div>
@@ -230,7 +230,7 @@
 <div class="viewcode-block" id="capture_store">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/cache.html#scraped.acquire.capture_store">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">capture_store</span><span class="p">(</span><span class="n">rootdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CaptureStore</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A directory-backed store, creating the directories it needs.</span>
+<span class="w">    </span><span class="sd">"""A directory-backed store, creating the directories it needs.</span>
 
 <span class="sd">    Uses `dol` so the same object works over a local directory, S3, or anything</span>
 <span class="sd">    else with a `Mapping` face.</span>
@@ -240,24 +240,24 @@
 <span class="sd">    from the underlying `open()`.</span>
 
 <span class="sd">    &gt;&gt;&gt; import tempfile, os</span>
-<span class="sd">    &gt;&gt;&gt; store = capture_store(os.path.join(tempfile.mkdtemp(), &quot;job&quot;))</span>
+<span class="sd">    &gt;&gt;&gt; store = capture_store(os.path.join(tempfile.mkdtemp(), "job"))</span>
 <span class="sd">    &gt;&gt;&gt; from .capture import Capture, Request</span>
-<span class="sd">    &gt;&gt;&gt; digest = store.add(Capture.from_body(Request(&quot;https://x.com/a&quot;), b&quot;hi&quot;))</span>
+<span class="sd">    &gt;&gt;&gt; digest = store.add(Capture.from_body(Request("https://x.com/a"), b"hi"))</span>
 <span class="sd">    &gt;&gt;&gt; store[digest].body</span>
-<span class="sd">    b&#39;hi&#39;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    b'hi'</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Files</span>
 
     <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">rootdir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
-    <span class="n">metadata_dir</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;metadata&quot;</span>
-    <span class="n">bodies_dir</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;bodies&quot;</span>
+    <span class="n">metadata_dir</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="s2">"metadata"</span>
+    <span class="n">bodies_dir</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="s2">"bodies"</span>
     <span class="n">metadata_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">bodies_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">CaptureStore</span><span class="p">(</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="n">Files</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metadata_dir</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">),</span> <span class="n">bodies</span><span class="o">=</span><span class="n">Files</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bodies_dir</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">Files</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">metadata_dir</span><span class="si">}</span><span class="s2">/"</span><span class="p">),</span> <span class="n">bodies</span><span class="o">=</span><span class="n">Files</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">bodies_dir</span><span class="si">}</span><span class="s2">/"</span><span class="p">)</span>
     <span class="p">)</span></div>
 
 
@@ -271,18 +271,18 @@
     <span class="n">revalidate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">should_cache</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Capture</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">capture</span><span class="p">:</span> <span class="n">capture</span><span class="o">.</span><span class="n">ok</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Request</span><span class="p">],</span> <span class="n">Capture</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap a fetcher so repeated requests are served from `store`.</span>
+<span class="w">    </span><span class="sd">"""Wrap a fetcher so repeated requests are served from `store`.</span>
 
 <span class="sd">    Two modes:</span>
 
 <span class="sd">    - **fetch-once** (default) — a hit is returned as-is; a re-run costs nothing.</span>
-<span class="sd">    - **revalidate** — a hit&#39;s validators are sent as `If-None-Match` /</span>
+<span class="sd">    - **revalidate** — a hit's validators are sent as `If-None-Match` /</span>
 <span class="sd">      `If-Modified-Since`, and a `304` reuses the stored body. This is what makes</span>
 <span class="sd">      incremental crawls cheap without going stale.</span>
 
 <span class="sd">    Only successful captures are cached by default: caching a `403` would make an</span>
 <span class="sd">    unblocked retry impossible without clearing the store.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Capture</span><span class="p">:</span>
         <span class="n">digest</span> <span class="o">=</span> <span class="n">request_digest</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
@@ -324,17 +324,17 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_validators</span><span class="p">(</span><span class="n">capture</span><span class="p">:</span> <span class="n">Capture</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conditional-request headers derived from a stored capture.</span>
+<span class="w">    </span><span class="sd">"""Conditional-request headers derived from a stored capture.</span>
 
 <span class="sd">    Prefer `ETag` over `Last-Modified` when both are present: `Last-Modified` has</span>
 <span class="sd">    one-second granularity and clock-skew problems across load-balanced origins.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">stored</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">capture</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-    <span class="k">if</span> <span class="s2">&quot;etag&quot;</span> <span class="ow">in</span> <span class="n">stored</span><span class="p">:</span>
-        <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;If-None-Match&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stored</span><span class="p">[</span><span class="s2">&quot;etag&quot;</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="s2">&quot;last-modified&quot;</span> <span class="ow">in</span> <span class="n">stored</span><span class="p">:</span>
-        <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;If-Modified-Since&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stored</span><span class="p">[</span><span class="s2">&quot;last-modified&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">"etag"</span> <span class="ow">in</span> <span class="n">stored</span><span class="p">:</span>
+        <span class="n">headers</span><span class="p">[</span><span class="s2">"If-None-Match"</span><span class="p">]</span> <span class="o">=</span> <span class="n">stored</span><span class="p">[</span><span class="s2">"etag"</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="s2">"last-modified"</span> <span class="ow">in</span> <span class="n">stored</span><span class="p">:</span>
+        <span class="n">headers</span><span class="p">[</span><span class="s2">"If-Modified-Since"</span><span class="p">]</span> <span class="o">=</span> <span class="n">stored</span><span class="p">[</span><span class="s2">"last-modified"</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">headers</span>
 </pre></div>
 

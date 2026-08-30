@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.acquire &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.acquire &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -88,7 +88,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for scraped.acquire</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Raw data acquisition: get the bytes down faithfully, with provenance.</span>
+<span></span><span class="sd">"""Raw data acquisition: get the bytes down faithfully, with provenance.</span>
 
 <span class="sd">An information-extraction job splits into three concerns. This package owns only</span>
 <span class="sd">the first, and provides seams for the other two rather than implementing them:</span>
@@ -102,9 +102,9 @@
 <span class="sd">## Simple path</span>
 
 <span class="sd">    &gt;&gt;&gt; from scraped.acquire import probe, fetch, scan_state_blobs</span>
-<span class="sd">    &gt;&gt;&gt; profile = probe(&quot;https://example.com&quot;)           # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; profile = probe("https://example.com")           # doctest: +SKIP</span>
 <span class="sd">    &gt;&gt;&gt; print(profile.summary())                         # doctest: +SKIP</span>
-<span class="sd">    &gt;&gt;&gt; capture = fetch(&quot;https://example.com&quot;)           # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; capture = fetch("https://example.com")           # doctest: +SKIP</span>
 <span class="sd">    &gt;&gt;&gt; blobs = scan_state_blobs(capture.text())         # doctest: +SKIP</span>
 
 <span class="sd">## The one idea worth internalizing</span>
@@ -116,13 +116,13 @@
 
 <span class="sd">Any payload rung is reachable from any transport rung, and the highest-value cell</span>
 <span class="sd">on the grid — *drive a real browser, then read the embedded state blob* — is the</span>
-<span class="sd">one the usual single-ladder framing hides. Reading a page&#39;s own `__NEXT_DATA__`</span>
+<span class="sd">one the usual single-ladder framing hides. Reading a page's own `__NEXT_DATA__`</span>
 <span class="sd">beats parsing its DOM even when you had to pay for a browser to see it: the blob</span>
 <span class="sd">is the data rather than a rendering of it, and it is complete even when the DOM</span>
 <span class="sd">renders lazily.</span>
 
 <span class="sd">See `misc/docs/acquisition-architecture.md` for the full design.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.blobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateBlob</span><span class="p">,</span> <span class="n">scan_state_blobs</span><span class="p">,</span> <span class="n">state_blob_markers</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">CaptureStore</span><span class="p">,</span> <span class="n">cached</span><span class="p">,</span> <span class="n">capture_store</span>
@@ -155,54 +155,54 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="c1"># simple path</span>
-    <span class="s2">&quot;probe&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;fetch&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;scan_state_blobs&quot;</span><span class="p">,</span>
+    <span class="s2">"probe"</span><span class="p">,</span>
+    <span class="s2">"fetch"</span><span class="p">,</span>
+    <span class="s2">"scan_state_blobs"</span><span class="p">,</span>
     <span class="c1"># records</span>
-    <span class="s2">&quot;Capture&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Request&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Response&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;SiteProfile&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;StateBlob&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;FetcherInfo&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;PolicyOutcome&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ProbeMarks&quot;</span><span class="p">,</span>
+    <span class="s2">"Capture"</span><span class="p">,</span>
+    <span class="s2">"Request"</span><span class="p">,</span>
+    <span class="s2">"Response"</span><span class="p">,</span>
+    <span class="s2">"SiteProfile"</span><span class="p">,</span>
+    <span class="s2">"StateBlob"</span><span class="p">,</span>
+    <span class="s2">"FetcherInfo"</span><span class="p">,</span>
+    <span class="s2">"PolicyOutcome"</span><span class="p">,</span>
+    <span class="s2">"ProbeMarks"</span><span class="p">,</span>
     <span class="c1"># seams</span>
-    <span class="s2">&quot;Fetcher&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;HttpFetcher&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CurlCffiTransport&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;UrllibTransport&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;default_fetcher&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;BrowserFetcher&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;BrowserSession&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;BrowserArtifacts&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;browser_check_requirements&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;storage_state_headers&quot;</span><span class="p">,</span>
+    <span class="s2">"Fetcher"</span><span class="p">,</span>
+    <span class="s2">"HttpFetcher"</span><span class="p">,</span>
+    <span class="s2">"CurlCffiTransport"</span><span class="p">,</span>
+    <span class="s2">"UrllibTransport"</span><span class="p">,</span>
+    <span class="s2">"default_fetcher"</span><span class="p">,</span>
+    <span class="s2">"BrowserFetcher"</span><span class="p">,</span>
+    <span class="s2">"BrowserSession"</span><span class="p">,</span>
+    <span class="s2">"BrowserArtifacts"</span><span class="p">,</span>
+    <span class="s2">"browser_check_requirements"</span><span class="p">,</span>
+    <span class="s2">"storage_state_headers"</span><span class="p">,</span>
     <span class="c1"># policy</span>
-    <span class="s2">&quot;RobotsPolicy&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;RobotsDisallowed&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Politeness&quot;</span><span class="p">,</span>
+    <span class="s2">"RobotsPolicy"</span><span class="p">,</span>
+    <span class="s2">"RobotsDisallowed"</span><span class="p">,</span>
+    <span class="s2">"Politeness"</span><span class="p">,</span>
     <span class="c1"># caching</span>
-    <span class="s2">&quot;CaptureStore&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;capture_store&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;cached&quot;</span><span class="p">,</span>
+    <span class="s2">"CaptureStore"</span><span class="p">,</span>
+    <span class="s2">"capture_store"</span><span class="p">,</span>
+    <span class="s2">"cached"</span><span class="p">,</span>
     <span class="c1"># diagnostics</span>
-    <span class="s2">&quot;ChallengeEncountered&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;detect_challenge&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;classify&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;state_blob_markers&quot;</span><span class="p">,</span>
+    <span class="s2">"ChallengeEncountered"</span><span class="p">,</span>
+    <span class="s2">"detect_challenge"</span><span class="p">,</span>
+    <span class="s2">"classify"</span><span class="p">,</span>
+    <span class="s2">"state_blob_markers"</span><span class="p">,</span>
     <span class="c1"># utilities</span>
-    <span class="s2">&quot;canonicalize_url&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;request_digest&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;body_digest&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;robots_sitemaps&quot;</span><span class="p">,</span>
+    <span class="s2">"canonicalize_url"</span><span class="p">,</span>
+    <span class="s2">"request_digest"</span><span class="p">,</span>
+    <span class="s2">"body_digest"</span><span class="p">,</span>
+    <span class="s2">"robots_sitemaps"</span><span class="p">,</span>
 <span class="p">]</span>
 
 
 <div class="viewcode-block" id="fetch">
 <a class="viewcode-back" href="../../module_docs/scraped/acquire.html#scraped.acquire.fetch">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fetcher</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">request_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Capture</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch one URL into a `Capture`, using sensible defaults.</span>
+<span class="w">    </span><span class="sd">"""Fetch one URL into a `Capture`, using sensible defaults.</span>
 
 <span class="sd">    The simple thing made simple: an impersonating transport, per-host politeness,</span>
 <span class="sd">    jittered retries, challenge detection, and an automatic state-blob scan — none</span>
@@ -210,7 +210,7 @@
 
 <span class="sd">    For anything beyond one URL, build a fetcher once and reuse it, so politeness</span>
 <span class="sd">    and caching are shared across the job.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">fetcher</span> <span class="o">=</span> <span class="n">fetcher</span> <span class="ow">or</span> <span class="n">default_fetcher</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">fetcher</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">request_kwargs</span><span class="p">))</span></div>
 

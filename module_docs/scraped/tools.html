@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.tools &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.tools &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -120,10 +120,10 @@ Also, we’ll use a dict as a store, for test simplicity purposes.
 Usually, though, you’ll want to use a directory or a MutableMapping as store,
 or a function that stores content in a specific way.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">uris</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;example1&#39;</span><span class="p">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;example2&#39;</span><span class="p">:</span> <span class="s1">&#39;world&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uris</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'example1'</span><span class="p">:</span> <span class="s1">'hello'</span><span class="p">,</span> <span class="s1">'example2'</span><span class="p">:</span> <span class="s1">'world'</span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">acquire_content</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">uris</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>  <span class="c1"># uri_to_content here is str.upper, to simulate content acquisition.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
-<span class="go">{&#39;example1&#39;: &#39;HELLO&#39;, &#39;example2&#39;: &#39;WORLD&#39;}</span>
+<span class="go">{'example1': 'HELLO', 'example2': 'WORLD'}</span>
 </pre></div>
 </div>
 <p>Note that often you want to just fix the uri_to_content function and sometimes store.
@@ -131,9 +131,9 @@ The acquire_content acts as a function factory for your convenience. If you don�
 specify uris (but at least specify <cite>uri_to_content</cite>), you get a function that takes
 uris as the first argument, and stores the content therefrom.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">content_acquirer</span> <span class="o">=</span> <span class="n">acquire_content</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">content_acquirer</span><span class="p">({</span><span class="s1">&#39;example3&#39;</span><span class="p">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;example4&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">content_acquirer</span><span class="p">({</span><span class="s1">'example3'</span><span class="p">:</span> <span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'example4'</span><span class="p">:</span> <span class="s1">'bar'</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
-<span class="go">{&#39;example1&#39;: &#39;HELLO&#39;, &#39;example2&#39;: &#39;WORLD&#39;, &#39;example3&#39;: &#39;FOO&#39;, &#39;example4&#39;: &#39;BAR&#39;}</span>
+<span class="go">{'example1': 'HELLO', 'example2': 'WORLD', 'example3': 'FOO', 'example4': 'BAR'}</span>
 </pre></div>
 </div>
 <p># Examples that would be typical for uri_to_content:
@@ -181,10 +181,10 @@ Also, we’ll use a dict as a store, for test simplicity purposes.
 Usually, though, you’ll want to use a directory or a MutableMapping as store,
 or a function that stores content in a specific way.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">uris</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;example1&#39;</span><span class="p">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;example2&#39;</span><span class="p">:</span> <span class="s1">&#39;world&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uris</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'example1'</span><span class="p">:</span> <span class="s1">'hello'</span><span class="p">,</span> <span class="s1">'example2'</span><span class="p">:</span> <span class="s1">'world'</span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">acquire_content</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">uris</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>  <span class="c1"># uri_to_content here is str.upper, to simulate content acquisition.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
-<span class="go">{&#39;example1&#39;: &#39;HELLO&#39;, &#39;example2&#39;: &#39;WORLD&#39;}</span>
+<span class="go">{'example1': 'HELLO', 'example2': 'WORLD'}</span>
 </pre></div>
 </div>
 <p>Note that often you want to just fix the uri_to_content function and sometimes store.
@@ -192,9 +192,9 @@ The acquire_content acts as a function factory for your convenience. If you don�
 specify uris (but at least specify <cite>uri_to_content</cite>), you get a function that takes
 uris as the first argument, and stores the content therefrom.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">content_acquirer</span> <span class="o">=</span> <span class="n">acquire_content</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">content_acquirer</span><span class="p">({</span><span class="s1">&#39;example3&#39;</span><span class="p">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;example4&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">content_acquirer</span><span class="p">({</span><span class="s1">'example3'</span><span class="p">:</span> <span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'example4'</span><span class="p">:</span> <span class="s1">'bar'</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
-<span class="go">{&#39;example1&#39;: &#39;HELLO&#39;, &#39;example2&#39;: &#39;WORLD&#39;, &#39;example3&#39;: &#39;FOO&#39;, &#39;example4&#39;: &#39;BAR&#39;}</span>
+<span class="go">{'example1': 'HELLO', 'example2': 'WORLD', 'example3': 'FOO', 'example4': 'BAR'}</span>
 </pre></div>
 </div>
 <p># Examples that would be typical for uri_to_content:

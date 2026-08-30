@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.acquire.signals &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.acquire.signals &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -89,7 +89,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for scraped.acquire.signals</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Diagnostic signals: reading what a response is actually telling you.</span>
+<span></span><span class="sd">"""Diagnostic signals: reading what a response is actually telling you.</span>
 
 <span class="sd">The escalation ladder is only useful if you can tell which rung you are on. These</span>
 <span class="sd">are the cheap, mechanical tests that turn a response into a *move*.</span>
@@ -97,11 +97,11 @@
 <span class="sd">The most expensive failure in acquisition is silent: saving a challenge page as</span>
 <span class="sd">if it were data. Detecting that and stopping is worth more than any bypass.</span>
 
-<span class="sd">&gt;&gt;&gt; classify(403, {&quot;set-cookie&quot;: &quot;datadome=abc&quot;}, &quot;&quot;)</span>
-<span class="sd">&#39;challenge&#39;</span>
-<span class="sd">&gt;&gt;&gt; classify(200, {&quot;content-type&quot;: &quot;text/html&quot;}, &quot;&lt;html&gt;&lt;body&gt;hi&lt;/body&gt;&lt;/html&gt;&quot;)</span>
-<span class="sd">&#39;ok&#39;</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&gt;&gt;&gt; classify(403, {"set-cookie": "datadome=abc"}, "")</span>
+<span class="sd">'challenge'</span>
+<span class="sd">&gt;&gt;&gt; classify(200, {"content-type": "text/html"}, "&lt;html&gt;&lt;body&gt;hi&lt;/body&gt;&lt;/html&gt;")</span>
+<span class="sd">'ok'</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -109,10 +109,10 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
 
-<span class="c1"># Statuses at which a vendor marker means &quot;you were stopped&quot; rather than</span>
-<span class="c1"># &quot;this origin is guarded&quot;.</span>
+<span class="c1"># Statuses at which a vendor marker means "you were stopped" rather than</span>
+<span class="c1"># "this origin is guarded".</span>
 <span class="c1">#</span>
-<span class="c1"># 503 and Cloudflare&#39;s 52x range belong here even though they read as server</span>
+<span class="c1"># 503 and Cloudflare's 52x range belong here even though they read as server</span>
 <span class="c1"># errors: interstitial challenge pages are historically served at 503, and</span>
 <span class="c1"># several vendors use it for load-shedding. Leaving it out meant a challenge</span>
 <span class="c1"># was classified as a transient error, retried, and then returned as data.</span>
@@ -121,46 +121,46 @@
 <span class="p">)</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;ChallengeEncountered&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;detect_challenge&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;classify&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;looks_truncated&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CHALLENGE_MARKERS&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;INTERACTIVE_MARKERS&quot;</span><span class="p">,</span>
+    <span class="s2">"ChallengeEncountered"</span><span class="p">,</span>
+    <span class="s2">"detect_challenge"</span><span class="p">,</span>
+    <span class="s2">"classify"</span><span class="p">,</span>
+    <span class="s2">"looks_truncated"</span><span class="p">,</span>
+    <span class="s2">"CHALLENGE_MARKERS"</span><span class="p">,</span>
+    <span class="s2">"INTERACTIVE_MARKERS"</span><span class="p">,</span>
 <span class="p">]</span>
 
 <span class="c1"># (vendor, where-to-look, pattern). Header/cookie markers are more reliable than</span>
 <span class="c1"># body markers, which is why they are checked first.</span>
 <span class="n">CHALLENGE_MARKERS</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="p">(</span><span class="s2">&quot;datadome&quot;</span><span class="p">,</span> <span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;x-datadome&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;datadome&quot;</span><span class="p">,</span> <span class="s2">&quot;cookie&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\bdatadome=&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;datadome&quot;</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;captcha-delivery\.com&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;cloudflare&quot;</span><span class="p">,</span> <span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;cf-mitigated&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;cloudflare&quot;</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;challenge-platform|cf_chl_opt|__cf_chl&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;akamai&quot;</span><span class="p">,</span> <span class="s2">&quot;cookie&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\b_abck=&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;imperva&quot;</span><span class="p">,</span> <span class="s2">&quot;cookie&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\bincap_ses|visid_incap&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;perimeterx&quot;</span><span class="p">,</span> <span class="s2">&quot;cookie&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\b_px(?:\d+)?=&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;kasada&quot;</span><span class="p">,</span> <span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;x-kpsdk&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"datadome"</span><span class="p">,</span> <span class="s2">"header"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"x-datadome"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"datadome"</span><span class="p">,</span> <span class="s2">"cookie"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"\bdatadome="</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"datadome"</span><span class="p">,</span> <span class="s2">"body"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"captcha-delivery\.com"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"cloudflare"</span><span class="p">,</span> <span class="s2">"header"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"cf-mitigated"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"cloudflare"</span><span class="p">,</span> <span class="s2">"body"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"challenge-platform|cf_chl_opt|__cf_chl"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"akamai"</span><span class="p">,</span> <span class="s2">"cookie"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"\b_abck="</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"imperva"</span><span class="p">,</span> <span class="s2">"cookie"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"\bincap_ses|visid_incap"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"perimeterx"</span><span class="p">,</span> <span class="s2">"cookie"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"\b_px(?:\d+)?="</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"kasada"</span><span class="p">,</span> <span class="s2">"header"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"x-kpsdk"</span><span class="p">),</span>
 <span class="p">)</span>
 
 <span class="c1"># Markers meaning a *human* is required. These are terminal: do not escalate,</span>
 <span class="c1"># do not retry, and never attempt to solve them.</span>
 <span class="n">INTERACTIVE_MARKERS</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="p">(</span><span class="s2">&quot;turnstile&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;challenges\.cloudflare\.com|cf-turnstile&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;recaptcha&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;google\.com/recaptcha|g-recaptcha&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;hcaptcha&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;hcaptcha\.com|h-captcha&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"turnstile"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"challenges\.cloudflare\.com|cf-turnstile"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"recaptcha"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"google\.com/recaptcha|g-recaptcha"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"hcaptcha"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"hcaptcha\.com|h-captcha"</span><span class="p">),</span>
 <span class="p">)</span>
 
 
 <div class="viewcode-block" id="ChallengeEncountered">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/signals.html#scraped.acquire.ChallengeEncountered">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ChallengeEncountered</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A bot-protection challenge was served instead of content.</span>
+<span class="w">    </span><span class="sd">"""A bot-protection challenge was served instead of content.</span>
 
 <span class="sd">    Raised rather than returned so that a challenge can never be mistaken for</span>
 <span class="sd">    data by a caller that forgot to check. Carries what is needed to decide what</span>
-<span class="sd">    to do next — and &quot;solve it&quot; is not among the options.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    to do next — and "solve it" is not among the options.</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -174,14 +174,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">vendor</span> <span class="o">=</span> <span class="n">vendor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">interactive</span> <span class="o">=</span> <span class="n">interactive</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
-        <span class="n">kind</span> <span class="o">=</span> <span class="s2">&quot;interactive challenge&quot;</span> <span class="k">if</span> <span class="n">interactive</span> <span class="k">else</span> <span class="s2">&quot;challenge&quot;</span>
+        <span class="n">kind</span> <span class="o">=</span> <span class="s2">"interactive challenge"</span> <span class="k">if</span> <span class="n">interactive</span> <span class="k">else</span> <span class="s2">"challenge"</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">vendor</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot; (HTTP </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="n">status</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">vendor</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'unknown'</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span>
+            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">" (HTTP </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">)"</span> <span class="k">if</span> <span class="n">status</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span>
             <span class="o">+</span> <span class="p">(</span>
-                <span class="s2">&quot;. A human must complete this; do not retry.&quot;</span>
+                <span class="s2">". A human must complete this; do not retry."</span>
                 <span class="k">if</span> <span class="n">interactive</span>
-                <span class="k">else</span> <span class="s2">&quot;. Escalate transport or stop; do not retry this request.&quot;</span>
+                <span class="k">else</span> <span class="s2">". Escalate transport or stop; do not retry this request."</span>
             <span class="p">)</span>
         <span class="p">)</span></div>
 
@@ -189,7 +189,7 @@
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ChallengeVerdict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;What, if anything, is standing between us and the content.</span>
+<span class="w">    </span><span class="sd">"""What, if anything, is standing between us and the content.</span>
 
 <span class="sd">    Crucially separates two facts that are easy to conflate:</span>
 
@@ -200,7 +200,7 @@
 
 <span class="sd">    Treating vendor-presence as blocking makes a client useless on exactly the</span>
 <span class="sd">    sites it exists for, which is a mistake worth encoding against.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">vendor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">interactive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -211,39 +211,39 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_joined_cookies</span><span class="p">(</span><span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;set-cookie&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"set-cookie"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="detect_challenge">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/signals.html#scraped.acquire.detect_challenge">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">detect_challenge</span><span class="p">(</span>
-    <span class="n">status</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">body</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">body</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChallengeVerdict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Identify a bot-protection challenge from cheap signals.</span>
+<span class="w">    </span><span class="sd">"""Identify a bot-protection challenge from cheap signals.</span>
 
 <span class="sd">    Checks headers and cookies before the body, since those are harder to fake</span>
 <span class="sd">    and cheaper to inspect. The body is scanned in full: an earlier version</span>
 <span class="sd">    truncated it, which hid widgets and challenge markers on large pages — and a</span>
 <span class="sd">    missed challenge is the expensive direction of this error.</span>
 
-<span class="sd">    &gt;&gt;&gt; bool(detect_challenge(200, {}, &quot;&lt;html&gt;fine&lt;/html&gt;&quot;))</span>
+<span class="sd">    &gt;&gt;&gt; bool(detect_challenge(200, {}, "&lt;html&gt;fine&lt;/html&gt;"))</span>
 <span class="sd">    False</span>
-<span class="sd">    &gt;&gt;&gt; detect_challenge(403, {&quot;cf-mitigated&quot;: &quot;challenge&quot;}, &quot;&quot;).serving</span>
+<span class="sd">    &gt;&gt;&gt; detect_challenge(403, {"cf-mitigated": "challenge"}, "").serving</span>
 <span class="sd">    True</span>
 
 <span class="sd">    A protected site emits vendor headers on successful responses too. That</span>
 <span class="sd">    identifies the guard; it does not mean you were stopped:</span>
 
-<span class="sd">    &gt;&gt;&gt; verdict = detect_challenge(200, {&quot;x-datadome&quot;: &quot;protected&quot;}, &quot;&lt;html&gt;data&lt;/html&gt;&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; verdict = detect_challenge(200, {"x-datadome": "protected"}, "&lt;html&gt;data&lt;/html&gt;")</span>
 <span class="sd">    &gt;&gt;&gt; verdict.vendor, verdict.serving</span>
-<span class="sd">    (&#39;datadome&#39;, False)</span>
+<span class="sd">    ('datadome', False)</span>
 
 <span class="sd">    An interactive widget is terminal, not an escalation cue:</span>
 
-<span class="sd">    &gt;&gt;&gt; detect_challenge(200, {}, &#39;&lt;div class=&quot;cf-turnstile&quot; data-sitekey=&quot;x&quot;&gt;&#39;).interactive</span>
+<span class="sd">    &gt;&gt;&gt; detect_challenge(200, {}, '&lt;div class="cf-turnstile" data-sitekey="x"&gt;').interactive</span>
 <span class="sd">    True</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">header_blob</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">())</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="sd">    """</span>
+    <span class="n">header_blob</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">())</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="n">cookie_blob</span> <span class="o">=</span> <span class="n">_joined_cookies</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="n">lowered_body</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
@@ -251,7 +251,7 @@
         <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">lowered_body</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ChallengeVerdict</span><span class="p">(</span><span class="n">vendor</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">serving</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">haystacks</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="n">header_blob</span><span class="p">,</span> <span class="s2">&quot;cookie&quot;</span><span class="p">:</span> <span class="n">cookie_blob</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="n">lowered_body</span><span class="p">}</span>
+    <span class="n">haystacks</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"header"</span><span class="p">:</span> <span class="n">header_blob</span><span class="p">,</span> <span class="s2">"cookie"</span><span class="p">:</span> <span class="n">cookie_blob</span><span class="p">,</span> <span class="s2">"body"</span><span class="p">:</span> <span class="n">lowered_body</span><span class="p">}</span>
     <span class="n">vendor_seen</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">for</span> <span class="n">vendor</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">CHALLENGE_MARKERS</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">haystacks</span><span class="p">[</span><span class="n">where</span><span class="p">]):</span>
@@ -259,7 +259,7 @@
         <span class="n">vendor_seen</span> <span class="o">=</span> <span class="n">vendor_seen</span> <span class="ow">or</span> <span class="n">vendor</span>
         <span class="c1"># A challenge *page* in the body is proof on its own; header and cookie</span>
         <span class="c1"># markers only mean the vendor is in front of this origin.</span>
-        <span class="k">if</span> <span class="n">where</span> <span class="o">==</span> <span class="s2">&quot;body&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">where</span> <span class="o">==</span> <span class="s2">"body"</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ChallengeVerdict</span><span class="p">(</span><span class="n">vendor</span><span class="o">=</span><span class="n">vendor</span><span class="p">,</span> <span class="n">serving</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ChallengeVerdict</span><span class="p">(</span>
@@ -272,18 +272,18 @@
 <div class="viewcode-block" id="looks_truncated">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/signals.html#scraped.acquire.looks_truncated">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">looks_truncated</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether the payload is shorter than the response claimed.</span>
+<span class="w">    </span><span class="sd">"""Whether the payload is shorter than the response claimed.</span>
 
 <span class="sd">    A `200` carrying a truncated body is a silent corruption that only shows up</span>
 <span class="sd">    downstream, so it is worth one cheap check here.</span>
 
-<span class="sd">    &gt;&gt;&gt; looks_truncated(b&quot;abc&quot;, {&quot;Content-Length&quot;: &quot;3&quot;})</span>
+<span class="sd">    &gt;&gt;&gt; looks_truncated(b"abc", {"Content-Length": "3"})</span>
 <span class="sd">    False</span>
-<span class="sd">    &gt;&gt;&gt; looks_truncated(b&quot;abc&quot;, {&quot;Content-Length&quot;: &quot;99&quot;})</span>
+<span class="sd">    &gt;&gt;&gt; looks_truncated(b"abc", {"Content-Length": "99"})</span>
 <span class="sd">    True</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;content-length&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"content-length"</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">body</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
@@ -294,41 +294,41 @@
 
 <div class="viewcode-block" id="classify">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/signals.html#scraped.acquire.classify">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">classify</span><span class="p">(</span><span class="n">status</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">body</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;One-word verdict driving the escalation decision.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">classify</span><span class="p">(</span><span class="n">status</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">body</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""One-word verdict driving the escalation decision.</span>
 
 <span class="sd">    Returns one of: `ok`, `challenge`, `rate_limited`, `forbidden`, `not_found`,</span>
 <span class="sd">    `client_error`, `server_error`, `auth_required`, `empty`.</span>
 
-<span class="sd">    &gt;&gt;&gt; classify(429, {}, &quot;&quot;)</span>
-<span class="sd">    &#39;rate_limited&#39;</span>
-<span class="sd">    &gt;&gt;&gt; classify(200, {}, &quot;&quot;)</span>
-<span class="sd">    &#39;empty&#39;</span>
+<span class="sd">    &gt;&gt;&gt; classify(429, {}, "")</span>
+<span class="sd">    'rate_limited'</span>
+<span class="sd">    &gt;&gt;&gt; classify(200, {}, "")</span>
+<span class="sd">    'empty'</span>
 
 <span class="sd">    A bare 403 is the most common block there is, and must never read as success:</span>
 
-<span class="sd">    &gt;&gt;&gt; classify(403, {}, &quot;nope&quot;)</span>
-<span class="sd">    &#39;forbidden&#39;</span>
-<span class="sd">    &gt;&gt;&gt; classify(451, {}, &quot;nope&quot;)</span>
-<span class="sd">    &#39;client_error&#39;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; classify(403, {}, "nope")</span>
+<span class="sd">    'forbidden'</span>
+<span class="sd">    &gt;&gt;&gt; classify(451, {}, "nope")</span>
+<span class="sd">    'client_error'</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">detect_challenge</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;challenge&quot;</span>
+        <span class="k">return</span> <span class="s2">"challenge"</span>
     <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">429</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;rate_limited&quot;</span>
+        <span class="k">return</span> <span class="s2">"rate_limited"</span>
     <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">401</span><span class="p">,</span> <span class="mi">407</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;auth_required&quot;</span>
+        <span class="k">return</span> <span class="s2">"auth_required"</span>
     <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;not_found&quot;</span>
+        <span class="k">return</span> <span class="s2">"not_found"</span>
     <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">403</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;forbidden&quot;</span>
+        <span class="k">return</span> <span class="s2">"forbidden"</span>
     <span class="k">if</span> <span class="n">status</span> <span class="o">&gt;=</span> <span class="mi">500</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;server_error&quot;</span>
+        <span class="k">return</span> <span class="s2">"server_error"</span>
     <span class="k">if</span> <span class="mi">400</span> <span class="o">&lt;=</span> <span class="n">status</span> <span class="o">&lt;</span> <span class="mi">500</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;client_error&quot;</span>
+        <span class="k">return</span> <span class="s2">"client_error"</span>
     <span class="k">if</span> <span class="mi">200</span> <span class="o">&lt;=</span> <span class="n">status</span> <span class="o">&lt;</span> <span class="mi">300</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">body</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
-        <span class="k">return</span> <span class="s2">&quot;empty&quot;</span>
-    <span class="k">return</span> <span class="s2">&quot;ok&quot;</span></div>
+        <span class="k">return</span> <span class="s2">"empty"</span>
+    <span class="k">return</span> <span class="s2">"ok"</span></div>
 
 </pre></div>
 

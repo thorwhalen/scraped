@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.acquire.blobs &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.acquire.blobs &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -110,10 +110,10 @@ visible, and it survives CSS and markup redesigns.</p>
 <p>This module is the seam to the extraction layer. It does not extract anything; it
 reports <em>where the structured data is</em> and how big it is, and leaves the choosing
 to the caller.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="s1">&#39;&lt;html&gt;&lt;script id=&quot;__NEXT_DATA__&quot; type=&quot;application/json&quot;&gt;{&quot;a&quot;:1}&lt;/script&gt;&lt;/html&gt;&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="s1">'&lt;html&gt;&lt;script id="__NEXT_DATA__" type="application/json"&gt;{"a":1}&lt;/script&gt;&lt;/html&gt;'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">blobs</span> <span class="o">=</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">b</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blobs</span><span class="p">]</span>
-<span class="go">[(&#39;next_data&#39;, {&#39;a&#39;: 1})]</span>
+<span class="go">[('next_data', {'a': 1})]</span>
 </pre></div>
 </div>
 <p>Lazily-rendered listings are the motivating case: a DOM scrape of a paginated
@@ -140,8 +140,8 @@ common cases.</p>
 <dd><p>Yield <cite>(attributes, body)</cite> for every <cite>&lt;script&gt;</cite> element.</p>
 <p>A regex rather than a DOM parse, deliberately: this must work on truncated,
 malformed, and challenge-page HTML where a parser may bail.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">iter_script_texts</span><span class="p">(</span><span class="s1">&#39;&lt;script type=&quot;x&quot; id=&quot;y&quot;&gt;B&lt;/script&gt;&#39;</span><span class="p">))</span>
-<span class="go">[({&#39;type&#39;: &#39;x&#39;, &#39;id&#39;: &#39;y&#39;}, &#39;B&#39;)]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">iter_script_texts</span><span class="p">(</span><span class="s1">'&lt;script type="x" id="y"&gt;B&lt;/script&gt;'</span><span class="p">))</span>
+<span class="go">[({'type': 'x', 'id': 'y'}, 'B')]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -153,19 +153,19 @@ malformed, and challenge-page HTML where a parser may bail.</p>
 <p>Recognizes framework-specific markers (Next.js, Nuxt, Apollo, Redux, Remix,
 Angular TransferState), standardized JSON-LD, and — when <cite>include_generic</cite> —
 any sufficiently large bare JSON script.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
-<span class="gp">... </span><span class="s1">&lt;script type=&quot;application/ld+json&quot;&gt;{&quot;@type&quot;:&quot;Product&quot;}&lt;/script&gt;</span>
-<span class="gp">... </span><span class="s1">&lt;script&gt;window.__APOLLO_STATE__ = {&quot;Product:1&quot;:{&quot;name&quot;:&quot;x&quot;}};&lt;/script&gt;</span>
-<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="s1">'''</span>
+<span class="gp">... </span><span class="s1">&lt;script type="application/ld+json"&gt;{"@type":"Product"}&lt;/script&gt;</span>
+<span class="gp">... </span><span class="s1">&lt;script&gt;window.__APOLLO_STATE__ = {"Product:1":{"name":"x"}};&lt;/script&gt;</span>
+<span class="gp">... </span><span class="s1">'''</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">kind</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">))</span>
-<span class="go">[&#39;apollo&#39;, &#39;ld_json&#39;]</span>
+<span class="go">['apollo', 'ld_json']</span>
 </pre></div>
 </div>
 <p>JSON-LD is worth trying first when present: it is standardized, so it is the
 most stable payload on the web.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">blob</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">)</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;ld_json&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">blob</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;@type&#39;</span><span class="p">]</span>
-<span class="go">&#39;Product&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">blob</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">)</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">'ld_json'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blob</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">'@type'</span><span class="p">]</span>
+<span class="go">'Product'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -174,8 +174,8 @@ most stable payload on the web.</p>
 <dt class="sig sig-object py" id="scraped.acquire.blobs.state_blob_markers">
 <span class="sig-prename descclassname"><span class="pre">scraped.acquire.blobs.</span></span><span class="sig-name descname"><span class="pre">state_blob_markers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/scraped/acquire/blobs.html#state_blob_markers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.blobs.state_blob_markers" title="Link to this definition"></a></dt>
 <dd><p>The marker names present, cheapest possible summary for capture metadata.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">state_blob_markers</span><span class="p">(</span><span class="s1">&#39;&lt;script id=&quot;__NEXT_DATA__&quot; type=&quot;application/json&quot;&gt;</span><span class="si">{}</span><span class="s1">&lt;/script&gt;&#39;</span><span class="p">)</span>
-<span class="go">[&#39;__NEXT_DATA__&#39;]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">state_blob_markers</span><span class="p">(</span><span class="s1">'&lt;script id="__NEXT_DATA__" type="application/json"&gt;</span><span class="si">{}</span><span class="s1">&lt;/script&gt;'</span><span class="p">)</span>
+<span class="go">['__NEXT_DATA__']</span>
 </pre></div>
 </div>
 </dd></dl>

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.acquire.policy &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.acquire.policy &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -89,19 +89,19 @@
            <div itemprop="articleBody">
              
   <h1>Source code for scraped.acquire.policy</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Policy: robots compliance, politeness, and retries.</span>
+<span></span><span class="sd">"""Policy: robots compliance, politeness, and retries.</span>
 
 <span class="sd">Policy is an *injected object*, not a global setting, and its outcome is recorded</span>
-<span class="sd">in every `Capture`. That is the whole point: &quot;did we respect robots on this</span>
-<span class="sd">capture&quot; becomes a queryable fact rather than an archaeology exercise, and an</span>
+<span class="sd">in every `Capture`. That is the whole point: "did we respect robots on this</span>
+<span class="sd">capture" becomes a queryable fact rather than an archaeology exercise, and an</span>
 <span class="sd">override is a deliberate, attributable act rather than a forgotten flag.</span>
 
-<span class="sd">&gt;&gt;&gt; policy = RobotsPolicy(get_robots_txt=lambda host: &quot;User-agent: *\\nDisallow: /x&quot;)</span>
-<span class="sd">&gt;&gt;&gt; policy.check(&quot;https://example.com/ok&quot;).robots_allowed</span>
+<span class="sd">&gt;&gt;&gt; policy = RobotsPolicy(get_robots_txt=lambda host: "User-agent: *\\nDisallow: /x")</span>
+<span class="sd">&gt;&gt;&gt; policy.check("https://example.com/ok").robots_allowed</span>
 <span class="sd">True</span>
-<span class="sd">&gt;&gt;&gt; policy.check(&quot;https://example.com/x/1&quot;).robots_allowed</span>
+<span class="sd">&gt;&gt;&gt; policy.check("https://example.com/x/1").robots_allowed</span>
 <span class="sd">False</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -115,17 +115,17 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.capture</span><span class="w"> </span><span class="kn">import</span> <span class="n">PolicyOutcome</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;RobotsPolicy&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Politeness&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;RobotsDisallowed&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;retry_delays&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;should_retry&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;DFLT_USER_AGENT&quot;</span><span class="p">,</span>
+    <span class="s2">"RobotsPolicy"</span><span class="p">,</span>
+    <span class="s2">"Politeness"</span><span class="p">,</span>
+    <span class="s2">"RobotsDisallowed"</span><span class="p">,</span>
+    <span class="s2">"retry_delays"</span><span class="p">,</span>
+    <span class="s2">"should_retry"</span><span class="p">,</span>
+    <span class="s2">"DFLT_USER_AGENT"</span><span class="p">,</span>
 <span class="p">]</span>
 
 <span class="c1"># An honest, contactable identity is the cheapest insurance available and costs</span>
 <span class="c1"># nothing when things go well.</span>
-<span class="n">DFLT_USER_AGENT</span> <span class="o">=</span> <span class="s2">&quot;scraped/acquire (+https://github.com/thorwhalen/scraped)&quot;</span>
+<span class="n">DFLT_USER_AGENT</span> <span class="o">=</span> <span class="s2">"scraped/acquire (+https://github.com/thorwhalen/scraped)"</span>
 
 <span class="n">DFLT_MIN_INTERVAL</span> <span class="o">=</span> <span class="mf">1.0</span>
 <span class="n">DFLT_JITTER</span> <span class="o">=</span> <span class="mf">0.5</span>
@@ -134,34 +134,34 @@
 <span class="n">DFLT_MAX_DELAY</span> <span class="o">=</span> <span class="mf">30.0</span>
 
 <span class="c1"># Statuses worth another attempt. 403 is deliberately absent: retrying a refusal</span>
-<span class="c1"># burns the address&#39;s reputation and confirms automation.</span>
+<span class="c1"># burns the address's reputation and confirms automation.</span>
 <span class="n">RETRIABLE_STATUSES</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="mi">408</span><span class="p">,</span> <span class="mi">425</span><span class="p">,</span> <span class="mi">429</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">502</span><span class="p">,</span> <span class="mi">503</span><span class="p">,</span> <span class="mi">504</span><span class="p">})</span>
 
 
 <div class="viewcode-block" id="RobotsDisallowed">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/policy.html#scraped.acquire.RobotsDisallowed">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RobotsDisallowed</span><span class="p">(</span><span class="ne">PermissionError</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The robots policy forbids this URL and no override was given.&quot;&quot;&quot;</span></div>
+<span class="w">    </span><span class="sd">"""The robots policy forbids this URL and no override was given."""</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_host_of</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="n">split</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s2">://</span><span class="si">{</span><span class="n">split</span><span class="o">.</span><span class="n">netloc</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">split</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s2">://</span><span class="si">{</span><span class="n">split</span><span class="o">.</span><span class="n">netloc</span><span class="si">}</span><span class="s2">"</span>
 
 
 <div class="viewcode-block" id="RobotsPolicy">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/policy.html#scraped.acquire.RobotsPolicy">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RobotsPolicy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Robots compliance, defaulting to on.</span>
+<span class="w">    </span><span class="sd">"""Robots compliance, defaulting to on.</span>
 
 <span class="sd">    `get_robots_txt` is injected so this module never performs I/O itself — which</span>
 <span class="sd">    keeps it testable and avoids a circular dependency on the fetchers.</span>
 
 <span class="sd">    Set `override_reason` to proceed despite a disallow. The reason is recorded in</span>
 <span class="sd">    the capture; there is deliberately no way to override *silently*.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">get_robots_txt</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
     <span class="n">user_agent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_USER_AGENT</span>
@@ -183,7 +183,7 @@
 <div class="viewcode-block" id="RobotsPolicy.allowed">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/policy.html#scraped.acquire.RobotsPolicy.allowed">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">allowed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether the policy permits this URL. `None` when unknown.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Whether the policy permits this URL. `None` when unknown."""</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parser</span><span class="p">(</span><span class="n">_host_of</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -193,11 +193,11 @@
 <div class="viewcode-block" id="RobotsPolicy.crawl_delay">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/policy.html#scraped.acquire.RobotsPolicy.crawl_delay">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">crawl_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Any `Crawl-delay` the site asks for.</span>
+<span class="w">        </span><span class="sd">"""Any `Crawl-delay` the site asks for.</span>
 
 <span class="sd">        RFC 9309 deliberately excluded `Crawl-delay` from the standard, but it is</span>
 <span class="sd">        a widely honored convention and honoring it is free.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parser</span><span class="p">(</span><span class="n">_host_of</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -208,12 +208,12 @@
 <div class="viewcode-block" id="RobotsPolicy.check">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/policy.html#scraped.acquire.RobotsPolicy.check">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PolicyOutcome</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate the policy, without raising.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Evaluate the policy, without raising."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">PolicyOutcome</span><span class="p">(</span>
                 <span class="n">robots_checked</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">robots_allowed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">robots_override_reason</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">override_reason</span> <span class="ow">or</span> <span class="s2">&quot;robots policy disabled&quot;</span><span class="p">,</span>
+                <span class="n">robots_override_reason</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">override_reason</span> <span class="ow">or</span> <span class="s2">"robots policy disabled"</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="n">allowed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">PolicyOutcome</span><span class="p">(</span>
@@ -226,17 +226,17 @@
 <div class="viewcode-block" id="RobotsPolicy.enforce">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/policy.html#scraped.acquire.RobotsPolicy.enforce">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">enforce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PolicyOutcome</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate the policy and raise if it forbids the URL.</span>
+<span class="w">        </span><span class="sd">"""Evaluate the policy and raise if it forbids the URL.</span>
 
-<span class="sd">        &gt;&gt;&gt; policy = RobotsPolicy(get_robots_txt=lambda h: &quot;User-agent: *\\nDisallow: /&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; policy.enforce(&quot;https://example.com/a&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; policy = RobotsPolicy(get_robots_txt=lambda h: "User-agent: *\\nDisallow: /")</span>
+<span class="sd">        &gt;&gt;&gt; policy.enforce("https://example.com/a")</span>
 <span class="sd">        Traceback (most recent call last):</span>
 <span class="sd">            ...</span>
 <span class="sd">        scraped.acquire.policy.RobotsDisallowed: robots.txt disallows https://example.com/a</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">outcome</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">outcome</span><span class="o">.</span><span class="n">robots_allowed</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">override_reason</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">RobotsDisallowed</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;robots.txt disallows </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">RobotsDisallowed</span><span class="p">(</span><span class="sa">f</span><span class="s2">"robots.txt disallows </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">outcome</span></div>
 </div>
 
@@ -246,13 +246,13 @@
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/policy.html#scraped.acquire.Politeness">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Politeness</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Per-host pacing. Per-host, never global — one slow site must not throttle</span>
+<span class="w">    </span><span class="sd">"""Per-host pacing. Per-host, never global — one slow site must not throttle</span>
 <span class="sd">    every other one.</span>
 
 <span class="sd">    &gt;&gt;&gt; pace = Politeness(min_interval=0.0, jitter=0.0)</span>
-<span class="sd">    &gt;&gt;&gt; pace.wait(&quot;https://example.com/a&quot;)  # returns immediately</span>
+<span class="sd">    &gt;&gt;&gt; pace.wait("https://example.com/a")  # returns immediately</span>
 <span class="sd">    0.0</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">min_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_MIN_INTERVAL</span>
     <span class="n">jitter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_JITTER</span>
@@ -262,11 +262,11 @@
 <div class="viewcode-block" id="Politeness.wait">
 <a class="viewcode-back" href="../../../module_docs/scraped/acquire/policy.html#scraped.acquire.Politeness.wait">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">crawl_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sleep as long as politeness requires; return the seconds slept.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Sleep as long as politeness requires; return the seconds slept."""</span>
         <span class="n">interval</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_interval</span><span class="p">,</span> <span class="n">crawl_delay</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="n">host</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
-            <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">))</span>
+            <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"-inf"</span><span class="p">))</span>
             <span class="n">delay</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">interval</span> <span class="o">-</span> <span class="n">elapsed</span><span class="p">)</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last</span><span class="p">[</span><span class="n">host</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">+</span> <span class="n">delay</span>
         <span class="k">if</span> <span class="n">delay</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -281,7 +281,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">should_retry</span><span class="p">(</span>
     <span class="n">status</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">challenge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">vendor_guarded</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether another attempt is warranted.</span>
+<span class="w">    </span><span class="sd">"""Whether another attempt is warranted.</span>
 
 <span class="sd">    A challenge is never retried — the answer will not change, and repeating it</span>
 <span class="sd">    confirms automation. Neither is a retriable-looking status on an origin known</span>
@@ -297,7 +297,7 @@
 <span class="sd">    False</span>
 <span class="sd">    &gt;&gt;&gt; should_retry(429, challenge=True)</span>
 <span class="sd">    False</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">challenge</span> <span class="ow">or</span> <span class="n">vendor_guarded</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># connection error / timeout</span>
@@ -315,7 +315,7 @@
     <span class="n">cap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_MAX_DELAY</span><span class="p">,</span>
     <span class="n">rng</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Full-jitter backoff delays.</span>
+<span class="w">    </span><span class="sd">"""Full-jitter backoff delays.</span>
 
 <span class="sd">    Full jitter does the least total work of the common strategies, at the cost of</span>
 <span class="sd">    slightly longer wall time — the right trade when being polite is the point.</span>
@@ -323,22 +323,22 @@
 <span class="sd">    &gt;&gt;&gt; delays = retry_delays(4, rng=random.Random(0))</span>
 <span class="sd">    &gt;&gt;&gt; len(delays), all(0 &lt;= d &lt;= 8 for d in delays)</span>
 <span class="sd">    (3, True)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">rng</span> <span class="o">=</span> <span class="n">rng</span> <span class="ow">or</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="n">base</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">attempts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">retry_after_seconds</span><span class="p">(</span><span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Honor an explicit `Retry-After`, which is a site telling you the answer.</span>
+<span class="w">    </span><span class="sd">"""Honor an explicit `Retry-After`, which is a site telling you the answer.</span>
 
-<span class="sd">    &gt;&gt;&gt; retry_after_seconds({&quot;Retry-After&quot;: &quot;12&quot;})</span>
+<span class="sd">    &gt;&gt;&gt; retry_after_seconds({"Retry-After": "12"})</span>
 <span class="sd">    12.0</span>
 <span class="sd">    &gt;&gt;&gt; retry_after_seconds({}) is None</span>
 <span class="sd">    True</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;retry-after&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"retry-after"</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>

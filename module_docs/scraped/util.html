@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.util &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.util &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -63,7 +63,10 @@
 <li class="toctree-l1"><a class="reference internal" href="tests/test_acquire.html">scraped.tests.test_acquire</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">scraped.tools</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">scraped.util</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#scraped.util.RecursiveDownloader"><code class="docutils literal notranslate"><span class="pre">RecursiveDownloader</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.util.RecursiveDownloader"><code class="docutils literal notranslate"><span class="pre">RecursiveDownloader</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scraped.util.RecursiveDownloader.parse"><code class="docutils literal notranslate"><span class="pre">RecursiveDownloader.parse()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#scraped.util.deduplicate_lines"><code class="docutils literal notranslate"><span class="pre">deduplicate_lines()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#scraped.util.download_file"><code class="docutils literal notranslate"><span class="pre">download_file()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#scraped.util.download_site"><code class="docutils literal notranslate"><span class="pre">download_site()</span></code></a></li>
@@ -121,6 +124,22 @@
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="scraped.util.RecursiveDownloader.parse">
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/util.html#RecursiveDownloader.parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.RecursiveDownloader.parse" title="Link to this definition"></a></dt>
+<dd><p>Process <em>response</em>, i.e. extract data from it and generate new
+requests.</p>
+<p>This is the default <span class="xref std std-ref">callback</span>: Scrapy uses
+it for the response to any request that does not define a
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">callback</span></code>, such as the requests that
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">start()</span></code> yields by default.</p>
+<p>Any <code class="xref py py-attr docutils literal notranslate"><span class="pre">cb_kwargs</span></code> of the request are passed as
+keyword parameters.</p>
+<p>Spiders must define this method, unless every request that they
+send defines a callback.</p>
+<p>See <span class="xref std std-ref">callback-output</span> about the supported return values.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py function">
@@ -240,8 +259,8 @@ path where the Markdown file was saved.</p>
 <dd class="field-even"><p>True if the content is HTML, otherwise False.</p>
 </dd>
 </dl>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">html_string</span> <span class="o">=</span> <span class="s2">&quot;&lt;html&gt;&lt;head&gt;&lt;title&gt;Test&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Hello, World!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">non_html_string</span> <span class="o">=</span> <span class="s2">&quot;This is just a plain text.&quot;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">html_string</span> <span class="o">=</span> <span class="s2">"&lt;html&gt;&lt;head&gt;&lt;title&gt;Test&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Hello, World!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">non_html_string</span> <span class="o">=</span> <span class="s2">"This is just a plain text."</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">is_html_content</span><span class="p">(</span><span class="n">html_string</span><span class="p">)</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">is_html_content</span><span class="p">(</span><span class="n">non_html_string</span><span class="p">)</span>
@@ -277,17 +296,17 @@ redowload the site if you want to change the minimum block size.</p>
 </dd>
 </dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">markdown_of_site</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;https://i2mint.github.io/dol/&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"https://i2mint.github.io/dol/"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">save_filepath</span><span class="o">=</span><span class="s1">&#39;~/dol_documentation.md&#39;</span>
+<span class="gp">... </span>    <span class="n">save_filepath</span><span class="o">=</span><span class="s1">'~/dol_documentation.md'</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="go">&#39;~/dol_documentation.md&#39;</span>
+<span class="go">'~/dol_documentation.md'</span>
 </pre></div>
 </div>
 <p>If you don’t specify a <cite>save_filepath</cite>, the function will return the Markdown
 string, which you can then analyze directly, and/or store as you wish.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">markdown_string</span> <span class="o">=</span> <span class="n">markdown_of_site</span><span class="p">(</span><span class="s2">&quot;https://i2mint.github.io/dol/&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">markdown_string</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> of length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">markdown_string</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">markdown_string</span> <span class="o">=</span> <span class="n">markdown_of_site</span><span class="p">(</span><span class="s2">"https://i2mint.github.io/dol/"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">markdown_string</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> of length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">markdown_string</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="go">str of length 626439</span>
 </pre></div>
 </div>

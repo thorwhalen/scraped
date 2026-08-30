@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.acquire.signals &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.acquire.signals &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -103,10 +103,10 @@
 are the cheap, mechanical tests that turn a response into a <em>move</em>.</p>
 <p>The most expensive failure in acquisition is silent: saving a challenge page as
 if it were data. Detecting that and stopping is worth more than any bypass.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;set-cookie&quot;</span><span class="p">:</span> <span class="s2">&quot;datadome=abc&quot;</span><span class="p">},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="go">&#39;challenge&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;text/html&quot;</span><span class="p">},</span> <span class="s2">&quot;&lt;html&gt;&lt;body&gt;hi&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="p">)</span>
-<span class="go">&#39;ok&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{</span><span class="s2">"set-cookie"</span><span class="p">:</span> <span class="s2">"datadome=abc"</span><span class="p">},</span> <span class="s2">""</span><span class="p">)</span>
+<span class="go">'challenge'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s2">"content-type"</span><span class="p">:</span> <span class="s2">"text/html"</span><span class="p">},</span> <span class="s2">"&lt;html&gt;&lt;body&gt;hi&lt;/body&gt;&lt;/html&gt;"</span><span class="p">)</span>
+<span class="go">'ok'</span>
 </pre></div>
 </div>
 <dl class="py exception">
@@ -124,17 +124,17 @@ to do next — and “solve it” is not among the options.</p>
 <dd><p>One-word verdict driving the escalation decision.</p>
 <p>Returns one of: <cite>ok</cite>, <cite>challenge</cite>, <cite>rate_limited</cite>, <cite>forbidden</cite>, <cite>not_found</cite>,
 <cite>client_error</cite>, <cite>server_error</cite>, <cite>auth_required</cite>, <cite>empty</cite>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">429</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="go">&#39;rate_limited&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="go">&#39;empty&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">429</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">""</span><span class="p">)</span>
+<span class="go">'rate_limited'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">""</span><span class="p">)</span>
+<span class="go">'empty'</span>
 </pre></div>
 </div>
 <p>A bare 403 is the most common block there is, and must never read as success:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;nope&quot;</span><span class="p">)</span>
-<span class="go">&#39;forbidden&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">451</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;nope&quot;</span><span class="p">)</span>
-<span class="go">&#39;client_error&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">"nope"</span><span class="p">)</span>
+<span class="go">'forbidden'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">451</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">"nope"</span><span class="p">)</span>
+<span class="go">'client_error'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -147,21 +147,21 @@ to do next — and “solve it” is not among the options.</p>
 and cheaper to inspect. The body is scanned in full: an earlier version
 truncated it, which hid widgets and challenge markers on large pages — and a
 missed challenge is the expensive direction of this error.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;&lt;html&gt;fine&lt;/html&gt;&quot;</span><span class="p">))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">"&lt;html&gt;fine&lt;/html&gt;"</span><span class="p">))</span>
 <span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;cf-mitigated&quot;</span><span class="p">:</span> <span class="s2">&quot;challenge&quot;</span><span class="p">},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">serving</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{</span><span class="s2">"cf-mitigated"</span><span class="p">:</span> <span class="s2">"challenge"</span><span class="p">},</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">serving</span>
 <span class="go">True</span>
 </pre></div>
 </div>
 <p>A protected site emits vendor headers on successful responses too. That
 identifies the guard; it does not mean you were stopped:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">verdict</span> <span class="o">=</span> <span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;x-datadome&quot;</span><span class="p">:</span> <span class="s2">&quot;protected&quot;</span><span class="p">},</span> <span class="s2">&quot;&lt;html&gt;data&lt;/html&gt;&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">verdict</span> <span class="o">=</span> <span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s2">"x-datadome"</span><span class="p">:</span> <span class="s2">"protected"</span><span class="p">},</span> <span class="s2">"&lt;html&gt;data&lt;/html&gt;"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">verdict</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span> <span class="n">verdict</span><span class="o">.</span><span class="n">serving</span>
-<span class="go">(&#39;datadome&#39;, False)</span>
+<span class="go">('datadome', False)</span>
 </pre></div>
 </div>
 <p>An interactive widget is terminal, not an escalation cue:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s1">&#39;&lt;div class=&quot;cf-turnstile&quot; data-sitekey=&quot;x&quot;&gt;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">interactive</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s1">'&lt;div class="cf-turnstile" data-sitekey="x"&gt;'</span><span class="p">)</span><span class="o">.</span><span class="n">interactive</span>
 <span class="go">True</span>
 </pre></div>
 </div>
@@ -173,9 +173,9 @@ identifies the guard; it does not mean you were stopped:</p>
 <dd><p>Whether the payload is shorter than the response claimed.</p>
 <p>A <cite>200</cite> carrying a truncated body is a silent corruption that only shows up
 downstream, so it is worth one cheap check here.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">looks_truncated</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;abc&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">:</span> <span class="s2">&quot;3&quot;</span><span class="p">})</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">looks_truncated</span><span class="p">(</span><span class="sa">b</span><span class="s2">"abc"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"Content-Length"</span><span class="p">:</span> <span class="s2">"3"</span><span class="p">})</span>
 <span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">looks_truncated</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;abc&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">:</span> <span class="s2">&quot;99&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">looks_truncated</span><span class="p">(</span><span class="sa">b</span><span class="s2">"abc"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"Content-Length"</span><span class="p">:</span> <span class="s2">"99"</span><span class="p">})</span>
 <span class="go">True</span>
 </pre></div>
 </div>

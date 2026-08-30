@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.acquire &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.acquire &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -181,9 +181,9 @@ state blobs to whatever does this (an LLM, a schema, hand-written code).</p></li
 </ol>
 <p>## Simple path</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">scraped.acquire</span><span class="w"> </span><span class="kn">import</span> <span class="n">probe</span><span class="p">,</span> <span class="n">fetch</span><span class="p">,</span> <span class="n">scan_state_blobs</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span> <span class="o">=</span> <span class="n">probe</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span> <span class="o">=</span> <span class="n">probe</span><span class="p">(</span><span class="s2">"https://example.com"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">capture</span> <span class="o">=</span> <span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">capture</span> <span class="o">=</span> <span class="n">fetch</span><span class="p">(</span><span class="s2">"https://example.com"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">blobs</span> <span class="o">=</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">capture</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -282,8 +282,8 @@ is the common case rather than an exotic one.</p>
 <dd><p>Decode the body, explicitly.</p>
 <p>Decoding is the extraction layer’s concern; this is a convenience, and it
 is deliberate about the fact that a choice is being made.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">),</span> <span class="sa">b</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
-<span class="go">&#39;hi&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">"u"</span><span class="p">),</span> <span class="sa">b</span><span class="s2">"hi"</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+<span class="go">'hi'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -375,7 +375,7 @@ capture” becomes a queryable fact rather than an archaeology exercise.</p>
 <dd><p>Per-host pacing. Per-host, never global — one slow site must not throttle
 every other one.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pace</span> <span class="o">=</span> <span class="n">Politeness</span><span class="p">(</span><span class="n">min_interval</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pace</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="s2">&quot;https://example.com/a&quot;</span><span class="p">)</span>  <span class="c1"># returns immediately</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pace</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="s2">"https://example.com/a"</span><span class="p">)</span>  <span class="c1"># returns immediately</span>
 <span class="go">0.0</span>
 </pre></div>
 </div>
@@ -434,9 +434,9 @@ otherwise only shows up downstream.</p>
 <dt class="sig sig-object py" id="scraped.acquire.Response.is_textual">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_textual</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#scraped.acquire.Response.is_textual" title="Link to this definition"></a></dt>
 <dd><p>Whether the declared content type suggests text rather than binary.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;text/html&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">is_textual</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">"u"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"Content-Type"</span><span class="p">:</span> <span class="s2">"text/html"</span><span class="p">})</span><span class="o">.</span><span class="n">is_textual</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;image/png&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">is_textual</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">"u"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"Content-Type"</span><span class="p">:</span> <span class="s2">"image/png"</span><span class="p">})</span><span class="o">.</span><span class="n">is_textual</span>
 <span class="go">False</span>
 </pre></div>
 </div>
@@ -482,8 +482,8 @@ a widely honored convention and honoring it is free.</p>
 <dt class="sig sig-object py" id="scraped.acquire.RobotsPolicy.enforce">
 <span class="sig-name descname"><span class="pre">enforce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="acquire/capture.html#scraped.acquire.capture.PolicyOutcome" title="scraped.acquire.capture.PolicyOutcome"><span class="pre">PolicyOutcome</span></a></span></span><a class="reference internal" href="../../_modules/scraped/acquire/policy.html#RobotsPolicy.enforce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.RobotsPolicy.enforce" title="Link to this definition"></a></dt>
 <dd><p>Evaluate the policy and raise if it forbids the URL.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span> <span class="o">=</span> <span class="n">RobotsPolicy</span><span class="p">(</span><span class="n">get_robots_txt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">h</span><span class="p">:</span> <span class="s2">&quot;User-agent: *</span><span class="se">\n</span><span class="s2">Disallow: /&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span><span class="o">.</span><span class="n">enforce</span><span class="p">(</span><span class="s2">&quot;https://example.com/a&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span> <span class="o">=</span> <span class="n">RobotsPolicy</span><span class="p">(</span><span class="n">get_robots_txt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">h</span><span class="p">:</span> <span class="s2">"User-agent: *</span><span class="se">\n</span><span class="s2">Disallow: /"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span><span class="o">.</span><span class="n">enforce</span><span class="p">(</span><span class="s2">"https://example.com/a"</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="w">    </span><span class="o">...</span>
 <span class="gr">scraped.acquire.policy.RobotsDisallowed</span>: <span class="n">robots.txt disallows https://example.com/a</span>
@@ -540,8 +540,8 @@ until retried on the impersonating rung.</p>
 <dt class="sig sig-object py" id="scraped.acquire.body_digest">
 <span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">body_digest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/capture.html#body_digest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.body_digest" title="Link to this definition"></a></dt>
 <dd><p>Content address of a payload.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">body_digest</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">)[:</span><span class="mi">8</span><span class="p">]</span>
-<span class="go">&#39;e3b0c442&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">body_digest</span><span class="p">(</span><span class="sa">b</span><span class="s2">""</span><span class="p">)[:</span><span class="mi">8</span><span class="p">]</span>
+<span class="go">'e3b0c442'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -553,7 +553,7 @@ until retried on the impersonating rung.</p>
 <p>Guides rather than fails: this rung is an optional extra, so the useful
 behaviour is to say precisely what to install.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="o">=</span> <span class="n">check_requirements</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">set</span><span class="p">(</span><span class="n">report</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;driver&quot;</span><span class="p">,</span> <span class="s2">&quot;browser_binary&quot;</span><span class="p">,</span> <span class="s2">&quot;ready&quot;</span><span class="p">,</span> <span class="s2">&quot;instructions&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">set</span><span class="p">(</span><span class="n">report</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s2">"driver"</span><span class="p">,</span> <span class="s2">"browser_binary"</span><span class="p">,</span> <span class="s2">"ready"</span><span class="p">,</span> <span class="s2">"instructions"</span><span class="p">}</span>
 <span class="go">True</span>
 </pre></div>
 </div>
@@ -581,12 +581,12 @@ unblocked retry impossible without clearing the store.</p>
 <p>Lowercases scheme and host, drops the default port, normalizes dot segments,
 strips a trailing slash on non-root paths, removes tracking parameters, sorts
 the query, and drops the fragment (which is client-side by definition).</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">canonicalize_url</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">)</span>
-<span class="go">&#39;https://example.com/&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">canonicalize_url</span><span class="p">(</span><span class="s2">&quot;https://example.com/a/&quot;</span><span class="p">)</span>
-<span class="go">&#39;https://example.com/a&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">canonicalize_url</span><span class="p">(</span><span class="s2">&quot;https://example.com/a/./b/../c&quot;</span><span class="p">)</span>
-<span class="go">&#39;https://example.com/a/c&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">canonicalize_url</span><span class="p">(</span><span class="s2">"https://example.com"</span><span class="p">)</span>
+<span class="go">'https://example.com/'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canonicalize_url</span><span class="p">(</span><span class="s2">"https://example.com/a/"</span><span class="p">)</span>
+<span class="go">'https://example.com/a'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canonicalize_url</span><span class="p">(</span><span class="s2">"https://example.com/a/./b/../c"</span><span class="p">)</span>
+<span class="go">'https://example.com/a/c'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -601,11 +601,11 @@ else with a <cite>Mapping</cite> face.</p>
 does neither, so without this the first write fails with a bare <cite>KeyError</cite>
 from the underlying <cite>open()</cite>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">capture_store</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="s2">&quot;job&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">capture_store</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="s2">"job"</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">.capture</span><span class="w"> </span><span class="kn">import</span> <span class="n">Capture</span><span class="p">,</span> <span class="n">Request</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">digest</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/a&quot;</span><span class="p">),</span> <span class="sa">b</span><span class="s2">&quot;hi&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">digest</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">"https://x.com/a"</span><span class="p">),</span> <span class="sa">b</span><span class="s2">"hi"</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">[</span><span class="n">digest</span><span class="p">]</span><span class="o">.</span><span class="n">body</span>
-<span class="go">b&#39;hi&#39;</span>
+<span class="go">b'hi'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -616,17 +616,17 @@ from the underlying <cite>open()</cite>.</p>
 <dd><p>One-word verdict driving the escalation decision.</p>
 <p>Returns one of: <cite>ok</cite>, <cite>challenge</cite>, <cite>rate_limited</cite>, <cite>forbidden</cite>, <cite>not_found</cite>,
 <cite>client_error</cite>, <cite>server_error</cite>, <cite>auth_required</cite>, <cite>empty</cite>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">429</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="go">&#39;rate_limited&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="go">&#39;empty&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">429</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">""</span><span class="p">)</span>
+<span class="go">'rate_limited'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">""</span><span class="p">)</span>
+<span class="go">'empty'</span>
 </pre></div>
 </div>
 <p>A bare 403 is the most common block there is, and must never read as success:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;nope&quot;</span><span class="p">)</span>
-<span class="go">&#39;forbidden&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">451</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;nope&quot;</span><span class="p">)</span>
-<span class="go">&#39;client_error&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">"nope"</span><span class="p">)</span>
+<span class="go">'forbidden'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="mi">451</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">"nope"</span><span class="p">)</span>
+<span class="go">'client_error'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -651,21 +651,21 @@ package stays usable and is merely <em>less capable</em> without it.</p>
 and cheaper to inspect. The body is scanned in full: an earlier version
 truncated it, which hid widgets and challenge markers on large pages — and a
 missed challenge is the expensive direction of this error.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;&lt;html&gt;fine&lt;/html&gt;&quot;</span><span class="p">))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">"&lt;html&gt;fine&lt;/html&gt;"</span><span class="p">))</span>
 <span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;cf-mitigated&quot;</span><span class="p">:</span> <span class="s2">&quot;challenge&quot;</span><span class="p">},</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">serving</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="p">{</span><span class="s2">"cf-mitigated"</span><span class="p">:</span> <span class="s2">"challenge"</span><span class="p">},</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">serving</span>
 <span class="go">True</span>
 </pre></div>
 </div>
 <p>A protected site emits vendor headers on successful responses too. That
 identifies the guard; it does not mean you were stopped:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">verdict</span> <span class="o">=</span> <span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;x-datadome&quot;</span><span class="p">:</span> <span class="s2">&quot;protected&quot;</span><span class="p">},</span> <span class="s2">&quot;&lt;html&gt;data&lt;/html&gt;&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">verdict</span> <span class="o">=</span> <span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s2">"x-datadome"</span><span class="p">:</span> <span class="s2">"protected"</span><span class="p">},</span> <span class="s2">"&lt;html&gt;data&lt;/html&gt;"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">verdict</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span> <span class="n">verdict</span><span class="o">.</span><span class="n">serving</span>
-<span class="go">(&#39;datadome&#39;, False)</span>
+<span class="go">('datadome', False)</span>
 </pre></div>
 </div>
 <p>An interactive widget is terminal, not an escalation cue:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s1">&#39;&lt;div class=&quot;cf-turnstile&quot; data-sitekey=&quot;x&quot;&gt;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">interactive</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">detect_challenge</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{},</span> <span class="s1">'&lt;div class="cf-turnstile" data-sitekey="x"&gt;'</span><span class="p">)</span><span class="o">.</span><span class="n">interactive</span>
 <span class="go">True</span>
 </pre></div>
 </div>
@@ -699,11 +699,11 @@ the obstacle rather than trip over it.</p>
 response + a hash of any body. Deliberately ignores headers that only add
 noise (User-Agent, tracing ids), because fragmenting the cache on those makes
 re-runs expensive for no correctness gain.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/p?b=2&amp;a=1&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/p?a=1&amp;b=2&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">"https://x.com/p?b=2&amp;a=1"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">"https://x.com/p?a=1&amp;b=2"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">request_digest</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">==</span> <span class="n">request_digest</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>  <span class="c1"># query order is not meaningful</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/p?a=1&amp;b=2&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="s2">&quot;whatever&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">"https://x.com/p?a=1&amp;b=2"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"User-Agent"</span><span class="p">:</span> <span class="s2">"whatever"</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">request_digest</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="n">request_digest</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>  <span class="c1"># noise headers ignored</span>
 <span class="go">True</span>
 </pre></div>
@@ -716,8 +716,8 @@ re-runs expensive for no correctness gain.</p>
 <dd><p>Sitemap URLs declared in a robots.txt.</p>
 <p>The <cite>Sitemap:</cite> directive is independent of any <cite>User-agent</cite> block, which is
 why it is parsed separately from the access rules.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">robots_sitemaps</span><span class="p">(</span><span class="s2">&quot;User-agent: *</span><span class="se">\n</span><span class="s2">Sitemap: https://x.com/sitemap.xml&quot;</span><span class="p">)</span>
-<span class="go">[&#39;https://x.com/sitemap.xml&#39;]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">robots_sitemaps</span><span class="p">(</span><span class="s2">"User-agent: *</span><span class="se">\n</span><span class="s2">Sitemap: https://x.com/sitemap.xml"</span><span class="p">)</span>
+<span class="go">['https://x.com/sitemap.xml']</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -729,19 +729,19 @@ why it is parsed separately from the access rules.</p>
 <p>Recognizes framework-specific markers (Next.js, Nuxt, Apollo, Redux, Remix,
 Angular TransferState), standardized JSON-LD, and — when <cite>include_generic</cite> —
 any sufficiently large bare JSON script.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
-<span class="gp">... </span><span class="s1">&lt;script type=&quot;application/ld+json&quot;&gt;{&quot;@type&quot;:&quot;Product&quot;}&lt;/script&gt;</span>
-<span class="gp">... </span><span class="s1">&lt;script&gt;window.__APOLLO_STATE__ = {&quot;Product:1&quot;:{&quot;name&quot;:&quot;x&quot;}};&lt;/script&gt;</span>
-<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="s1">'''</span>
+<span class="gp">... </span><span class="s1">&lt;script type="application/ld+json"&gt;{"@type":"Product"}&lt;/script&gt;</span>
+<span class="gp">... </span><span class="s1">&lt;script&gt;window.__APOLLO_STATE__ = {"Product:1":{"name":"x"}};&lt;/script&gt;</span>
+<span class="gp">... </span><span class="s1">'''</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">kind</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">))</span>
-<span class="go">[&#39;apollo&#39;, &#39;ld_json&#39;]</span>
+<span class="go">['apollo', 'ld_json']</span>
 </pre></div>
 </div>
 <p>JSON-LD is worth trying first when present: it is standardized, so it is the
 most stable payload on the web.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">blob</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">)</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;ld_json&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">blob</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;@type&#39;</span><span class="p">]</span>
-<span class="go">&#39;Product&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">blob</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">scan_state_blobs</span><span class="p">(</span><span class="n">html</span><span class="p">)</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">'ld_json'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blob</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">'@type'</span><span class="p">]</span>
+<span class="go">'Product'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -750,8 +750,8 @@ most stable payload on the web.</p>
 <dt class="sig sig-object py" id="scraped.acquire.state_blob_markers">
 <span class="sig-prename descclassname"><span class="pre">scraped.acquire.</span></span><span class="sig-name descname"><span class="pre">state_blob_markers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/scraped/acquire/blobs.html#state_blob_markers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.acquire.state_blob_markers" title="Link to this definition"></a></dt>
 <dd><p>The marker names present, cheapest possible summary for capture metadata.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">state_blob_markers</span><span class="p">(</span><span class="s1">&#39;&lt;script id=&quot;__NEXT_DATA__&quot; type=&quot;application/json&quot;&gt;</span><span class="si">{}</span><span class="s1">&lt;/script&gt;&#39;</span><span class="p">)</span>
-<span class="go">[&#39;__NEXT_DATA__&#39;]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">state_blob_markers</span><span class="p">(</span><span class="s1">'&lt;script id="__NEXT_DATA__" type="application/json"&gt;</span><span class="si">{}</span><span class="s1">&lt;/script&gt;'</span><span class="p">)</span>
+<span class="go">['__NEXT_DATA__']</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -764,11 +764,11 @@ most stable payload on the web.</p>
 the session in a browser, then do the actual work with an impersonating HTTP
 client at a fraction of the cost.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">tempfile</span><span class="o">,</span><span class="w"> </span><span class="nn">pathlib</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cookies&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="s2">&quot;x.com&quot;</span><span class="p">}]}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span> <span class="o">/</span> <span class="s2">&quot;s.json&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"cookies"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span> <span class="s2">"1"</span><span class="p">,</span> <span class="s2">"domain"</span><span class="p">:</span> <span class="s2">"x.com"</span><span class="p">}]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span> <span class="o">/</span> <span class="s2">"s.json"</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">storage_state_headers</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-<span class="go">{&#39;Cookie&#39;: &#39;a=1&#39;}</span>
+<span class="go">{'Cookie': 'a=1'}</span>
 </pre></div>
 </div>
 </dd></dl>

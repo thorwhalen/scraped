@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.acquire.cache &mdash; scraped 0.0.12 documentation</title>
+  <title>scraped.acquire.cache &mdash; scraped 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -113,9 +113,9 @@ must also carry provenance and survive a client swap, the right shape is a plain
 deduplication (the same payload at five URLs is stored once) and change detection
 (a digest that did not change means the page did not change).</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">CaptureStore</span><span class="o">.</span><span class="n">in_memory</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fetcher</span> <span class="o">=</span> <span class="n">cached</span><span class="p">(</span><span class="k">lambda</span> <span class="n">request</span><span class="p">:</span> <span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;hi&quot;</span><span class="p">),</span> <span class="n">store</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">first</span> <span class="o">=</span> <span class="n">fetcher</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">second</span> <span class="o">=</span> <span class="n">fetcher</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">))</span>   <span class="c1"># served from the store</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fetcher</span> <span class="o">=</span> <span class="n">cached</span><span class="p">(</span><span class="k">lambda</span> <span class="n">request</span><span class="p">:</span> <span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"hi"</span><span class="p">),</span> <span class="n">store</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first</span> <span class="o">=</span> <span class="n">fetcher</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">"https://example.com"</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">second</span> <span class="o">=</span> <span class="n">fetcher</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">"https://example.com"</span><span class="p">))</span>   <span class="c1"># served from the store</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">first</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">body_sha256</span> <span class="o">==</span> <span class="n">second</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">body_sha256</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
@@ -168,11 +168,11 @@ else with a <cite>Mapping</cite> face.</p>
 does neither, so without this the first write fails with a bare <cite>KeyError</cite>
 from the underlying <cite>open()</cite>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">capture_store</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="s2">&quot;job&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">capture_store</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="s2">"job"</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">.capture</span><span class="w"> </span><span class="kn">import</span> <span class="n">Capture</span><span class="p">,</span> <span class="n">Request</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">digest</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">&quot;https://x.com/a&quot;</span><span class="p">),</span> <span class="sa">b</span><span class="s2">&quot;hi&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">digest</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Capture</span><span class="o">.</span><span class="n">from_body</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="s2">"https://x.com/a"</span><span class="p">),</span> <span class="sa">b</span><span class="s2">"hi"</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">[</span><span class="n">digest</span><span class="p">]</span><span class="o">.</span><span class="n">body</span>
-<span class="go">b&#39;hi&#39;</span>
+<span class="go">b'hi'</span>
 </pre></div>
 </div>
 </dd></dl>
