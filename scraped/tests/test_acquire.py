@@ -553,7 +553,10 @@ def test_persistent_store_actually_writes(tmp_path):
 def test_persistent_store_expands_user(tmp_path, monkeypatch):
     from scraped.acquire import capture_store
 
+    # `Path.expanduser` reads HOME on POSIX but USERPROFILE on Windows, so both
+    # have to be redirected for this to test anything on either platform.
     monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
     capture_store("~/acq-selftest")
     assert (tmp_path / "acq-selftest" / "metadata").is_dir()
 
