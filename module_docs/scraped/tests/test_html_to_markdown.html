@@ -1,0 +1,170 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.tests.test_html_to_markdown &mdash; scraped 0.0.14 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=544df88d"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="scraped.tools" href="../tools.html" />
+    <link rel="prev" title="scraped.tests.test_acquire" href="test_acquire.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire.html">scraped.acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire/blobs.html">scraped.acquire.blobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire/cache.html">scraped.acquire.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire/capture.html">scraped.acquire.capture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire/fetchers.html">scraped.acquire.fetchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire/fetchers/browser.html">scraped.acquire.fetchers.browser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire/fetchers/http.html">scraped.acquire.fetchers.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire/policy.html">scraped.acquire.policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire/probe.html">scraped.acquire.probe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire/signals.html">scraped.acquire.signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acquire/url.html">scraped.acquire.url</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">scraped.tests.test_html_to_markdown</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.tests.test_html_to_markdown.test_blank_lines_inside_code_blocks_are_preserved"><code class="docutils literal notranslate"><span class="pre">test_blank_lines_inside_code_blocks_are_preserved()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.tests.test_html_to_markdown.test_iterable_mixing_paths_directories_and_raw_html"><code class="docutils literal notranslate"><span class="pre">test_iterable_mixing_paths_directories_and_raw_html()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.tests.test_html_to_markdown.test_paragraphs_are_no_longer_hard_wrapped"><code class="docutils literal notranslate"><span class="pre">test_paragraphs_are_no_longer_hard_wrapped()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.tests.test_html_to_markdown.test_unknown_options_raise_rather_than_being_ignored"><code class="docutils literal notranslate"><span class="pre">test_unknown_options_raise_rather_than_being_ignored()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">scraped.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">scraped.tests.test_html_to_markdown</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/module_docs/scraped/tests/test_html_to_markdown.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-scraped.tests.test_html_to_markdown">
+<span id="scraped-tests-test-html-to-markdown"></span><h1>scraped.tests.test_html_to_markdown<a class="headerlink" href="#module-scraped.tests.test_html_to_markdown" title="Link to this heading"></a></h1>
+<p>Tests for <cite>scraped.util.html_to_markdown</cite>, the HTML-&gt;Markdown converter.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.tests.test_html_to_markdown.test_blank_lines_inside_code_blocks_are_preserved">
+<span class="sig-prename descclassname"><span class="pre">scraped.tests.test_html_to_markdown.</span></span><span class="sig-name descname"><span class="pre">test_blank_lines_inside_code_blocks_are_preserved</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/scraped/tests/test_html_to_markdown.html#test_blank_lines_inside_code_blocks_are_preserved"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.tests.test_html_to_markdown.test_blank_lines_inside_code_blocks_are_preserved" title="Link to this definition"></a></dt>
+<dd><p>PEP 8 puts two blank lines between top-level defs – keep them.</p>
+<blockquote>
+<div><p>A blanket <a href="#id1"><span class="problematic" id="id2">``</span></a>re.sub(r”</p>
+</div></blockquote>
+<p>{3,}”, “</p>
+<dl class="simple">
+<dt>“, md)`` over the whole document would</dt><dd><p>silently rewrite the source code on every technical page scraped.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.tests.test_html_to_markdown.test_iterable_mixing_paths_directories_and_raw_html">
+<span class="sig-prename descclassname"><span class="pre">scraped.tests.test_html_to_markdown.</span></span><span class="sig-name descname"><span class="pre">test_iterable_mixing_paths_directories_and_raw_html</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/scraped/tests/test_html_to_markdown.html#test_iterable_mixing_paths_directories_and_raw_html"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.tests.test_html_to_markdown.test_iterable_mixing_paths_directories_and_raw_html" title="Link to this definition"></a></dt>
+<dd><p>Each item gets the same dispatch a lone string gets.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.tests.test_html_to_markdown.test_paragraphs_are_no_longer_hard_wrapped">
+<span class="sig-prename descclassname"><span class="pre">scraped.tests.test_html_to_markdown.</span></span><span class="sig-name descname"><span class="pre">test_paragraphs_are_no_longer_hard_wrapped</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/scraped/tests/test_html_to_markdown.html#test_paragraphs_are_no_longer_hard_wrapped"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.tests.test_html_to_markdown.test_paragraphs_are_no_longer_hard_wrapped" title="Link to this definition"></a></dt>
+<dd><p>html2text ran with its default <code class="docutils literal notranslate"><span class="pre">body_width=78</span></code>; markdownify does not.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scraped.tests.test_html_to_markdown.test_unknown_options_raise_rather_than_being_ignored">
+<span class="sig-prename descclassname"><span class="pre">scraped.tests.test_html_to_markdown.</span></span><span class="sig-name descname"><span class="pre">test_unknown_options_raise_rather_than_being_ignored</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/scraped/tests/test_html_to_markdown.html#test_unknown_options_raise_rather_than_being_ignored"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.tests.test_html_to_markdown.test_unknown_options_raise_rather_than_being_ignored" title="Link to this definition"></a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">MarkdownConverter</span></code> swallows unknown options, so a typo would no-op.</p>
+<p>In particular an <code class="docutils literal notranslate"><span class="pre">html2text</span></code> option carried over from before the
+<code class="docutils literal notranslate"><span class="pre">markdownify</span></code> migration must not silently do nothing.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="test_acquire.html" class="btn btn-neutral float-left" title="scraped.tests.test_acquire" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../tools.html" class="btn btn-neutral float-right" title="scraped.tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

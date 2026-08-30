@@ -15,5 +15,6 @@
    module_docs/scraped/acquire/signals
    module_docs/scraped/acquire/url
    module_docs/scraped/tests/test_acquire
+   module_docs/scraped/tests/test_html_to_markdown
    module_docs/scraped/tools
    module_docs/scraped/util

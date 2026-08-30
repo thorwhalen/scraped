@@ -1,0 +1,291 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scraped.tests.test_html_to_markdown &mdash; scraped 0.0.14 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=544df88d"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            scraped
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped.html">scraped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire.html">scraped.acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/blobs.html">scraped.acquire.blobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/cache.html">scraped.acquire.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/capture.html">scraped.acquire.capture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/fetchers.html">scraped.acquire.fetchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/fetchers/browser.html">scraped.acquire.fetchers.browser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/fetchers/http.html">scraped.acquire.fetchers.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/policy.html">scraped.acquire.policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/probe.html">scraped.acquire.probe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/signals.html">scraped.acquire.signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/acquire/url.html">scraped.acquire.url</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/tests/test_html_to_markdown.html">scraped.tests.test_html_to_markdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/tools.html">scraped.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/scraped/util.html">scraped.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">scraped</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">scraped.tests.test_html_to_markdown</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scraped.tests.test_html_to_markdown</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Tests for `scraped.util.html_to_markdown`, the HTML-&gt;Markdown converter."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">scraped</span><span class="w"> </span><span class="kn">import</span> <span class="n">html_to_markdown</span>
+
+<span class="n">SAMPLE_HTML</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">&lt;html&gt;&lt;head&gt;&lt;title&gt;Page title&lt;/title&gt;&lt;style&gt;body{color:red}&lt;/style&gt;</span>
+<span class="s2">&lt;script&gt;var x = 1;&lt;/script&gt;&lt;/head&gt;</span>
+<span class="s2">&lt;body&gt;</span>
+<span class="s2">&lt;h1&gt;Heading One&lt;/h1&gt;</span>
+<span class="s2">&lt;p&gt;Some &lt;b&gt;bold&lt;/b&gt; and &lt;em&gt;italic&lt;/em&gt; text with a</span>
+<span class="s2">&lt;a href="https://example.com/a"&gt;link&lt;/a&gt;.&lt;/p&gt;</span>
+<span class="s2">&lt;ul&gt;&lt;li&gt;alpha&lt;/li&gt;&lt;li&gt;beta with &lt;code&gt;inline_code()&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;</span>
+<span class="s2">&lt;pre&gt;&lt;code&gt;def f():</span>
+<span class="s2">    return 1</span>
+<span class="s2">&lt;/code&gt;&lt;/pre&gt;</span>
+<span class="s2">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;A&lt;/th&gt;&lt;th&gt;B&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;</span>
+<span class="s2">&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;2&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</span>
+<span class="s2">&lt;blockquote&gt;Quoted - with a caf&amp;eacute;.&lt;/blockquote&gt;</span>
+<span class="s2">&lt;/body&gt;&lt;/html&gt;</span>
+<span class="s2">"""</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_structure_survives_conversion</span><span class="p">():</span>
+    <span class="n">md</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span><span class="n">SAMPLE_HTML</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="s2">"# Heading One"</span> <span class="ow">in</span> <span class="n">md</span>  <span class="c1"># ATX headings, not setext</span>
+    <span class="k">assert</span> <span class="s2">"**bold**"</span> <span class="ow">in</span> <span class="n">md</span> <span class="ow">and</span> <span class="s2">"*italic*"</span> <span class="ow">in</span> <span class="n">md</span>
+    <span class="k">assert</span> <span class="s2">"[link](https://example.com/a)"</span> <span class="ow">in</span> <span class="n">md</span>
+    <span class="k">assert</span> <span class="s2">"* alpha"</span> <span class="ow">in</span> <span class="n">md</span>
+    <span class="k">assert</span> <span class="s2">"`inline_code()`"</span> <span class="ow">in</span> <span class="n">md</span>
+    <span class="k">assert</span> <span class="s2">"| A | B |"</span> <span class="ow">in</span> <span class="n">md</span>  <span class="c1"># GitHub-flavoured table</span>
+    <span class="k">assert</span> <span class="s2">"&gt; Quoted"</span> <span class="ow">in</span> <span class="n">md</span>
+    <span class="k">assert</span> <span class="s2">"café"</span> <span class="ow">in</span> <span class="n">md</span>  <span class="c1"># unicode passes through unescaped</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_non_content_tags_are_dropped</span><span class="p">():</span>
+    <span class="n">md</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span><span class="n">SAMPLE_HTML</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="s2">"Page title"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">md</span>
+    <span class="k">assert</span> <span class="s2">"color:red"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">md</span>
+    <span class="k">assert</span> <span class="s2">"var x"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">md</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_markdownify_options_are_forwarded</span><span class="p">():</span>
+    <span class="n">md</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span><span class="s2">"&lt;ul&gt;&lt;li&gt;a&lt;/li&gt;&lt;/ul&gt;"</span><span class="p">,</span> <span class="n">bullets</span><span class="o">=</span><span class="s2">"-"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="s2">"- a"</span> <span class="ow">in</span> <span class="n">md</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_mapping_input_is_aggregated_in_order</span><span class="p">():</span>
+    <span class="n">htmls</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"one"</span><span class="p">:</span> <span class="s2">"&lt;h1&gt;One&lt;/h1&gt;"</span><span class="p">,</span> <span class="s2">"two"</span><span class="p">:</span> <span class="s2">"&lt;h1&gt;Two&lt;/h1&gt;"</span><span class="p">}</span>
+    <span class="n">md</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span><span class="n">htmls</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">md</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"# One"</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">md</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"# Two"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_list_aggregator_returns_one_string_per_document</span><span class="p">():</span>
+    <span class="n">htmls</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"one"</span><span class="p">:</span> <span class="s2">"&lt;h1&gt;One&lt;/h1&gt;"</span><span class="p">,</span> <span class="s2">"two"</span><span class="p">:</span> <span class="s2">"&lt;h1&gt;Two&lt;/h1&gt;"</span><span class="p">}</span>
+    <span class="n">mds</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span><span class="n">htmls</span><span class="p">,</span> <span class="n">markdown_contents_aggregator</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">mds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="n">mds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"# One"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_prefixes_are_woven_in</span><span class="p">():</span>
+    <span class="n">htmls</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"one"</span><span class="p">:</span> <span class="s2">"&lt;h1&gt;One&lt;/h1&gt;"</span><span class="p">}</span>
+    <span class="n">md</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span><span class="n">htmls</span><span class="p">,</span> <span class="n">prefixes</span><span class="o">=</span><span class="p">[</span><span class="s2">"&lt;!-- src: one --&gt;"</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="n">md</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"&lt;!-- src: one --&gt;</span><span class="se">\n</span><span class="s2"># One"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_directory_of_html_files_and_saving</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
+        <span class="n">folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="s2">"a.html"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">"&lt;html&gt;&lt;body&gt;&lt;h1&gt;A&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;"</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">folder</span> <span class="o">/</span> <span class="s2">"out.md"</span>
+        <span class="n">returned</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">folder</span><span class="p">),</span> <span class="n">save_filepath</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">returned</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="s2">"# A"</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="test_blank_lines_inside_code_blocks_are_preserved">
+<a class="viewcode-back" href="../../../module_docs/scraped/tests/test_html_to_markdown.html#scraped.tests.test_html_to_markdown.test_blank_lines_inside_code_blocks_are_preserved">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_blank_lines_inside_code_blocks_are_preserved</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""PEP 8 puts two blank lines between top-level defs -- keep them.</span>
+
+<span class="sd">    A blanket ``re.sub(r"\n{3,}", "\n\n", md)`` over the whole document would</span>
+<span class="sd">    silently rewrite the source code on every technical page scraped.</span>
+<span class="sd">    """</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">"&lt;pre&gt;&lt;code&gt;def func(x):</span><span class="se">\n</span><span class="s2">    return x + 1</span><span class="se">\n\n\n</span><span class="s2">"</span>
+        <span class="s2">"def test_answer():</span><span class="se">\n</span><span class="s2">    assert func(3) == 5</span><span class="se">\n</span><span class="s2">&lt;/code&gt;&lt;/pre&gt;"</span>
+    <span class="p">)</span>
+    <span class="n">md</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="s2">"return x + 1</span><span class="se">\n\n\n</span><span class="s2">def test_answer():"</span> <span class="ow">in</span> <span class="n">md</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_blank_line_runs_outside_code_blocks_are_collapsed</span><span class="p">():</span>
+    <span class="n">md</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span><span class="s2">"&lt;p&gt;a&lt;/p&gt;&lt;div&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;/div&gt;&lt;p&gt;b&lt;/p&gt;"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="s2">"</span><span class="se">\n\n\n</span><span class="s2">"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">md</span>
+
+
+<div class="viewcode-block" id="test_paragraphs_are_no_longer_hard_wrapped">
+<a class="viewcode-back" href="../../../module_docs/scraped/tests/test_html_to_markdown.html#scraped.tests.test_html_to_markdown.test_paragraphs_are_no_longer_hard_wrapped">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_paragraphs_are_no_longer_hard_wrapped</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""html2text ran with its default ``body_width=78``; markdownify does not."""</span>
+    <span class="n">long_sentence</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">"word"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">md</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">"&lt;p&gt;</span><span class="si">{</span><span class="n">long_sentence</span><span class="si">}</span><span class="s2">&lt;/p&gt;"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">long_sentence</span> <span class="ow">in</span> <span class="n">md</span></div>
+
+
+
+<div class="viewcode-block" id="test_unknown_options_raise_rather_than_being_ignored">
+<a class="viewcode-back" href="../../../module_docs/scraped/tests/test_html_to_markdown.html#scraped.tests.test_html_to_markdown.test_unknown_options_raise_rather_than_being_ignored">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_unknown_options_raise_rather_than_being_ignored</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""``MarkdownConverter`` swallows unknown options, so a typo would no-op.</span>
+
+<span class="sd">    In particular an ``html2text`` option carried over from before the</span>
+<span class="sd">    ``markdownify`` migration must not silently do nothing.</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">"body_width"</span><span class="p">):</span>
+        <span class="n">html_to_markdown</span><span class="p">(</span><span class="s2">"&lt;p&gt;a&lt;/p&gt;"</span><span class="p">,</span> <span class="n">body_width</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># --- issue #11: any non-str, non-Mapping iterable used to raise -------------</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_iterable_of_raw_html_strings</span><span class="p">():</span>
+    <span class="n">mds</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">"&lt;h1&gt;One&lt;/h1&gt;"</span><span class="p">,</span> <span class="s2">"&lt;h1&gt;Two&lt;/h1&gt;"</span><span class="p">],</span> <span class="n">markdown_contents_aggregator</span><span class="o">=</span><span class="nb">list</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="p">[</span><span class="n">md</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">md</span> <span class="ow">in</span> <span class="n">mds</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s2">"# One"</span><span class="p">,</span> <span class="s2">"# Two"</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_iterable_of_html_file_paths</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
+        <span class="n">folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="s2">"a.html"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">"&lt;h1&gt;A&lt;/h1&gt;"</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="s2">"b.html"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">"&lt;h1&gt;B&lt;/h1&gt;"</span><span class="p">)</span>
+        <span class="n">md</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="s2">"a.html"</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="s2">"b.html"</span><span class="p">)])</span>
+    <span class="k">assert</span> <span class="n">md</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"# A"</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">md</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"# B"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="test_iterable_mixing_paths_directories_and_raw_html">
+<a class="viewcode-back" href="../../../module_docs/scraped/tests/test_html_to_markdown.html#scraped.tests.test_html_to_markdown.test_iterable_mixing_paths_directories_and_raw_html">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_iterable_mixing_paths_directories_and_raw_html</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""Each item gets the same dispatch a lone string gets."""</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
+        <span class="n">folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="s2">"sub"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="s2">"sub"</span> <span class="o">/</span> <span class="s2">"a.html"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">"&lt;h1&gt;A&lt;/h1&gt;"</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="s2">"b.html"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">"&lt;h1&gt;B&lt;/h1&gt;"</span><span class="p">)</span>
+        <span class="n">md</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span>
+            <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="s2">"sub"</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="s2">"b.html"</span><span class="p">),</span> <span class="s2">"&lt;h1&gt;C&lt;/h1&gt;"</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">md</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"# A"</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">md</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"# B"</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">md</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"# C"</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_generator_input_is_accepted</span><span class="p">():</span>
+    <span class="n">md</span> <span class="o">=</span> <span class="n">html_to_markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">"&lt;h1&gt;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&lt;/h1&gt;"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="n">md</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"# 0"</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">md</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"# 1"</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">md</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"# 2"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_unsupported_type_raises_type_error</span><span class="p">():</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">"not int"</span><span class="p">):</span>
+        <span class="n">html_to_markdown</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

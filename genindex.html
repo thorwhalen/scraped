@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; scraped 0.0.13 documentation</title>
+  <title>Index &mdash; scraped 0.0.14 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=9fc46840"></script>
+      <script src="_static/documentation_options.js?v=544df88d"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -59,6 +59,7 @@
 <li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/signals.html">scraped.acquire.signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/acquire/url.html">scraped.acquire.url</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/tests/test_html_to_markdown.html">scraped.tests.test_html_to_markdown</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/tools.html">scraped.tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/scraped/util.html">scraped.util</a></li>
 </ul>
@@ -100,6 +101,7 @@
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
@@ -348,6 +350,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/scraped/util.html#scraped.util.html_to_markdown">html_to_markdown() (in module scraped.util)</a>
 </li>
+      <li><a href="module_docs/scraped/util.html#scraped.util.HTML_TO_MARKDOWN_DEFAULTS">HTML_TO_MARKDOWN_DEFAULTS (in module scraped.util)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/scraped/acquire.html#scraped.acquire.HttpFetcher">HttpFetcher (class in scraped.acquire)</a>
 
       <ul>
@@ -432,11 +438,21 @@
 </li>
         <li><a href="module_docs/scraped/acquire/url.html#module-scraped.acquire.url">scraped.acquire.url</a>
 </li>
+        <li><a href="module_docs/scraped/tests/test_html_to_markdown.html#module-scraped.tests.test_html_to_markdown">scraped.tests.test_html_to_markdown</a>
+</li>
         <li><a href="module_docs/scraped/tools.html#module-scraped.tools">scraped.tools</a>
 </li>
         <li><a href="module_docs/scraped/util.html#module-scraped.util">scraped.util</a>
 </li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/scraped/util.html#scraped.util.NON_CONTENT_TAGS">NON_CONTENT_TAGS (in module scraped.util)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -624,8 +640,6 @@
         <li><a href="module_docs/scraped/acquire/policy.html#module-scraped.acquire.policy">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     scraped.acquire.probe
 
@@ -633,6 +647,8 @@
         <li><a href="module_docs/scraped/acquire/probe.html#module-scraped.acquire.probe">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     scraped.acquire.signals
 
@@ -645,6 +661,13 @@
 
       <ul>
         <li><a href="module_docs/scraped/acquire/url.html#module-scraped.acquire.url">module</a>
+</li>
+      </ul></li>
+      <li>
+    scraped.tests.test_html_to_markdown
+
+      <ul>
+        <li><a href="module_docs/scraped/tests/test_html_to_markdown.html#module-scraped.tests.test_html_to_markdown">module</a>
 </li>
       </ul></li>
       <li>
@@ -705,20 +728,28 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/scraped/tests/test_html_to_markdown.html#scraped.tests.test_html_to_markdown.test_blank_lines_inside_code_blocks_are_preserved">test_blank_lines_inside_code_blocks_are_preserved() (in module scraped.tests.test_html_to_markdown)</a>
+</li>
+      <li><a href="module_docs/scraped/tests/test_html_to_markdown.html#scraped.tests.test_html_to_markdown.test_iterable_mixing_paths_directories_and_raw_html">test_iterable_mixing_paths_directories_and_raw_html() (in module scraped.tests.test_html_to_markdown)</a>
+</li>
+      <li><a href="module_docs/scraped/tests/test_html_to_markdown.html#scraped.tests.test_html_to_markdown.test_paragraphs_are_no_longer_hard_wrapped">test_paragraphs_are_no_longer_hard_wrapped() (in module scraped.tests.test_html_to_markdown)</a>
+</li>
+      <li><a href="module_docs/scraped/tests/test_html_to_markdown.html#scraped.tests.test_html_to_markdown.test_unknown_options_raise_rather_than_being_ignored">test_unknown_options_raise_rather_than_being_ignored() (in module scraped.tests.test_html_to_markdown)</a>
+</li>
       <li><a href="module_docs/scraped/acquire.html#scraped.acquire.Capture.text">text() (scraped.acquire.Capture method)</a>
 
       <ul>
         <li><a href="module_docs/scraped/acquire/capture.html#scraped.acquire.capture.Capture.text">(scraped.acquire.capture.Capture method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/scraped/acquire.html#scraped.acquire.Capture.to_json">to_json() (scraped.acquire.Capture method)</a>
 
       <ul>
         <li><a href="module_docs/scraped/acquire/capture.html#scraped.acquire.capture.Capture.to_json">(scraped.acquire.capture.Capture method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.fetchers.http.Transport">Transport (class in scraped.acquire.fetchers.http)</a>
 </li>
       <li><a href="module_docs/scraped/acquire/fetchers/http.html#scraped.acquire.fetchers.http.TransportResult">TransportResult (class in scraped.acquire.fetchers.http)</a>

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.util &mdash; scraped 0.0.13 documentation</title>
+  <title>scraped.util &mdash; scraped 0.0.14 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=9fc46840"></script>
+      <script src="../../_static/documentation_options.js?v=544df88d"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -59,6 +59,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/signals.html">scraped.acquire.signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/url.html">scraped.acquire.url</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/tests/test_html_to_markdown.html">scraped.tests.test_html_to_markdown</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/tools.html">scraped.tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/util.html">scraped.util</a></li>
 </ul>
@@ -92,7 +93,8 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Callable</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
@@ -104,7 +106,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">scrapy.crawler</span><span class="w"> </span><span class="kn">import</span> <span class="n">CrawlerProcess</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scrapy.linkextractors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinkExtractor</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">html2text</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">markdownify</span><span class="w"> </span><span class="kn">import</span> <span class="n">MarkdownConverter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">config2py</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_app_config_folder</span><span class="p">,</span> <span class="n">process_path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">graze.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">url_to_localpath</span> <span class="k">as</span> <span class="n">graze_url_to_localpath</span>
 
@@ -344,6 +347,135 @@
 
 
 
+<span class="c1">#: Tags whose *content* is never part of the document text. ``markdownify``</span>
+<span class="c1">#: already drops ``script``/``style``, but not ``&lt;title&gt;``, so the whole head is</span>
+<span class="c1">#: removed before conversion (``html2text``, which this replaced, ignored it too).</span>
+<span class="n">NON_CONTENT_TAGS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"head"</span><span class="p">,</span> <span class="s2">"script"</span><span class="p">,</span> <span class="s2">"style"</span><span class="p">,</span> <span class="s2">"noscript"</span><span class="p">)</span>
+
+<span class="c1">#: Defaults for the HTML-&gt;Markdown conversion. Override any of them by passing</span>
+<span class="c1">#: the same keyword to :func:`html_to_markdown`.</span>
+<span class="n">HTML_TO_MARKDOWN_DEFAULTS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"heading_style"</span><span class="p">:</span> <span class="s2">"ATX"</span><span class="p">,</span>  <span class="c1"># "# Title", not the underlined setext form</span>
+    <span class="s2">"bullets"</span><span class="p">:</span> <span class="s2">"*"</span><span class="p">,</span>
+    <span class="s2">"escape_underscores"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># keeps identifiers like ``foo_bar`` readable</span>
+    <span class="s2">"escape_asterisks"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1">#: An opening (or closing) fence of a fenced code block, allowing markdown's</span>
+<span class="c1">#: three spaces of leading indentation.</span>
+<span class="n">_CODE_FENCE_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^ {0,3}(`{3,}|~{3,})"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_outside_code_fences</span><span class="p">(</span><span class="n">markdown</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Split *markdown* into ``(is_fenced_code, text)`` chunks.</span>
+
+<span class="sd">    An unterminated fence keeps everything after it marked as code, which is the</span>
+<span class="sd">    conservative choice: whitespace inside code is content.</span>
+
+<span class="sd">    &gt;&gt;&gt; list(_outside_code_fences("a\\n```\\nb\\n```\\nc\\n"))</span>
+<span class="sd">    [(False, 'a\\n'), (True, '```\\nb\\n```\\n'), (False, 'c\\n')]</span>
+<span class="sd">    """</span>
+    <span class="n">chunk</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">fence</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">markdown</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(</span><span class="n">keepends</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">_CODE_FENCE_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fence</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+                <span class="n">chunk</span><span class="p">,</span> <span class="n">fence</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">],</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">chunk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">chunk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">and</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">==</span> <span class="n">fence</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+                <span class="n">chunk</span><span class="p">,</span> <span class="n">fence</span> <span class="o">=</span> <span class="p">[],</span> <span class="s2">""</span>
+    <span class="k">yield</span> <span class="nb">bool</span><span class="p">(</span><span class="n">fence</span><span class="p">),</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_collapse_blank_runs</span><span class="p">(</span><span class="n">markdown</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Collapse runs of blank lines to a single one, *outside code blocks*.</span>
+
+<span class="sd">    Two blank lines between top-level ``def``s is PEP 8, so a global</span>
+<span class="sd">    ``re.sub(r"\\n{3,}", "\\n\\n", ...)`` would silently rewrite the source code</span>
+<span class="sd">    on every technical page scraped. Fenced regions pass through untouched.</span>
+
+<span class="sd">    &gt;&gt;&gt; _collapse_blank_runs("a\\n\\n\\n\\nb\\n")</span>
+<span class="sd">    'a\\n\\nb\\n'</span>
+<span class="sd">    &gt;&gt;&gt; _collapse_blank_runs("```\\na\\n\\n\\n\\nb\\n```\\n")</span>
+<span class="sd">    '```\\na\\n\\n\\n\\nb\\n```\\n'</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">text</span> <span class="k">if</span> <span class="n">is_code</span> <span class="k">else</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\n{3,}"</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">is_code</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">_outside_code_fences</span><span class="p">(</span><span class="n">markdown</span><span class="p">)</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_markdownify_options</span><span class="p">(</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Merge *overrides* over :data:`HTML_TO_MARKDOWN_DEFAULTS`, validating names.</span>
+
+<span class="sd">    ``MarkdownConverter`` silently ignores options it does not know, so a typo --</span>
+<span class="sd">    or an option name carried over from ``html2text``, which this module used</span>
+<span class="sd">    before -- would be a quiet no-op rather than an error. Raise instead.</span>
+<span class="sd">    """</span>
+    <span class="n">known</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">MarkdownConverter</span><span class="o">.</span><span class="n">DefaultOptions</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)}</span>
+    <span class="n">unknown</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">overrides</span><span class="p">)</span> <span class="o">-</span> <span class="n">known</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">unknown</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Unknown markdownify option(s): </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span><span class="si">}</span><span class="s2">. "</span>
+            <span class="s2">"These are `markdownify.MarkdownConverter` options; the `html2text` "</span>
+            <span class="s2">"options this function used to accept (body_width, ignore_links, "</span>
+            <span class="s2">"unicode_snob, ...) no longer apply. "</span>
+            <span class="sa">f</span><span class="s2">"Valid options are: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">known</span><span class="p">))</span><span class="si">}</span><span class="s2">."</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">HTML_TO_MARKDOWN_DEFAULTS</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_convert_html</span><span class="p">(</span><span class="n">converter</span><span class="p">:</span> <span class="n">MarkdownConverter</span><span class="p">,</span> <span class="n">html</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Convert one HTML string to Markdown, dropping non-content tags first."""</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s2">"html.parser"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">NON_CONTENT_TAGS</span><span class="p">):</span>
+        <span class="n">tag</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">_collapse_blank_runs</span><span class="p">(</span><span class="n">converter</span><span class="o">.</span><span class="n">convert_soup</span><span class="p">(</span><span class="n">soup</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_could_be_a_path</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Whether *string* is worth handing to the filesystem at all.</span>
+
+<span class="sd">    Markup and newlines never appear in the paths this module deals with, and a</span>
+<span class="sd">    long-enough string makes ``Path.is_dir`` raise ``OSError: File name too</span>
+<span class="sd">    long`` rather than return ``False``.</span>
+
+<span class="sd">    &gt;&gt;&gt; _could_be_a_path("a/b.html"), _could_be_a_path("&lt;p&gt;hi&lt;/p&gt;")</span>
+<span class="sd">    (True, False)</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1000</span> <span class="ow">and</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">string</span> <span class="ow">and</span> <span class="s2">"&lt;"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">string</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_html_contents_of</span><span class="p">(</span><span class="n">html_or_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Yield the HTML content(s) *html_or_path* denotes.</span>
+
+<span class="sd">    One string can mean three things, and this is the single place that decides</span>
+<span class="sd">    which: an ``.html`` file path, a directory to walk recursively, or a literal</span>
+<span class="sd">    HTML string.</span>
+
+<span class="sd">    &gt;&gt;&gt; list(_html_contents_of("&lt;p&gt;hi&lt;/p&gt;"))</span>
+<span class="sd">    ['&lt;p&gt;hi&lt;/p&gt;']</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">_could_be_a_path</span><span class="p">(</span><span class="n">html_or_path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">html_or_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".html"</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">Path</span><span class="p">(</span><span class="n">html_or_path</span><span class="p">)</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="c1"># TODO: Handle directories better, in such a way that they can be</span>
+        <span class="c1">#   captured and produce their own markdown content, which will then</span>
+        <span class="c1">#   be combined with the rest of the markdown content.</span>
+        <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">html_or_path</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">filepath</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">is_file</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">html_or_path</span><span class="p">)</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">)):</span>
+                <span class="k">yield</span> <span class="n">filepath</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span>
+            <span class="k">return</span>
+    <span class="k">yield</span> <span class="n">html_or_path</span>
+
+
 <span class="c1"># TODO: Replace this by a version that uses dol.store_aggregate</span>
 <div class="viewcode-block" id="html_to_markdown">
 <a class="viewcode-back" href="../../module_docs/scraped/util.html#scraped.util.html_to_markdown">[docs]</a>
@@ -354,14 +486,16 @@
     <span class="n">content_filt</span><span class="o">=</span><span class="n">is_html_content</span><span class="p">,</span>
     <span class="n">markdown_contents_aggregator</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">,</span>
     <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">html2text_options</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">markdownify_options</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Convert one or several HTML files into a single Markdown file or return the</span>
 <span class="sd">    Markdown string(s).</span>
 
-<span class="sd">    :param htmls: A single file path, an iterable of file paths, or a mapping of</span>
-<span class="sd">        names to file paths.</span>
+<span class="sd">    :param htmls: A string, an iterable of strings, or a mapping of names to</span>
+<span class="sd">        HTML contents. Each string is dispatched by :func:`_html_contents_of`:</span>
+<span class="sd">        a path ending in ``.html`` is read, an existing directory is walked</span>
+<span class="sd">        recursively, and anything else is taken as literal HTML.</span>
 <span class="sd">    :param save_filepath: The file path where the combined Markdown will be saved,</span>
 <span class="sd">        or the folder path where it should be saved (a name will be generated based</span>
 <span class="sd">        on the url).</span>
@@ -370,8 +504,11 @@
 <span class="sd">    :param markdown_contents_aggregator: A function to aggregate the Markdown strings.</span>
 <span class="sd">    :param prefixes: A list of prefixes to be woven with to each Markdown string</span>
 <span class="sd">        (there must be the same number of prefixes as HTML files).</span>
-<span class="sd">    :param html2text_options: Options to pass to the html2text.HTML2Text()</span>
-<span class="sd">        converter.</span>
+<span class="sd">    :param markdownify_options: Options overriding</span>
+<span class="sd">        :data:`HTML_TO_MARKDOWN_DEFAULTS`, passed to ``markdownify``'s</span>
+<span class="sd">        ``MarkdownConverter``. Unknown option names raise ``TypeError`` -- in</span>
+<span class="sd">        particular the ``html2text`` options this function accepted before</span>
+<span class="sd">        (``body_width``, ``ignore_links``, ...) are no longer valid.</span>
 <span class="sd">    :return: Combined Markdown string if save_filepath is None, otherwise returns the</span>
 <span class="sd">        path where the Markdown file was saved.</span>
 
@@ -381,37 +518,21 @@
 <span class="sd">        and `markdown_contents_aggregator=list`.</span>
 <span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">read_html_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span>
-
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">htmls</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
         <span class="n">html_contents</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="n">content_filt</span><span class="p">,</span> <span class="n">htmls</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">htmls</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">html_contents</span> <span class="o">=</span> <span class="n">_html_contents_of</span><span class="p">(</span><span class="n">htmls</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">htmls</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
+        <span class="c1"># Each item gets the same path/directory/raw-HTML dispatch a lone string</span>
+        <span class="c1"># gets, so a list of N items behaves like N single-item calls.</span>
+        <span class="n">html_contents</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_html_contents_of</span><span class="p">,</span> <span class="n">htmls</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">htmls</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">htmls</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".html"</span><span class="p">):</span>
-                <span class="n">html_contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">read_html_file</span><span class="p">(</span><span class="n">htmls</span><span class="p">)]</span>
-            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">htmls</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1000</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">htmls</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-                <span class="c1"># TODO: Handle this better, and in such a way that directories can be</span>
-                <span class="c1">#   captured and produce their own markdown content, which will then</span>
-                <span class="c1">#   be combined with the rest of the markdown content.</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"htmls must be a string, an iterable of strings, or a mapping, "</span>
+            <span class="sa">f</span><span class="s2">"not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">htmls</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
 
-                <span class="c1"># For now though:</span>
-                <span class="c1"># Recursively find all HTML files in the directory</span>
-                <span class="n">html_contents</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span>
-                    <span class="n">read_html_file</span><span class="p">,</span> <span class="nb">filter</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">is_file</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">htmls</span><span class="p">)</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">))</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">html_contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">htmls</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">htmls</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">"htmls must be an iterable of file paths or a mapping, not </span><span class="si">{</span><span class="n">htmls</span><span class="si">}</span><span class="s2">"</span>
-            <span class="p">)</span>
-        <span class="c1"># html_contents = map(read_html_file, htmls)</span>
-
-    <span class="c1"># Initialize the html2text converter with options</span>
-    <span class="n">converter</span> <span class="o">=</span> <span class="n">html2text</span><span class="o">.</span><span class="n">HTML2Text</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">html2text_options</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="n">converter</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="n">converter</span> <span class="o">=</span> <span class="n">MarkdownConverter</span><span class="p">(</span><span class="o">**</span><span class="n">_resolve_markdownify_options</span><span class="p">(</span><span class="n">markdownify_options</span><span class="p">))</span>
 
     <span class="c1"># Convert HTML contents to Markdown</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_markdown_contents</span><span class="p">(</span><span class="n">html_contents</span><span class="p">):</span>
@@ -419,7 +540,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">html_content</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
                     <span class="n">html_content</span> <span class="o">=</span> <span class="n">html_content</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
-                <span class="k">yield</span> <span class="n">converter</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">_convert_html</span><span class="p">(</span><span class="n">converter</span><span class="p">,</span> <span class="n">html_content</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to decode HTML content: </span><span class="si">{</span><span class="n">html_content</span><span class="p">[:</span><span class="mi">30</span><span class="p">]</span><span class="si">=}</span><span class="s2">"</span><span class="p">)</span>
                 <span class="c1"># TODO: Give more control to the user to decide what to do in this case</span>

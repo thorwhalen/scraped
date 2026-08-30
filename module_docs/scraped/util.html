@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.util &mdash; scraped 0.0.13 documentation</title>
+  <title>scraped.util &mdash; scraped 0.0.14 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=9fc46840"></script>
+      <script src="../../_static/documentation_options.js?v=544df88d"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -61,8 +61,11 @@
 <li class="toctree-l1"><a class="reference internal" href="acquire/signals.html">scraped.acquire.signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acquire/url.html">scraped.acquire.url</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests/test_html_to_markdown.html">scraped.tests.test_html_to_markdown</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">scraped.tools</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">scraped.util</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.util.HTML_TO_MARKDOWN_DEFAULTS"><code class="docutils literal notranslate"><span class="pre">HTML_TO_MARKDOWN_DEFAULTS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scraped.util.NON_CONTENT_TAGS"><code class="docutils literal notranslate"><span class="pre">NON_CONTENT_TAGS</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#scraped.util.RecursiveDownloader"><code class="docutils literal notranslate"><span class="pre">RecursiveDownloader</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#scraped.util.RecursiveDownloader.parse"><code class="docutils literal notranslate"><span class="pre">RecursiveDownloader.parse()</span></code></a></li>
 </ul>
@@ -106,6 +109,21 @@
   <section id="module-scraped.util">
 <span id="scraped-util"></span><h1>scraped.util<a class="headerlink" href="#module-scraped.util" title="Link to this heading"></a></h1>
 <p>Utils for scraped.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="scraped.util.HTML_TO_MARKDOWN_DEFAULTS">
+<span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">HTML_TO_MARKDOWN_DEFAULTS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'bullets':</span> <span class="pre">'*',</span> <span class="pre">'escape_asterisks':</span> <span class="pre">False,</span> <span class="pre">'escape_underscores':</span> <span class="pre">False,</span> <span class="pre">'heading_style':</span> <span class="pre">'ATX'}</span></span><a class="headerlink" href="#scraped.util.HTML_TO_MARKDOWN_DEFAULTS" title="Link to this definition"></a></dt>
+<dd><p>Defaults for the HTML-&gt;Markdown conversion. Override any of them by passing
+the same keyword to <a class="reference internal" href="#scraped.util.html_to_markdown" title="scraped.util.html_to_markdown"><code class="xref py py-func docutils literal notranslate"><span class="pre">html_to_markdown()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scraped.util.NON_CONTENT_TAGS">
+<span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">NON_CONTENT_TAGS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('head',</span> <span class="pre">'script',</span> <span class="pre">'style',</span> <span class="pre">'noscript')</span></span><a class="headerlink" href="#scraped.util.NON_CONTENT_TAGS" title="Link to this definition"></a></dt>
+<dd><p>Tags whose <em>content</em> is never part of the document text. <code class="docutils literal notranslate"><span class="pre">markdownify</span></code>
+already drops <code class="docutils literal notranslate"><span class="pre">script</span></code>/<code class="docutils literal notranslate"><span class="pre">style</span></code>, but not <code class="docutils literal notranslate"><span class="pre">&lt;title&gt;</span></code>, so the whole head is
+removed before conversion (<code class="docutils literal notranslate"><span class="pre">html2text</span></code>, which this replaced, ignored it too).</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="scraped.util.RecursiveDownloader">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">RecursiveDownloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/util.html#RecursiveDownloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.RecursiveDownloader" title="Link to this definition"></a></dt>
@@ -212,14 +230,16 @@ content-type.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="scraped.util.html_to_markdown">
-<span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">html_to_markdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">htmls:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">~collections.abc.Iterable[str]</span> <span class="pre">|</span> <span class="pre">~collections.abc.Mapping[str,</span> <span class="pre">str],</span> <span class="pre">save_filepath:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">*,</span> <span class="pre">content_filt=&lt;function</span> <span class="pre">is_html_content&gt;,</span> <span class="pre">markdown_contents_aggregator:</span> <span class="pre">~collections.abc.Callable</span> <span class="pre">=</span> <span class="pre">&lt;built-in</span> <span class="pre">method</span> <span class="pre">join</span> <span class="pre">of</span> <span class="pre">str</span> <span class="pre">object&gt;,</span> <span class="pre">prefixes=None,</span> <span class="pre">**html2text_options</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/util.html#html_to_markdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.html_to_markdown" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">scraped.util.</span></span><span class="sig-name descname"><span class="pre">html_to_markdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">htmls:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">~collections.abc.Iterable[str]</span> <span class="pre">|</span> <span class="pre">~collections.abc.Mapping[str,</span> <span class="pre">str],</span> <span class="pre">save_filepath:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">*,</span> <span class="pre">content_filt=&lt;function</span> <span class="pre">is_html_content&gt;,</span> <span class="pre">markdown_contents_aggregator:</span> <span class="pre">~collections.abc.Callable</span> <span class="pre">=</span> <span class="pre">&lt;built-in</span> <span class="pre">method</span> <span class="pre">join</span> <span class="pre">of</span> <span class="pre">str</span> <span class="pre">object&gt;,</span> <span class="pre">prefixes=None,</span> <span class="pre">**markdownify_options</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/scraped/util.html#html_to_markdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scraped.util.html_to_markdown" title="Link to this definition"></a></dt>
 <dd><p>Convert one or several HTML files into a single Markdown file or return the
 Markdown string(s).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>htmls</strong> – A single file path, an iterable of file paths, or a mapping of
-names to file paths.</p></li>
+<li><p><strong>htmls</strong> – A string, an iterable of strings, or a mapping of names to
+HTML contents. Each string is dispatched by <code class="xref py py-func docutils literal notranslate"><span class="pre">_html_contents_of()</span></code>:
+a path ending in <code class="docutils literal notranslate"><span class="pre">.html</span></code> is read, an existing directory is walked
+recursively, and anything else is taken as literal HTML.</p></li>
 <li><p><strong>save_filepath</strong> – The file path where the combined Markdown will be saved,
 or the folder path where it should be saved (a name will be generated based
 on the url).
@@ -228,8 +248,11 @@ If None, returns the Markdown string.</p></li>
 <li><p><strong>markdown_contents_aggregator</strong> – A function to aggregate the Markdown strings.</p></li>
 <li><p><strong>prefixes</strong> – A list of prefixes to be woven with to each Markdown string
 (there must be the same number of prefixes as HTML files).</p></li>
-<li><p><strong>html2text_options</strong> – Options to pass to the html2text.HTML2Text()
-converter.</p></li>
+<li><p><strong>markdownify_options</strong> – Options overriding
+<a class="reference internal" href="#scraped.util.HTML_TO_MARKDOWN_DEFAULTS" title="scraped.util.HTML_TO_MARKDOWN_DEFAULTS"><code class="xref py py-data docutils literal notranslate"><span class="pre">HTML_TO_MARKDOWN_DEFAULTS</span></code></a>, passed to <code class="docutils literal notranslate"><span class="pre">markdownify</span></code>’s
+<code class="docutils literal notranslate"><span class="pre">MarkdownConverter</span></code>. Unknown option names raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> – in
+particular the <code class="docutils literal notranslate"><span class="pre">html2text</span></code> options this function accepted before
+(<code class="docutils literal notranslate"><span class="pre">body_width</span></code>, <code class="docutils literal notranslate"><span class="pre">ignore_links</span></code>, …) are no longer valid.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
