@@ -1,0 +1,104 @@
+{
+  "cases": [
+    {
+      "argv": [],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "usage: scraped [-h] {markdown-of-site,download-site,scrape-multiple-sites} ...\n",
+      "tier": 1,
+      "usage": "usage: scraped [-h] {markdown-of-site,download-site,scrape-multiple-sites} ..."
+    },
+    {
+      "argv": [
+        "--help"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "usage: scraped [-h] {markdown-of-site,download-site,scrape-multiple-sites} ...\n\npositional arguments:\n  {markdown-of-site,download-site,scrape-multiple-sites}\n    markdown-of-site    Download a site and convert it to markdown. This can be quite useful when\n                        you want to perform some NLP analysis on a site, feed some information to\n                        an AI model, or simply want to read the site offline. Markdown offers a\n                        happy medium between readability and simplicity, and is supported by many\n                        tools and platforms. Args: - url: The URL of the site to download. -\n                        depth: The maximum depth to follow links. - filter_urls: A function to\n                        filter URLs to download. - save_filepath: The file path where the combined\n                        Markdown will be saved. - deduplicate_lines_min_block_size: The minimum\n                        block size to deduplicate lines. - verbosity: The verbosity level. -\n                        dir_to_save_page_slurps: The directory to save the downloaded pages. -\n                        extra_kwargs: Extra keyword arguments to pass to the Scrapy spider.\n                        Returns: - The Markdown string of the site (if save_filepath is None),\n                        otherwise the save_filepath. Note: deduplicate_lines_min_block_size\n                        requires the hg package to be installed. We advise you to install it using\n                        `pip install hg`, and use `hg.deduplicate_string_lines` directly on the\n                        output markdown string if you don't know what the minimum block size\n                        should be. This will avoid having to redowload the site if you want to\n                        change the minimum block size. >>> markdown_of_site( ...\n                        \"https://i2mint.github.io/dol/\", ... depth=2, ...\n                        save_filepath='~/dol_documentation.md' ... ) # doctest: +SKIP\n                        '~/dol_documentation.md' If you don't specify a `save_filepath`, the\n                        function will return the Markdown string, which you can then analyze\n                        directly, and/or store as you wish. >>> markdown_string =\n                        markdown_of_site(\"https://i2mint.github.io/dol/\") # doctest: +SKIP >>>\n                        print(f\"{type(markdown_string).__name__} of length\n                        {len(markdown_string)}\") # doctest: +SKIP str of length 626439\n    download-site       Recursively downloads contents from the given URL to a local folder.\n                        :param start_url: The URL to start downloading from. :param\n                        url_to_filepath: The function to convert URLs to local filepaths. :param\n                        depth: The maximum depth to follow links. :param filter_urls: A function\n                        to filter URLs to download. :param mk_missing_dirs: Whether to create\n                        missing directories. :param verbosity: The verbosity level. :param\n                        rootdir: The root directory to save the downloaded files. :param\n                        extra_kwargs: Extra keyword arguments to pass to the Scrapy spider.\n    scrape-multiple-sites\n                        Scrape multiple URLs and save the results to a directory. Args: -\n                        name_and_url: a dictionary mapping names to URLs - save_dir: the directory\n                        to save the results to - url_scrape_function: the function to use to\n                        scrape the URLs\n\noptions:\n  -h, --help            show this help message and exit\n",
+      "tier": 3,
+      "usage": "usage: scraped [-h] {markdown-of-site,download-site,scrape-multiple-sites} ..."
+    },
+    {
+      "argv": [
+        "-h"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "usage: scraped [-h] {markdown-of-site,download-site,scrape-multiple-sites} ...\n\npositional arguments:\n  {markdown-of-site,download-site,scrape-multiple-sites}\n    markdown-of-site    Download a site and convert it to markdown. This can be quite useful when\n                        you want to perform some NLP analysis on a site, feed some information to\n                        an AI model, or simply want to read the site offline. Markdown offers a\n                        happy medium between readability and simplicity, and is supported by many\n                        tools and platforms. Args: - url: The URL of the site to download. -\n                        depth: The maximum depth to follow links. - filter_urls: A function to\n                        filter URLs to download. - save_filepath: The file path where the combined\n                        Markdown will be saved. - deduplicate_lines_min_block_size: The minimum\n                        block size to deduplicate lines. - verbosity: The verbosity level. -\n                        dir_to_save_page_slurps: The directory to save the downloaded pages. -\n                        extra_kwargs: Extra keyword arguments to pass to the Scrapy spider.\n                        Returns: - The Markdown string of the site (if save_filepath is None),\n                        otherwise the save_filepath. Note: deduplicate_lines_min_block_size\n                        requires the hg package to be installed. We advise you to install it using\n                        `pip install hg`, and use `hg.deduplicate_string_lines` directly on the\n                        output markdown string if you don't know what the minimum block size\n                        should be. This will avoid having to redowload the site if you want to\n                        change the minimum block size. >>> markdown_of_site( ...\n                        \"https://i2mint.github.io/dol/\", ... depth=2, ...\n                        save_filepath='~/dol_documentation.md' ... ) # doctest: +SKIP\n                        '~/dol_documentation.md' If you don't specify a `save_filepath`, the\n                        function will return the Markdown string, which you can then analyze\n                        directly, and/or store as you wish. >>> markdown_string =\n                        markdown_of_site(\"https://i2mint.github.io/dol/\") # doctest: +SKIP >>>\n                        print(f\"{type(markdown_string).__name__} of length\n                        {len(markdown_string)}\") # doctest: +SKIP str of length 626439\n    download-site       Recursively downloads contents from the given URL to a local folder.\n                        :param start_url: The URL to start downloading from. :param\n                        url_to_filepath: The function to convert URLs to local filepaths. :param\n                        depth: The maximum depth to follow links. :param filter_urls: A function\n                        to filter URLs to download. :param mk_missing_dirs: Whether to create\n                        missing directories. :param verbosity: The verbosity level. :param\n                        rootdir: The root directory to save the downloaded files. :param\n                        extra_kwargs: Extra keyword arguments to pass to the Scrapy spider.\n    scrape-multiple-sites\n                        Scrape multiple URLs and save the results to a directory. Args: -\n                        name_and_url: a dictionary mapping names to URLs - save_dir: the directory\n                        to save the results to - url_scrape_function: the function to use to\n                        scrape the URLs\n\noptions:\n  -h, --help            show this help message and exit\n",
+      "tier": 3,
+      "usage": "usage: scraped [-h] {markdown-of-site,download-site,scrape-multiple-sites} ..."
+    },
+    {
+      "argv": [
+        "markdown-of-site",
+        "--help"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "usage: scraped markdown-of-site [-h] [--depth DEPTH] [-f FILTER_URLS] [-s SAVE_FILEPATH]\n                                [--deduplicate-lines-min-block-size DEDUPLICATE_LINES_MIN_BLOCK_SIZE]\n                                [-v VERBOSITY] [--dir-to-save-page-slurps DIR_TO_SAVE_PAGE_SLURPS]\n                                url\n\nDownload a site and convert it to markdown.\n\nThis can be quite useful when you want to perform some NLP analysis on a site,\nfeed some information to an AI model, or simply want to read the site offline.\nMarkdown offers a happy medium between readability and simplicity, and is\nsupported by many tools and platforms.\n\nArgs:\n- url: The URL of the site to download.\n- depth: The maximum depth to follow links.\n- filter_urls: A function to filter URLs to download.\n- save_filepath: The file path where the combined Markdown will be saved.\n- deduplicate_lines_min_block_size: The minimum block size to deduplicate lines.\n- verbosity: The verbosity level.\n- dir_to_save_page_slurps: The directory to save the downloaded pages.\n- extra_kwargs: Extra keyword arguments to pass to the Scrapy spider.\n\nReturns:\n- The Markdown string of the site (if save_filepath is None), otherwise the save_filepath.\n\nNote: deduplicate_lines_min_block_size requires the hg package to be installed.\n    We advise you to install it using `pip install hg`, and use\n    `hg.deduplicate_string_lines` directly on the output markdown string if you\n    don't know what the minimum block size should be. This will avoid having to\n    redowload the site if you want to change the minimum block size.\n\n>>> markdown_of_site(\n...     \"https://i2mint.github.io/dol/\",\n...     depth=2,\n...     save_filepath='~/dol_documentation.md'\n... )  # doctest: +SKIP\n'~/dol_documentation.md'\n\nIf you don't specify a `save_filepath`, the function will return the Markdown\nstring, which you can then analyze directly, and/or store as you wish.\n\n>>> markdown_string = markdown_of_site(\"https://i2mint.github.io/dol/\")  # doctest: +SKIP\n>>> print(f\"{type(markdown_string).__name__} of length {len(markdown_string)}\")  # doctest: +SKIP\nstr of length 626439\n\npositional arguments:\n  url                   -\n\noptions:\n  -h, --help            show this help message and exit\n  --depth DEPTH         1\n  -f FILTER_URLS, --filter-urls FILTER_URLS\n                        -\n  -s SAVE_FILEPATH, --save-filepath SAVE_FILEPATH\n                        -\n  --deduplicate-lines-min-block-size DEDUPLICATE_LINES_MIN_BLOCK_SIZE\n                        -\n  -v VERBOSITY, --verbosity VERBOSITY\n                        0\n  --dir-to-save-page-slurps DIR_TO_SAVE_PAGE_SLURPS\n                        -\n",
+      "tier": 3,
+      "usage": "usage: scraped markdown-of-site [-h] [--depth DEPTH] [-f FILTER_URLS] [-s SAVE_FILEPATH] [--deduplicate-lines-min-block-size DEDUPLICATE_LINES_MIN_BLOCK_SIZE] [-v VERBOSITY] [--dir-to-save-page-slurps DIR_TO_SAVE_PAGE_SLURPS] url"
+    },
+    {
+      "argv": [
+        "scrape-multiple-sites",
+        "--help"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "usage: scraped scrape-multiple-sites [-h] [-s SAVE_DIR] [-u URL_SCRAPE_FUNCTION] name-and-url\n\nScrape multiple URLs and save the results to a directory.\n\nArgs:\n- name_and_url: a dictionary mapping names to URLs\n- save_dir: the directory to save the results to\n- url_scrape_function: the function to use to scrape the URLs\n\npositional arguments:\n  name-and-url          -\n\noptions:\n  -h, --help            show this help message and exit\n  -s SAVE_DIR, --save-dir SAVE_DIR\n                        '.'\n  -u URL_SCRAPE_FUNCTION, --url-scrape-function URL_SCRAPE_FUNCTION\n                        functools.partial(<function markdown_of_site at 0xADDR>, depth=3)\n",
+      "tier": 3,
+      "usage": "usage: scraped scrape-multiple-sites [-h] [-s SAVE_DIR] [-u URL_SCRAPE_FUNCTION] name-and-url"
+    },
+    {
+      "argv": [
+        "no-such-command"
+      ],
+      "returncode": 2,
+      "stderr": "usage: scraped [-h] {markdown-of-site,download-site,scrape-multiple-sites} ...\nscraped: error: argument {markdown-of-site,download-site,scrape-multiple-sites}: invalid choice: 'no-such-command' (choose from markdown-of-site, download-site, scrape-multiple-sites)\n",
+      "stdout": "",
+      "tier": 1,
+      "usage": "usage: scraped [-h] {markdown-of-site,download-site,scrape-multiple-sites} ... scraped: error: argument {markdown-of-site,download-site,scrape-multiple-sites}: invalid choice: 'no-such-command' (choose from markdown-of-site, download-site, scrape-multiple-sites)"
+    },
+    {
+      "argv": [
+        "markdown-of-site",
+        "--no-such-flag"
+      ],
+      "returncode": 2,
+      "stderr": "usage: scraped markdown-of-site [-h] [--depth DEPTH] [-f FILTER_URLS] [-s SAVE_FILEPATH]\n                                [--deduplicate-lines-min-block-size DEDUPLICATE_LINES_MIN_BLOCK_SIZE]\n                                [-v VERBOSITY] [--dir-to-save-page-slurps DIR_TO_SAVE_PAGE_SLURPS]\n                                url\nscraped markdown-of-site: error: the following arguments are required: url\n",
+      "stdout": "",
+      "tier": 1,
+      "usage": "usage: scraped markdown-of-site [-h] [--depth DEPTH] [-f FILTER_URLS] [-s SAVE_FILEPATH] [--deduplicate-lines-min-block-size DEDUPLICATE_LINES_MIN_BLOCK_SIZE] [-v VERBOSITY] [--dir-to-save-page-slurps DIR_TO_SAVE_PAGE_SLURPS] url scraped markdown-of-site: error: the following arguments are required: url"
+    },
+    {
+      "argv": [
+        "markdown-of-site"
+      ],
+      "returncode": 2,
+      "stderr": "usage: scraped markdown-of-site [-h] [--depth DEPTH] [-f FILTER_URLS] [-s SAVE_FILEPATH]\n                                [--deduplicate-lines-min-block-size DEDUPLICATE_LINES_MIN_BLOCK_SIZE]\n                                [-v VERBOSITY] [--dir-to-save-page-slurps DIR_TO_SAVE_PAGE_SLURPS]\n                                url\nscraped markdown-of-site: error: the following arguments are required: url\n",
+      "stdout": "",
+      "tier": 1,
+      "usage": "usage: scraped markdown-of-site [-h] [--depth DEPTH] [-f FILTER_URLS] [-s SAVE_FILEPATH] [--deduplicate-lines-min-block-size DEDUPLICATE_LINES_MIN_BLOCK_SIZE] [-v VERBOSITY] [--dir-to-save-page-slurps DIR_TO_SAVE_PAGE_SLURPS] url scraped markdown-of-site: error: the following arguments are required: url"
+    }
+  ],
+  "cw_golden": 1,
+  "env": {
+    "COLUMNS": "100",
+    "NO_COLOR": "1",
+    "PYTHONHASHSEED": "0",
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1",
+    "TERM": "dumb"
+  },
+  "newlines": "lf",
+  "note": "Recorded from the argh implementation (scraped/tools.py at main, before the cw migration) with cw.testing.characterize. 'download-site --help' is deliberately absent: it renders DFLT_ROOTDIR, an absolute path under the recording user's home, into the help body. Its grammar is pinned by its usage line in test_cli_surface.py instead.",
+  "prog": [
+    "scraped"
+  ],
+  "recorded_with": {
+    "implementation": "CPython",
+    "platform": "Darwin",
+    "python": "3.12.12"
+  }
+}

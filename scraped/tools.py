@@ -210,20 +210,27 @@ def scrape_multiple_sites(
     return dict(gen())
 
 
+# The commands the CLI dispatches. Named so a test can assert on the list
+# itself rather than re-deriving it from the parser.
+COMMANDS = [
+    markdown_of_site,
+    download_site,
+    scrape_multiple_sites,
+]
+
+
 def main():
     """
     Run the command-line interface of scraped.
-    """
-    import argh
 
-    argh.dispatch_commands(
-        [
-            markdown_of_site,
-            download_site,
-            scrape_multiple_sites,
-        ]
-    )
+    Returns the exit code. ``cw.dispatch`` returns it rather than exiting, so
+    the console script (``sys.exit(main())``) and the ``__main__`` guard below
+    are what turn it into a process status.
+    """
+    import cw
+
+    return cw.dispatch(COMMANDS)
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
