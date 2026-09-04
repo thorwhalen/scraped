@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scraped.tools &mdash; scraped 0.0.14 documentation</title>
+  <title>scraped.tools &mdash; scraped 0.0.15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=544df88d"></script>
+      <script src="../../_static/documentation_options.js?v=f0357c94"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -59,6 +59,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/signals.html">scraped.acquire.signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/acquire/url.html">scraped.acquire.url</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/tests/test_acquire.html">scraped.tests.test_acquire</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/tests/test_cli_surface.html">scraped.tests.test_cli_surface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/tests/test_html_to_markdown.html">scraped.tests.test_html_to_markdown</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/tools.html">scraped.tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/scraped/util.html">scraped.util</a></li>
@@ -307,26 +308,33 @@
 
 
 
+<span class="c1"># The commands the CLI dispatches. Named so a test can assert on the list</span>
+<span class="c1"># itself rather than re-deriving it from the parser.</span>
+<span class="n">COMMANDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">markdown_of_site</span><span class="p">,</span>
+    <span class="n">download_site</span><span class="p">,</span>
+    <span class="n">scrape_multiple_sites</span><span class="p">,</span>
+<span class="p">]</span>
+
+
 <div class="viewcode-block" id="main">
 <a class="viewcode-back" href="../../module_docs/scraped/tools.html#scraped.tools.main">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Run the command-line interface of scraped.</span>
-<span class="sd">    """</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">argh</span>
 
-    <span class="n">argh</span><span class="o">.</span><span class="n">dispatch_commands</span><span class="p">(</span>
-        <span class="p">[</span>
-            <span class="n">markdown_of_site</span><span class="p">,</span>
-            <span class="n">download_site</span><span class="p">,</span>
-            <span class="n">scrape_multiple_sites</span><span class="p">,</span>
-        <span class="p">]</span>
-    <span class="p">)</span></div>
+<span class="sd">    Returns the exit code. ``cw.dispatch`` returns it rather than exiting, so</span>
+<span class="sd">    the console script (``sys.exit(main())``) and the ``__main__`` guard below</span>
+<span class="sd">    are what turn it into a process status.</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">cw</span>
+
+    <span class="k">return</span> <span class="n">cw</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">COMMANDS</span><span class="p">)</span></div>
 
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span>
+    <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </pre></div>
 
            </div>
