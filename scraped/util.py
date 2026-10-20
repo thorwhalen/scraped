@@ -248,6 +248,7 @@ from scraped.html_markdown import (  # noqa: F401 (re-exported)
     NON_CONTENT_TAGS,
     _collapse_blank_runs,
     _convert_html,
+    _make_converter,
     _resolve_markdownify_options,
     html_to_markdown_str,
 )
@@ -344,7 +345,7 @@ def html_to_markdown(
             f"not {type(htmls).__name__}"
         )
 
-    converter = MarkdownConverter(**_resolve_markdownify_options(markdownify_options))
+    converter = _make_converter(**_resolve_markdownify_options(markdownify_options))
 
     # Convert HTML contents to Markdown
     def _markdown_contents(html_contents):

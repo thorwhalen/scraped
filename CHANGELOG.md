@@ -4,6 +4,8 @@
 
 ### Changed
 
+- **`html_to_markdown_str` / `html_to_markdown` clean the HTML before converting** (moved from `contaix.web.html_to_clean_markdown`, #25): permalink anchors (Sphinx `headerlink`, MkDocs `toclink`, ...) are dropped, single-child wrapper chains unwrapped, source whitespace collapsed outside `<pre>`, text that would open a list/heading/quote/rule at a line start escaped, inline text after a list kept as its own paragraph, a link wrapping a heading moved inside it, a `<pre>` holding backtick runs gets a longer fence, and a page nested too deeply for the recursion limit is retried in a big-stack thread. Blank-run collapsing now recognises fences at any indentation (in list items) and the CommonMark closing rule. `clean=False` converts the soup as parsed. New keywords on `html_to_markdown_str`: `clean`, `ignore_images`, `include_links`, `parser` (`"html.parser"` by default, `"lxml"` parses omitted end tags like a browser).
+
 - **HTML→Markdown conversion now uses `markdownify` (MIT) instead of `html2text`
   (GPL-3.0-or-later).** `html2text` was imported at module scope in
   `scraped/util.py`, so `import scraped` required a copyleft distribution to be
