@@ -156,3 +156,25 @@ def test_unsupported_type_raises_type_error():
 
     with pytest.raises(TypeError, match="not int"):
         html_to_markdown(123)
+
+
+def test_html_to_markdown_str_agrees_with_html_to_markdown():
+    from scraped import html_to_markdown, html_to_markdown_str
+
+    html = "<html><head><title>t</title></head><body><h1>A</h1><p>x_y *z*</p></body></html>"
+    assert html_to_markdown_str(html) == html_to_markdown(html)
+    assert html_to_markdown_str(html.encode(), bullets="-") == html_to_markdown(html, bullets="-")
+
+
+def test_the_light_converter_does_not_import_the_crawler_stack():
+    """contaix delegates here only because this import stays cheap (scraped#15)."""
+    import subprocess
+    import sys
+
+    code = (
+        "import sys; from scraped import html_to_markdown_str; "
+        "html_to_markdown_str('<p>a</p>'); "
+        "print(sorted(m for m in ('scrapy', 'hubcap', 'graze') if m in sys.modules))"
+    )
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True)
+    assert out.stdout.strip() == "[]"
