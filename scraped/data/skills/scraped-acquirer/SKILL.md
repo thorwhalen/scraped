@@ -54,7 +54,14 @@ payload.** Artifacts go to the capture store on disk; file paths come back.
 ## Run every step under the budget
 
 ```python
-from scraped.acquire import AcquisitionBudget, AcquisitionReport, Claim, SelfCritique, StopRules, probe
+from scraped.acquire import (
+    AcquisitionBudget,
+    AcquisitionReport,
+    Claim,
+    SelfCritique,
+    StopRules,
+    probe,
+)
 
 budget = AcquisitionBudget(StopRules(max_steps=12, max_failures=3, max_seconds=300))
 with budget.attempt("probe"):
@@ -80,12 +87,18 @@ capture lands on disk and re-runs are free.
 ```python
 report = AcquisitionReport.from_budget(
     budget,
-    claims=[Claim("listings are in __NEXT_DATA__ props.pageProps.items", "YES", [path])],
+    claims=[
+        Claim("listings are in __NEXT_DATA__ props.pageProps.items", "YES", [path])
+    ],
     artifacts=[path, har_path],
-    critique=SelfCritique(gaps=[...], skipped_steps=[...], assumptions=[...],
-                          staleness_risk="prices change daily"),
+    critique=SelfCritique(
+        gaps=[...],
+        skipped_steps=[...],
+        assumptions=[...],
+        staleness_risk="prices change daily",
+    ),
 )
-print(report.check().to_markdown())   # check() enforces stopped_reason + word budget
+print(report.check().to_markdown())  # check() enforces stopped_reason + word budget
 ```
 
 - `Validated?`: `YES` only if you checked the claim against captured bytes;

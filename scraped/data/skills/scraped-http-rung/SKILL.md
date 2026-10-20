@@ -15,10 +15,16 @@ metadata:
 # HTTP rung
 
 ```python
-from scraped.acquire import Request, cached, capture_store, default_fetcher, scan_state_blobs
+from scraped.acquire import (
+    Request,
+    cached,
+    capture_store,
+    default_fetcher,
+    scan_state_blobs,
+)
 
 fetcher = cached(default_fetcher(), capture_store("~/.cache/my-job"))
-capture = fetcher(Request(url))      # a second run costs no network at all
+capture = fetcher(Request(url))  # a second run costs no network at all
 blobs = scan_state_blobs(capture.text())
 ```
 

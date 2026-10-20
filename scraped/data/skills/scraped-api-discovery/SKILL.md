@@ -23,10 +23,10 @@ the page — a title, a price, a name.
 from scraped.acquire import client_code, discover_api, pagination_shape, replay_request
 
 candidates = discover_api(har_path, ["Blue Bicycle", "349"])
-best = candidates[0]                     # most targets found, structured first
-request = replay_request(best)           # credential-looking headers dropped
-print(client_code(best))                 # a snippet that re-sends it via fetch
-print(pagination_shape(best.capture))     # cursor / page / offset, if detectable
+best = candidates[0]  # most targets found, structured first
+request = replay_request(best)  # credential-looking headers dropped
+print(client_code(best))  # a snippet that re-sends it via fetch
+print(pagination_shape(best.capture))  # cursor / page / offset, if detectable
 ```
 
 `har_captures(har_path)` yields every recorded exchange as a `Capture` if you need

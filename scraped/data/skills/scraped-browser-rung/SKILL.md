@@ -22,8 +22,8 @@ from scraped.acquire import BrowserFetcher, BrowserSession, Request, scan_state_
 
 with BrowserSession(artifact_dir="~/runs/job") as session:
     capture = BrowserFetcher(session=session)(Request(url))
-    session.save_storage_state()          # then work at HTTP speed
-    artifacts = session.artifacts()       # har_path and friends, on disk
+    session.save_storage_state()  # then work at HTTP speed
+    artifacts = session.artifacts()  # har_path and friends, on disk
 blobs = scan_state_blobs(capture.text())  # the blob beats the DOM
 ```
 
