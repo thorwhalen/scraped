@@ -18,11 +18,15 @@ _LAZY_NAMES = {
     "acquire_content": "scraped.tools",
 }
 
+#: Submodules that ``import scraped`` used to bind as a side effect.
+_SUBMODULES = ("util", "tools", "acquire", "html_markdown")
+
 #: Optional extras from other packages: ``name -> (module, attribute)``.
 _OPTIONAL_NAMES = {
     "github_repo_text_aggregate": ("hubcap", "repo_text_aggregate"),
 }
 
+#: Optional names are left out: a star-import must not fail without ``hubcap``.
 __all__ = ["html_to_markdown_str", *_LAZY_NAMES]
 
 
@@ -33,10 +37,12 @@ def __getattr__(name):
         module, attr = _OPTIONAL_NAMES[name]
         try:
             value = getattr(_import_module(module), attr)
-        except ImportError as error:
+        except (ImportError, OSError) as error:  # hubcap may raise OSError without a token
             raise AttributeError(
                 f"scraped.{name} needs the optional package {module!r}"
             ) from error
+    elif name in _SUBMODULES:
+        value = _import_module(f"scraped.{name}")
     else:
         raise AttributeError(f"module 'scraped' has no attribute {name!r}")
     globals()[name] = value
@@ -44,4 +50,4 @@ def __getattr__(name):
 
 
 def __dir__():
-    return sorted({*globals(), *_LAZY_NAMES, *_OPTIONAL_NAMES})
+    return sorted({*globals(), *_LAZY_NAMES, *_OPTIONAL_NAMES, *_SUBMODULES})

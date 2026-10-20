@@ -240,7 +240,10 @@ def is_html_content(content: str | bytes) -> bool:
     return False
 
 
+from bs4 import BeautifulSoup  # noqa: F401 (kept importable from here)
 from scraped.html_markdown import (  # noqa: F401 (re-exported)
+    _CODE_FENCE_RE,
+    _outside_code_fences,
     HTML_TO_MARKDOWN_DEFAULTS,
     NON_CONTENT_TAGS,
     _collapse_blank_runs,

@@ -119,6 +119,10 @@ def html_to_markdown_str(html: str | bytes, **markdownify_options) -> str:
     and ``noscript`` blocks are dropped, and runs of blank lines are collapsed
     outside fenced code.
 
+    Unlike :func:`scraped.html_to_markdown`, the input is always taken as HTML
+    text: a file path or directory is not read, and bytes that are not UTF-8
+    raise ``UnicodeDecodeError`` rather than being skipped.
+
     :param html: The HTML, as ``str`` or UTF-8 ``bytes``.
     :param markdownify_options: ``markdownify.MarkdownConverter`` options
         overriding the defaults. Unknown names raise ``TypeError``.
@@ -130,5 +134,7 @@ def html_to_markdown_str(html: str | bytes, **markdownify_options) -> str:
     """
     if isinstance(html, bytes):
         html = html.decode()
+    if not isinstance(html, str):
+        raise TypeError(f"html must be str or bytes, not {type(html).__name__}")
     converter = MarkdownConverter(**_resolve_markdownify_options(markdownify_options))
     return _convert_html(converter, html)
