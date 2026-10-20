@@ -46,6 +46,7 @@ dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "ruff>=0.1.0",
+    "pyyaml",  # test_skills reads SKILL.md frontmatter
 ]
 docs = [
     "sphinx>=6.0",
