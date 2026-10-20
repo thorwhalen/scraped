@@ -69,6 +69,8 @@ def test_the_default_files_live_outside_the_package(tmp_path, monkeypatch):
     monkeypatch.delenv("SCRAPED_SITE_PATTERNS_DIR")
     monkeypatch.setenv("HOME", str(tmp_path / "home"))
     monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "xdg"))
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path / "localappdata"))  # Windows
+    monkeypatch.setenv("APPDATA", str(tmp_path / "appdata"))
     import scraped
 
     public, _ = default_paths()
