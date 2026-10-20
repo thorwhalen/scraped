@@ -2,24 +2,36 @@
 
 Each acquisition job rediscovers the same facts about a site: which generator
 built it, which transport and payload rung worked, how it paginates and where
-paging is capped. This module keeps them in two Markdown files, one section per
+paging is capped. This module keeps them in Markdown files, one section per
 host, which a person and an agent can both read:
 
-- ``site-patterns.md`` -- committed and public: fingerprints, rungs, pagination
-  shapes, known caps of public sites;
-- ``site-patterns.local.md`` -- gitignored, beside it: anything private
-  (authenticated flows, internal hosts). The split is the point of the design.
+- ``site-patterns.md`` -- public: fingerprints, rungs, pagination shapes, known
+  caps of public sites;
+- ``site-patterns.local.md`` -- beside it, never shared: anything private
+  (authenticated flows, internal hosts, text that looks like a credential). The
+  split is the point of the design.
+
+Both live in a user data folder (see :func:`default_paths`), since an installed
+package's own folder is read-only and replaced on upgrade. The ``site-patterns.md``
+shipped with the ``scraped-acquire`` skill is seed data (:func:`seed_path`): read
+first, never written unless passed explicitly as ``public``, which is what a
+contributor does to commit a pattern back to the package.
 
 :func:`remember` is the post-run step. It routes a pattern to the local file
-whenever it is private (:attr:`SitePattern.authenticated`, or an internal host,
-see :func:`is_private_host`), so a private fact cannot land in the public file by
-default. :func:`recall` reads both, the local entry overriding the public one.
+whenever it is private (:attr:`SitePattern.authenticated`, an internal host, see
+:func:`is_private_host`, or a field that looks like a secret, see
+:func:`secret_fields`), so a private fact cannot land in the public file by
+default. :func:`recall` reads the seed, then the public file, then the local one,
+each later entry overriding the earlier.
 
 >>> import tempfile, os
 >>> folder = tempfile.mkdtemp()
 >>> public, local = (os.path.join(folder, n) for n in ("p.md", "p.local.md"))
 >>> str(remember(SitePattern("shop.example.com", generator="Next.js", transport="http",
 ...                      payload="state blob"), public=public, local=local)) == public
+True
+>>> str(remember(SitePattern("shop.example.com", notes=("cookie: sid=9f8e7d6c5b4a",)),
+...          public=public, local=local)) == local
 True
 >>> str(remember(SitePattern("wiki.corp", transport="browser", authenticated=True),
 ...          public=public, local=local)) == local
@@ -33,6 +45,7 @@ False
 from __future__ import annotations
 
 import ipaddress
+import os
 import re
 from dataclasses import dataclass, fields, replace
 from urllib.parse import urlsplit
@@ -43,6 +56,28 @@ from typing import Mapping, Optional, Sequence
 #: The public file's name; the private overlay is the same name with ``.local``.
 SITE_PATTERNS_NAME = "site-patterns.md"
 LOCAL_SITE_PATTERNS_NAME = "site-patterns.local.md"
+#: Environment variable naming the folder of the user's two files (see :func:`default_paths`).
+SITE_PATTERNS_DIR_ENVVAR = "SCRAPED_SITE_PATTERNS_DIR"
+#: The app data subfolder holding them when the environment variable is unset.
+SITE_PATTERNS_SUBDIR = "site-patterns"
+
+#: Shapes of a credential in free text: a header or cookie, a ``key=value`` whose key
+#: names a secret and whose value is opaque, a JWT, a known key prefix, or a long
+#: opaque string mixing letters and digits. Errs on the side of routing to the local
+#: file: a false positive keeps a harmless fact private, a false negative publishes a
+#: secret.
+SECRET_TEXT_PATTERNS = (
+    re.compile(r"(?i)\b(?:authorization|proxy-authorization|cookie|set-cookie)\s*:"),
+    re.compile(r"(?i)\b(?:bearer|basic)\s+(?=[^\s]*\d)[a-z0-9._~+/=-]{8,}"),
+    re.compile(
+        r"(?i)[a-z0-9_-]*(?:token|secret|passw(?:or)?d|pwd|api[_-]?key|session|sid|auth)"
+        r"[a-z0-9_-]*\s*[=:]\s*[\"']?(?=[^\s\"']*\d)[a-z0-9._~+/%=-]{8,}"
+    ),
+    re.compile(r"\beyJ[a-zA-Z0-9_-]{8,}\.[a-zA-Z0-9_-]{8,}"),
+    re.compile(r"\b(?:sk|pk|rk)[-_](?:live[-_]|test[-_])?[a-zA-Z0-9_-]{16,}"),
+    re.compile(r"\b(?:gh[pousr]_[a-zA-Z0-9]{20,}|AKIA[0-9A-Z]{16}|xox[abposr]-[a-zA-Z0-9-]{10,})"),
+    re.compile(r"\b(?=[a-zA-Z0-9_-]*\d)(?=[a-zA-Z0-9_-]*[a-zA-Z])[a-zA-Z0-9_-]{32,}\b"),
+)
 
 #: Host suffixes that name a private network, never a public site.
 PRIVATE_HOST_SUFFIXES = (
@@ -65,8 +100,9 @@ _CONTROL_RE = re.compile(r"[\x00-\x1f\x7f\u0085\u2028\u2029]")
 _HEADER = """# Site patterns
 
 What earlier jobs learned about each site, one section per host, written by
-`scraped.acquire.remember` after a run. Public sites only: authenticated flows and
-internal hosts go to the gitignored `site-patterns.local.md` beside this file.
+`scraped.acquire.remember` after a run. Public sites only: authenticated flows,
+internal hosts and anything that looks like a credential go to
+`site-patterns.local.md` beside this file, which is never shared.
 """
 
 _SECTION_RE = re.compile(r"^## (?P<host>\S+)\s*$")
@@ -154,20 +190,68 @@ def is_private_host(host: str) -> bool:
     return not address.is_global
 
 
+def has_secret(text: str) -> bool:
+    """Whether ``text`` looks like it holds a credential (see :data:`SECRET_TEXT_PATTERNS`).
+
+    >>> [has_secret(t) for t in ("cursor (size=first, cursor=after)", "10000 results",
+    ...                          "needs Cookie: sid=abc", "api_key=a1b2c3d4e5",
+    ...                          "page via ?pageToken=", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0")]
+    [False, False, True, True, False, True]
+    """
+    return any(p.search(text) for p in SECRET_TEXT_PATTERNS)
+
+
+def secret_fields(pattern: SitePattern) -> tuple[str, ...]:
+    """The names of ``pattern``'s text fields (notes included) that look like secrets."""
+    found = [name for name in _TEXT_FIELDS if has_secret(getattr(pattern, name))]
+    if any(has_secret(note) for note in pattern.notes):
+        found.append("notes")
+    return tuple(found)
+
+
 def is_private(pattern: SitePattern) -> bool:
-    """Whether ``pattern`` belongs in the local file: marked private, authenticated, or internal."""
-    return pattern.private or pattern.authenticated or is_private_host(pattern.host)
+    """Whether ``pattern`` belongs in the local file.
+
+    True when it is marked private, authenticated, names an internal host, or holds
+    text that looks like a credential.
+    """
+    return (
+        pattern.private
+        or pattern.authenticated
+        or is_private_host(pattern.host)
+        or bool(secret_fields(pattern))
+    )
 
 
-def default_paths() -> tuple[Path, Path]:
-    """``(public, local)``: the files that ship beside the ``scraped-acquire`` skill."""
-    folder = (
+def seed_path() -> Path:
+    """The ``site-patterns.md`` shipped beside the ``scraped-acquire`` skill: seed data.
+
+    :func:`recall` reads it first; :func:`remember` writes to it only when it is passed
+    explicitly as ``public`` (a contributor committing a pattern back to the package).
+    """
+    return (
         Path(__file__).resolve().parent.parent
         / "data"
         / "skills"
         / "scraped-acquire"
         / "references"
+        / SITE_PATTERNS_NAME
     )
+
+
+def default_paths() -> tuple[Path, Path]:
+    """``(public, local)``: the user's own files, in a writable data folder.
+
+    The folder is ``$SCRAPED_SITE_PATTERNS_DIR`` when set, else the ``site-patterns``
+    subfolder of scraped's app data folder (``~/.local/share/scraped`` on Linux).
+    Nothing is created until :func:`remember` writes.
+    """
+    folder = os.environ.get(SITE_PATTERNS_DIR_ENVVAR)
+    if not folder:
+        from config2py import get_app_data_folder
+
+        folder = Path(get_app_data_folder("scraped")) / SITE_PATTERNS_SUBDIR
+    folder = Path(folder).expanduser()
     return folder / SITE_PATTERNS_NAME, folder / LOCAL_SITE_PATTERNS_NAME
 
 
@@ -220,20 +304,37 @@ def write_patterns(path: str | Path, patterns: Mapping[str, SitePattern]) -> Non
 
 
 def recall(
-    host: str, *, public: str | Path | None = None, local: str | Path | None = None
+    host: str,
+    *,
+    public: str | Path | None = None,
+    local: str | Path | None = None,
+    seed: str | Path | None = None,
 ) -> Optional[SitePattern]:
-    """What is known about ``host``: the public entry updated by the local one, or None.
+    """What is known about ``host``, or None.
 
-    A result that drew on the local file is marked ``private``, so passing it back to
-    :func:`remember` can never copy the local facts into the public file.
+    The seed entry (``seed``, default :func:`seed_path`), updated by the public entry,
+    updated by the local one. Pass ``seed=""`` to skip the seed. A result that drew on
+    the local file is marked ``private``, so passing it back to :func:`remember` can
+    never copy the local facts into the public file.
     """
     dflt_public, dflt_local = default_paths()
     host = normalize_host(host)
-    public_entry = read_patterns(public or dflt_public).get(host)
+    public = Path(public or dflt_public)
+    seed = seed_path() if seed is None else seed
+    seed_entry = (
+        read_patterns(seed).get(host)
+        if seed and Path(seed).resolve() != public.resolve()
+        else None
+    )
+    public_entry = read_patterns(public).get(host)
     local_entry = read_patterns(local or dflt_local).get(host)
     if local_entry is not None:
         local_entry = replace(local_entry, private=True)
-    known = [entry for entry in (public_entry, local_entry) if entry is not None]
+    known = [
+        entry
+        for entry in (seed_entry, public_entry, local_entry)
+        if entry is not None
+    ]
     if not known:
         return None
     pattern = known[0]
@@ -254,12 +355,20 @@ def remember(
 
     It goes to the local file when ``private`` is true, or when it is left as None and
     :func:`is_private` says so. Passing ``private=False`` for an authenticated or
-    internal pattern raises ``ValueError``: that is the leak this split exists to stop.
+    internal pattern, or one holding secret-looking text, raises ``ValueError``: that
+    is the leak this split exists to stop. The files default to :func:`default_paths`;
+    pass ``public=seed_path()`` to commit a public pattern back to the package.
     """
     dflt_public, dflt_local = default_paths()
     if private is False and is_private(pattern):
+        secrets = secret_fields(pattern)
+        why = (
+            f"its {', '.join(secrets)} look like a credential"
+            if secrets
+            else "authenticated or an internal host"
+        )
         raise ValueError(
-            f"{pattern.host} is private (authenticated or an internal host); "
+            f"{pattern.host} is private ({why}); "
             "it can only be remembered in the local file"
         )
     target = Path(

@@ -85,6 +85,7 @@ from .site_patterns import (
     pattern_from_run,
     recall,
     remember,
+    seed_path,
 )
 from .signals import ChallengeEncountered, classify, detect_challenge
 from .url import canonicalize_url
@@ -96,6 +97,7 @@ __all__ = [
     "remember",
     "pattern_from_run",
     "is_private_host",
+    "seed_path",
     # simple path
     "probe",
     "fetch",

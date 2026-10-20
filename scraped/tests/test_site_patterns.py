@@ -5,7 +5,7 @@ from datetime import date
 import pytest
 
 from scraped.acquire import SiteProfile, SitePattern, pattern_from_run, recall, remember
-from scraped.acquire.site_patterns import default_paths, read_patterns
+from scraped.acquire.site_patterns import default_paths, has_secret, read_patterns, seed_path
 
 
 @pytest.fixture
@@ -52,10 +52,57 @@ def test_pattern_from_run_reads_the_profile_and_pagination():
     assert got.generator == "Gatsby"
 
 
-def test_the_public_file_ships_and_holds_no_private_host():
-    public, _ = default_paths()
-    assert public.is_file()
-    assert all(not SitePattern(h).host.endswith(".corp") for h in read_patterns(public))
+def test_the_seed_file_ships_and_holds_no_private_host():
+    seed = seed_path()
+    assert seed.is_file()
+    assert all(not SitePattern(h).host.endswith(".corp") for h in read_patterns(seed))
+
+
+def test_the_default_files_live_outside_the_package(tmp_path, monkeypatch):
+    monkeypatch.setenv("SCRAPED_SITE_PATTERNS_DIR", str(tmp_path / "patterns"))
+    public, local = default_paths()
+    assert (public.parent, local.name) == (tmp_path / "patterns", "site-patterns.local.md")
+    assert remember(SitePattern("shop.example.com", transport="http")) == public
+    assert not seed_path().read_text().count("shop.example.com")
+    monkeypatch.delenv("SCRAPED_SITE_PATTERNS_DIR")
+    package_dir = seed_path().parents[3]
+    assert package_dir not in default_paths()[0].parents
+
+
+def test_recall_layers_seed_then_public_then_local(tmp_path, files):
+    seed = tmp_path / "seed.md"
+    remember(SitePattern("x.com", generator="Gatsby", cap="500"), public=seed, local=files["local"])
+    remember(SitePattern("x.com", cap="1000"), **files)
+    remember(SitePattern("x.com", transport="browser"), private=True, **files)
+    got = recall("x.com", seed=seed, **files)
+    assert (got.generator, got.cap, got.transport, got.private) == ("Gatsby", "1000", "browser", True)
+    assert recall("x.com", seed="", **files).generator == ""
+
+
+@pytest.mark.parametrize("field, text", [
+    ("notes", "send Cookie: sid=9f8e7d6c5b4a"),
+    ("notes", "worked with Authorization: Bearer abc123def456"),
+    ("notes", "api_key=a1b2c3d4e5f6 in query"),
+    ("notes", "jwt eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0"),
+    ("payload", "api (session_id=7f3a9c2e11)"),
+    ("notes", "ghp_abcdefghijklmnopqrstuvwxyz0123"),
+    ("notes", "id 3f9a2b7c8d1e4f5a6b7c8d9e0f1a2b3c"),
+])
+def test_secret_looking_text_goes_to_the_local_file(files, field, text):
+    pattern = SitePattern("shop.example.com", **{field: (text,) if field == "notes" else text})
+    assert remember(pattern, **files) == files["local"]
+    assert not files["public"].exists()
+    with pytest.raises(ValueError, match="credential"):
+        remember(pattern, private=False, **files)
+
+
+@pytest.mark.parametrize("text", [
+    "cursor (size=variables.first, cursor=variables.after)", "deep paging capped",
+    "page via ?pageToken=", "basic pagination", "token pagination", "cookie banner blocks the DOM",
+    "10000 results", "state blob in __NEXT_DATA__",
+])
+def test_ordinary_notes_are_not_mistaken_for_secrets(text):
+    assert not has_secret(text)
 
 
 def test_a_probe_shaped_host_is_normalised_and_stays_public(files):
