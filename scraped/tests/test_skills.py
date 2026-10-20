@@ -31,11 +31,12 @@ def test_skill_is_spec_clean(skill_dir):
     assert len(fm["description"]) <= 1024
     assert len(path.read_text().splitlines()) < 500
     assert set(fm) <= {"name", "description", "license", "compatibility",
-                       "metadata", "allowed-tools", "coact"}
+                       "metadata", "allowed-tools"}
 
 
 def test_subagent_return_schema_matches_report_schema():
-    returns = _frontmatter(SKILLS / "scraped-acquirer" / "SKILL.md")["coact"]["returns"]
+    fm = _frontmatter(SKILLS / "scraped-acquirer" / "SKILL.md")
+    returns = fm["metadata"]["coact"]["returns"]
     declared = returns["json_schema"]
     code = report_json_schema()
     assert set(declared["required"]) == set(code["required"])
