@@ -37,7 +37,10 @@ def __getattr__(name):
         module, attr = _OPTIONAL_NAMES[name]
         try:
             value = getattr(_import_module(module), attr)
-        except (ImportError, OSError) as error:  # hubcap may raise OSError without a token
+        except (
+            ImportError,
+            OSError,
+        ) as error:  # hubcap may raise OSError without a token
             raise AttributeError(
                 f"scraped.{name} needs the optional package {module!r}"
             ) from error
