@@ -120,7 +120,9 @@ class AcquisitionBudget:
     def record_failure(self, label: str, error: BaseException | str) -> None:
         """The single place a failure is counted."""
         self.failures += 1
-        self.errors.append((label, repr(error) if isinstance(error, BaseException) else error))
+        self.errors.append(
+            (label, repr(error) if isinstance(error, BaseException) else error)
+        )
 
     @contextmanager
     def attempt(self, label: str, *, reraise: bool = False) -> Iterator[None]:
@@ -218,7 +220,9 @@ class AcquisitionReport:
         if self.claims:
             lines += ["| Claim | Validated? | Evidence |", "|---|---|---|"]
             for c in self.claims:
-                lines.append(f"| {c.text} | {c.validated.value} | {', '.join(c.evidence)} |")
+                lines.append(
+                    f"| {c.text} | {c.validated.value} | {', '.join(c.evidence)} |"
+                )
             lines.append("")
         if self.artifacts:
             lines += ["**Artifacts:**", *[f"- {p}" for p in self.artifacts], ""]
@@ -250,7 +254,9 @@ class AcquisitionReport:
 
     def to_dict(self) -> dict:
         d = asdict(self)
-        d["claims"] = [{**asdict(c), "validated": c.validated.value} for c in self.claims]
+        d["claims"] = [
+            {**asdict(c), "validated": c.validated.value} for c in self.claims
+        ]
         return d
 
 
