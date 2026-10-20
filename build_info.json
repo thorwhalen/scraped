@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-20T11:08:14Z",
+  "built_at": "2026-10-20T11:13:02Z",
   "package": {
     "name": "scraped",
-    "version": "0.0.16",
+    "version": "0.0.17",
     "display_name": "scraped",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "4cd88e622fba7ac2b99d1227d222f41080e390db",
-    "short_commit": "4cd88e6",
+    "commit": "8f25fb4d48ca91a27c104dfd325aee88bcac1c1a",
+    "short_commit": "8f25fb4",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/scraped",
-    "commit_url": "https://github.com/thorwhalen/scraped/commit/4cd88e622fba7ac2b99d1227d222f41080e390db",
+    "commit_url": "https://github.com/thorwhalen/scraped/commit/8f25fb4d48ca91a27c104dfd325aee88bcac1c1a",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/scraped",
-    "sha": "4cd88e622fba7ac2b99d1227d222f41080e390db",
+    "sha": "8f25fb4d48ca91a27c104dfd325aee88bcac1c1a",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "39412600444",
-    "run_url": "https://github.com/thorwhalen/scraped/actions/runs/39412600444",
+    "run_id": "39413144625",
+    "run_url": "https://github.com/thorwhalen/scraped/actions/runs/39413144625",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -60,16 +60,16 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.17",
+    "latest": "0.0.18",
     "relation": "behind",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/scraped && cd scraped\ngit checkout 4cd88e622fba7ac2b99d1227d222f41080e390db\npip install \"epythet==0.2.19\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/scraped && cd scraped\ngit checkout 8f25fb4d48ca91a27c104dfd325aee88bcac1c1a\npip install \"epythet==0.2.19\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": false,
     "notes": [
-      "The documented version (0.0.16) is behind the latest release on PyPI (0.0.17): `pip install scraped` gives newer code than these docs describe."
+      "The documented version (0.0.17) is behind the latest release on PyPI (0.0.18): `pip install scraped` gives newer code than these docs describe."
     ]
   }
 }
