@@ -56,3 +56,35 @@ def test_the_public_file_ships_and_holds_no_private_host():
     public, _ = default_paths()
     assert public.is_file()
     assert all(not SitePattern(h).host.endswith(".corp") for h in read_patterns(public))
+
+
+def test_a_probe_shaped_host_is_normalised_and_stays_public(files):
+    profile = SiteProfile(url="https://Shop.Example.com/", host="https://Shop.Example.com")
+    pattern = pattern_from_run(profile, transport="http", payload="api")
+    assert pattern.host == "shop.example.com"
+    assert remember(pattern, **files) == files["public"]
+    assert recall("https://shop.example.com:443", **files).payload == "api"
+
+
+@pytest.mark.parametrize("bad", ["l1\n## secret.corp\n- authenticated: yes", "a\r## x.corp", "a b"])
+def test_a_line_break_cannot_forge_a_section(bad):
+    with pytest.raises(ValueError):
+        SitePattern("y.com", notes=(bad,))
+    with pytest.raises(ValueError):
+        SitePattern("y.com", cap=bad)
+
+
+def test_recalled_local_facts_are_never_promoted_to_the_public_file(files):
+    from dataclasses import replace
+
+    remember(SitePattern("x.com", transport="http"), **files)
+    remember(SitePattern("x.com", notes=("internal admin path",)), private=True, **files)
+    assert remember(replace(recall("x.com", **files), cap="1000"), **files) == files["local"]
+    assert "internal admin" not in files["public"].read_text()
+
+
+@pytest.mark.parametrize("host", ["wiki.corp.", "foo.intranet", "127.1", "0x7f.1", "a.test", "[::1]:8080"])
+def test_internal_host_spellings_are_private(host):
+    from scraped.acquire import is_private_host
+
+    assert is_private_host(host)

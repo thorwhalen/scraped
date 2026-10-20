@@ -35,6 +35,7 @@ from __future__ import annotations
 import ipaddress
 import re
 from dataclasses import dataclass, fields, replace
+from urllib.parse import urlsplit
 from datetime import date
 from pathlib import Path
 from typing import Mapping, Optional, Sequence
@@ -44,7 +45,14 @@ SITE_PATTERNS_NAME = "site-patterns.md"
 LOCAL_SITE_PATTERNS_NAME = "site-patterns.local.md"
 
 #: Host suffixes that name a private network, never a public site.
-PRIVATE_HOST_SUFFIXES = (".local", ".internal", ".lan", ".corp", ".home.arpa", ".localhost")
+PRIVATE_HOST_SUFFIXES = (
+    ".local", ".internal", ".intranet", ".private", ".lan", ".corp", ".home.arpa",
+    ".localhost", ".test", ".invalid",
+)
+#: A public top-level label: letters, or an IDNA ``xn--`` label. Anything else is not a public site.
+_PUBLIC_TLD_RE = re.compile(r"^(?:[a-z]{2,63}|xn--[a-z0-9-]+)$")
+#: Characters that would break a one-line Markdown field: line breaks and other controls.
+_CONTROL_RE = re.compile(r"[\x00-\x1f\x7f\u0085\u2028\u2029]")
 
 _HEADER = """# Site patterns
 
@@ -70,6 +78,15 @@ class SitePattern:
     seen: str = ""  # ISO date of the run that last confirmed it
     notes: tuple[str, ...] = ()
     authenticated: bool = False  # needed a login: always private
+    private: bool = False  # came from (or belongs in) the local file: never written public
+
+    def __post_init__(self):
+        object.__setattr__(self, "host", normalize_host(self.host))
+        for name in (*_TEXT_FIELDS, "notes"):
+            values = getattr(self, name)
+            for value in values if name == "notes" else (values,):
+                if _CONTROL_RE.search(value):
+                    raise ValueError(f"{name} of {self.host} holds a line break or control character")
 
     def merged(self, newer: "SitePattern") -> "SitePattern":
         """This pattern updated by ``newer``: its set fields win, notes accumulate."""
@@ -82,23 +99,46 @@ class SitePattern:
         return replace(self, **updates, notes=notes)
 
 
+def normalize_host(host: str) -> str:
+    """The bare, lower-case host name of ``host``, which may be a URL or ``host:port``.
+
+    >>> normalize_host("https://user:pw@Shop.Example.com.:8443/path")
+    'shop.example.com'
+    """
+    text = host.strip()
+    parts = urlsplit(text if "://" in text else f"//{text}")
+    try:
+        name = parts.hostname or ""
+    except ValueError:
+        name = ""
+    name = name.rstrip(".")
+    if not name or _CONTROL_RE.search(name) or " " in name:
+        raise ValueError(f"not a host name: {host!r}")
+    return name
+
+
 def is_private_host(host: str) -> bool:
     """Whether ``host`` names a private network rather than a public site.
 
-    >>> [is_private_host(h) for h in ("example.com", "10.0.0.7", "intranet", "wiki.corp")]
-    [False, True, True, True]
+    Conservative: a name whose last label is not a public top-level label (an IP
+    shorthand like ``127.1``, a dotless name) counts as private.
+
+    >>> [is_private_host(h) for h in ("example.com", "https://10.0.0.7:80", "intranet",
+    ...                                "wiki.corp.", "127.1", "[::1]:8080")]
+    [False, True, True, True, True, True]
     """
-    name = host.split(":")[0].strip("[]").lower()
+    name = normalize_host(host)
     try:
         address = ipaddress.ip_address(name)
     except ValueError:
-        return "." not in name or name.endswith(PRIVATE_HOST_SUFFIXES)
+        tld = name.rsplit(".", 1)[-1]
+        return "." not in name or name.endswith(PRIVATE_HOST_SUFFIXES) or not _PUBLIC_TLD_RE.match(tld)
     return not address.is_global
 
 
 def is_private(pattern: SitePattern) -> bool:
-    """Whether ``pattern`` belongs in the local file: authenticated, or an internal host."""
-    return pattern.authenticated or is_private_host(pattern.host)
+    """Whether ``pattern`` belongs in the local file: marked private, authenticated, or internal."""
+    return pattern.private or pattern.authenticated or is_private_host(pattern.host)
 
 
 def default_paths() -> tuple[Path, Path]:
@@ -151,13 +191,18 @@ def write_patterns(path: str | Path, patterns: Mapping[str, SitePattern]) -> Non
 def recall(
     host: str, *, public: str | Path | None = None, local: str | Path | None = None
 ) -> Optional[SitePattern]:
-    """What is known about ``host``: the public entry updated by the local one, or None."""
+    """What is known about ``host``: the public entry updated by the local one, or None.
+
+    A result that drew on the local file is marked ``private``, so passing it back to
+    :func:`remember` can never copy the local facts into the public file.
+    """
     dflt_public, dflt_local = default_paths()
-    entries = [
-        read_patterns(path).get(host)
-        for path in (public or dflt_public, local or dflt_local)
-    ]
-    known = [entry for entry in entries if entry is not None]
+    host = normalize_host(host)
+    public_entry = read_patterns(public or dflt_public).get(host)
+    local_entry = read_patterns(local or dflt_local).get(host)
+    if local_entry is not None:
+        local_entry = replace(local_entry, private=True)
+    known = [entry for entry in (public_entry, local_entry) if entry is not None]
     if not known:
         return None
     pattern = known[0]
