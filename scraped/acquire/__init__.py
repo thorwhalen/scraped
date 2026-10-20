@@ -58,6 +58,14 @@ from .fetchers import (
     default_fetcher,
     storage_state_headers,
 )
+from .api_shape import (
+    GraphQLOperation,
+    Pagination,
+    graphql_operations,
+    pagination_shape,
+    persisted_queries,
+    persisted_query_misses,
+)
 from .har import ApiCandidate, client_code, discover_api, har_captures, replay_request
 from .policy import Politeness, RobotsDisallowed, RobotsPolicy
 from .probe import SiteProfile, probe, robots_sitemaps
@@ -103,6 +111,12 @@ __all__ = [
     "ApiCandidate",
     "replay_request",
     "client_code",
+    "GraphQLOperation",
+    "graphql_operations",
+    "persisted_queries",
+    "persisted_query_misses",
+    "Pagination",
+    "pagination_shape",
     # diagnostics
     "ChallengeEncountered",
     "detect_challenge",
