@@ -66,7 +66,9 @@ SITE_PATTERNS_SUBDIR = "site-patterns"
 #: Before a credential-like key: up to four ``word_``/``word-``/``word.`` or camelCase
 #: prefixes (``x-api-key``, ``accessToken``), starting at a word start (so ``outside``
 #: is not ``sid``). Bounded, so matching stays linear on long runs.
-_KEY_PREFIX = r"(?<![a-z0-9])(?:[a-z0-9]{1,32}[_.-]|[a-z][a-z0-9]{0,31}(?=(?-i:[A-Z]))){0,4}"
+_KEY_PREFIX = (
+    r"(?<![a-z0-9])(?:[a-z0-9]{1,32}[_.-]|[a-z][a-z0-9]{0,31}(?=(?-i:[A-Z]))){0,4}"
+)
 #: After it: an optional ``id``/``key``/``token`` suffix, a closing quote (JSON), ``=`` or ``:``.
 _KEY_TAIL = r"(?:[_.-]?(?:id|key|token))?[\"']?\s*[=:]\s*[\"']?"
 
@@ -87,7 +89,10 @@ SECRET_TEXT_PATTERNS = (
         r"|access[_-]?key|private[_-]?key|credentials?)" + _KEY_TAIL + r"[^\s\"',;]{4,}"
     ),
     re.compile(
-        r"(?i)" + _KEY_PREFIX + r"(?:token|session|sid|auth)" + _KEY_TAIL
+        r"(?i)"
+        + _KEY_PREFIX
+        + r"(?:token|session|sid|auth)"
+        + _KEY_TAIL
         + r"(?=[^\s\"',;]{0,512}\d)[^\s\"',;]{8,}"
     ),
     re.compile(r"(?i)\b[a-z][a-z0-9+.-]{0,15}://[^/\s:@]{1,64}:[^/\s@]{1,128}@"),
@@ -369,9 +374,7 @@ def recall(
     if local_entry is not None:
         local_entry = replace(local_entry, private=True)
     known = [
-        entry
-        for entry in (seed_entry, public_entry, local_entry)
-        if entry is not None
+        entry for entry in (seed_entry, public_entry, local_entry) if entry is not None
     ]
     if not known:
         return None
