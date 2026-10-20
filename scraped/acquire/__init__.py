@@ -68,6 +68,16 @@ from .api_shape import (
 )
 from .har import ApiCandidate, client_code, discover_api, har_captures, replay_request
 from .policy import Politeness, RobotsDisallowed, RobotsPolicy
+from .report import (
+    AcquisitionBudget,
+    AcquisitionReport,
+    BudgetExhausted,
+    Claim,
+    SelfCritique,
+    StopRules,
+    Validated,
+    report_json_schema,
+)
 from .probe import SiteProfile, probe, robots_sitemaps
 from .signals import ChallengeEncountered, classify, detect_challenge
 from .url import canonicalize_url
@@ -117,6 +127,15 @@ __all__ = [
     "persisted_query_misses",
     "Pagination",
     "pagination_shape",
+    # the acquisition subagent's contract
+    "StopRules",
+    "AcquisitionBudget",
+    "BudgetExhausted",
+    "AcquisitionReport",
+    "Claim",
+    "Validated",
+    "SelfCritique",
+    "report_json_schema",
     # diagnostics
     "ChallengeEncountered",
     "detect_challenge",
