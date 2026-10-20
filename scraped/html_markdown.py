@@ -48,9 +48,9 @@ _CODE_FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
 #: spends C stack on every Python call, so the retry runs in a thread with
 #: :data:`DEEP_HTML_THREAD_STACK_BYTES` of stack, which makes the high limit safe there too.
 DEEP_HTML_RECURSION_LIMIT = 100_000
-#: Windows refuses a thread stack over 256 MiB (CPython's ``THREAD_MAX_STACKSIZE``).
+#: Windows refuses a thread stack of 256 MiB or more (CPython's ``THREAD_MAX_STACKSIZE``).
 DEEP_HTML_THREAD_STACK_BYTES = (
-    (256 if sys.platform == "win32" else 512) * 1024 * 1024
+    (255 if sys.platform == "win32" else 512) * 1024 * 1024
 )  # virtual: only touched pages cost memory
 
 #: Serialises the temporary raise of the (process-wide) recursion limit, so two
