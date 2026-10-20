@@ -12,38 +12,38 @@ description: >-
 license: MIT
 metadata:
   audience: consumers
-coact:
-  model: sonnet
-  tools: [Bash, Read, Write, Grep, Glob]
-  skills: [scraped-acquire, scraped-recon, scraped-http-rung, scraped-browser-rung, scraped-api-discovery]
-  returns:
-    description: >-
-      A report, never a payload: AcquisitionReport.to_dict() — required
-      stopped_reason, claims with Validated YES/PARTIAL/NO and evidence paths,
-      artifact paths in the capture store, a self-critique (gaps, skipped steps,
-      assumptions, staleness risk). At most 400 words.
-    json_schema:
-      type: object
-      properties:
-        stopped_reason: { type: string, minLength: 1 }
-        claims:
-          type: array
-          items:
+  coact:
+    model: sonnet
+    tools: [Bash, Read, Write, Grep, Glob]
+    skills: [scraped-acquire, scraped-recon, scraped-http-rung, scraped-browser-rung, scraped-api-discovery]
+    returns:
+      description: >-
+        A report, never a payload: AcquisitionReport.to_dict() — required
+        stopped_reason, claims with Validated YES/PARTIAL/NO and evidence paths,
+        artifact paths in the capture store, a self-critique (gaps, skipped steps,
+        assumptions, staleness risk). At most 400 words.
+      json_schema:
+        type: object
+        properties:
+          stopped_reason: { type: string, minLength: 1 }
+          claims:
+            type: array
+            items:
+              type: object
+              properties:
+                text: { type: string }
+                validated: { enum: ["YES", "PARTIAL", "NO"] }
+                evidence: { type: array, items: { type: string } }
+              required: [text, validated]
+          artifacts: { type: array, items: { type: string } }
+          critique:
             type: object
             properties:
-              text: { type: string }
-              validated: { enum: ["YES", "PARTIAL", "NO"] }
-              evidence: { type: array, items: { type: string } }
-            required: [text, validated]
-        artifacts: { type: array, items: { type: string } }
-        critique:
-          type: object
-          properties:
-            gaps: { type: array, items: { type: string } }
-            skipped_steps: { type: array, items: { type: string } }
-            assumptions: { type: array, items: { type: string } }
-            staleness_risk: { type: string }
-      required: [stopped_reason, claims, artifacts, critique]
+              gaps: { type: array, items: { type: string } }
+              skipped_steps: { type: array, items: { type: string } }
+              assumptions: { type: array, items: { type: string } }
+              staleness_risk: { type: string }
+        required: [stopped_reason, claims, artifacts, critique]
 ---
 
 # Acquisition subagent
