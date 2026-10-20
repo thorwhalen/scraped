@@ -36,6 +36,10 @@ browser, then read the page's own `__NEXT_DATA__` rather than its DOM.
 
 ## The workflow
 
+0. **Recall** — `recall(host)` returns what earlier jobs learned about the site
+   (generator, the rung that worked, pagination shape, known caps), from
+   `references/site-patterns.md` plus its gitignored `site-patterns.local.md`.
+   Start from it rather than rediscovering it.
 1. **Recon** — load `scraped-recon`. `probe(url)` costs about three requests and
    usually decides the whole job (robots, JSON negotiation, generator, state blobs,
    which vendor guards the origin).
@@ -46,6 +50,10 @@ browser, then read the page's own `__NEXT_DATA__` rather than its DOM.
    paths.
 4. **API discovery** — load `scraped-api-discovery` to turn a recorded HAR into
    the JSON call that carries what you see on the page, then drop back to HTTP.
+
+5. **Remember** — after the run, `remember(pattern_from_run(profile, transport=...,
+   payload=..., pagination=...))`. An authenticated flow or an internal host goes to
+   the local file automatically; never force one into the public file.
 
 ## Hard rules
 

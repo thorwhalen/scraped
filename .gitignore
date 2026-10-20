@@ -113,3 +113,6 @@ venv.bak/
 
 # PyCharm
 .idea
+
+# Private overlay of the site-pattern memory (scraped.acquire.site_patterns)
+*.local.md
