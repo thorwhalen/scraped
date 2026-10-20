@@ -24,7 +24,9 @@ comparison was empty on CPython 3.10 and 3.12 alike.
 """
 
 import json
+import os
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -39,6 +41,14 @@ DOWNLOAD_SITE_USAGE = (
     "usage: scraped download-site [-h] [-u [URL_TO_FILEPATH]] [-d DEPTH] "
     "[-f FILTER_URLS] [-m] [-v VERBOSITY] [-r ROOTDIR] url"
 )
+
+
+@pytest.fixture(autouse=True)
+def _console_script_on_path(monkeypatch):
+    """Find the ``scraped`` script of *this* interpreter even when its ``bin`` is
+    not on PATH (a test run through an explicit interpreter, say)."""
+    bin_dir = str(Path(sys.executable).parent)
+    monkeypatch.setenv("PATH", bin_dir + os.pathsep + os.environ.get("PATH", ""))
 
 
 def test_cli_surface_matches_the_argh_recorded_golden():
