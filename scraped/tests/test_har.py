@@ -91,7 +91,7 @@ def test_replays_drop_credentials_and_pseudo_headers():
     best = discover_api(HAR, TARGETS)[0]
     request = replay_request(best)
     assert set(request.headers) == {"Content-Type"}
-    assert "Cookie" in replay_request(best, drop_headers=()).headers
+    assert "Cookie" in replay_request(best, keep_credentials=True).headers
     code = client_code(best)
     assert "fictional" not in code
     compile(code, "<client_code>", "exec")  # runnable as written
@@ -101,3 +101,44 @@ def test_replays_drop_credentials_and_pseudo_headers():
 def test_targets_are_required():
     with pytest.raises(ValueError, match="target"):
         discover_api(HAR, [""])
+
+
+def test_more_credential_headers_are_dropped():
+    from scraped.acquire import Request
+
+    headers = {"X-API-Key": "k", "Proxy-Authorization": "p", "X-Auth-Token": "t", "Accept": "*/*"}
+    assert set(replay_request(Request("https://example.com/api", headers=headers)).headers) == {"Accept"}
+
+
+def test_form_posts_recorded_as_params_keep_their_body():
+    entry = _entry("https://example.com/api/search", "application/json", '{"name": "Blue Kettle"}', method="POST")
+    entry["request"]["postData"] = {
+        "mimeType": "application/x-www-form-urlencoded",
+        "params": [{"name": "q", "value": "blue kettle"}, {"name": "page", "value": "1"}],
+    }
+    [capture] = har_captures({"log": {"entries": [entry]}})
+    assert capture.request.body == b"q=blue+kettle&page=1"
+
+
+def test_content_types_and_sniffing():
+    entries = [
+        _entry("https://example.com/icon.svg", "image/svg+xml", "<svg>Blue Kettle</svg>"),
+        _entry("https://example.com/api/raw", "", '{"name": "Blue Kettle"}'),
+        _entry("https://example.com/moved", "text/html", "Blue Kettle", status=302),
+    ]
+    ranked = discover_api({"log": {"entries": entries}}, ["blue kettle"])
+    assert [(c.request.url, c.payload) for c in ranked] == [("https://example.com/api/raw", "structured")]
+
+
+def test_targets_equal_after_folding_count_once():
+    [c] = discover_api(HAR, ["Caf\u00e9 Lumi\u00e8re", "CAF\u00c9 LUMI\u00c8RE", "caf\u00e9 lumi\u00e8re"])[:1]
+    assert len(c.found) == 1
+
+
+def test_bad_bodies_and_boms_do_not_stop_the_reader(tmp_path, caplog):
+    bad = _entry("https://example.com/api/a", "application/json", "")
+    bad["response"]["content"].update(text="not=base64==!", encoding="base64")
+    good = _entry("https://example.com/api/b", "application/json", '{"name": "Blue Kettle"}')
+    path = tmp_path / "bom.har"
+    path.write_text(json.dumps({"log": {"entries": [bad, good]}}), encoding="utf-8-sig")
+    assert [c.request.url for c in discover_api(path, ["blue kettle"])] == ["https://example.com/api/b"]
