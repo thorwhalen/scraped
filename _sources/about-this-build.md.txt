@@ -5,7 +5,7 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-10-20 16:51 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/8d87ad6c4d381a8a634c5a272f7cab2c460879ef"><code>8d87ad6</code></a> on branch <code>main</code>, for **scraped 0.0.23** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 17:00 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/9e1392adae365edc281b6dacb3e0546411dcff53"><code>9e1392a</code></a> on branch <code>main</code>, for **scraped 0.0.24** (from <code>pyproject.toml</code>).
 
 :::{note}
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -15,7 +15,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/thorwhalen/scraped/commit/8d87ad6c4d381a8a634c5a272f7cab2c460879ef"><code>8d87ad6c4d381a8a634c5a272f7cab2c460879ef</code></a> |
+| Commit | <a href="https://github.com/thorwhalen/scraped/commit/9e1392adae365edc281b6dacb3e0546411dcff53"><code>9e1392adae365edc281b6dacb3e0546411dcff53</code></a> |
 | Branch | <code>main</code> |
 | Tags at this commit | none |
 | Working tree | clean |
@@ -26,9 +26,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 | | |
 |---|---|
 | Repository | <code>thorwhalen/scraped</code> |
-| Run | <a href="https://github.com/thorwhalen/scraped/actions/runs/39460870251">39460870251</a> |
+| Run | <a href="https://github.com/thorwhalen/scraped/actions/runs/39461970060">39461970060</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>8d87ad6c4d381a8a634c5a272f7cab2c460879ef</code> (in the history of the built commit) |
+| Event commit | <code>9e1392adae365edc281b6dacb3e0546411dcff53</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -53,13 +53,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/scraped/0.0.23/">0.0.23</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/scraped/0.0.24/">0.0.24</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/scraped && cd scraped
-git checkout 8d87ad6c4d381a8a634c5a272f7cab2c460879ef
+git checkout 9e1392adae365edc281b6dacb3e0546411dcff53
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
