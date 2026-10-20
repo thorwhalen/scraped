@@ -5,19 +5,17 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-10-20 12:48 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d"><code>4b9ec5d</code></a> on branch <code>main</code>, for **scraped 0.0.20** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 15:01 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/a9a6011b587b5b4260c4111184a3af0b92fb3ed1"><code>a9a6011</code></a> on branch <code>main</code>, for **scraped 0.0.21** (from <code>pyproject.toml</code>).
 
-:::{warning}
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.20) is ahead of the latest release on PyPI (0.0.19): these docs describe unreleased code.
+:::{note}
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/thorwhalen/scraped/commit/4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d"><code>4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d</code></a> |
+| Commit | <a href="https://github.com/thorwhalen/scraped/commit/a9a6011b587b5b4260c4111184a3af0b92fb3ed1"><code>a9a6011b587b5b4260c4111184a3af0b92fb3ed1</code></a> |
 | Branch | <code>main</code> |
 | Tags at this commit | none |
 | Working tree | clean |
@@ -28,15 +26,15 @@ The documentation and the package may be misaligned:
 | | |
 |---|---|
 | Repository | <code>thorwhalen/scraped</code> |
-| Run | <a href="https://github.com/thorwhalen/scraped/actions/runs/39424908384">39424908384</a> |
+| Run | <a href="https://github.com/thorwhalen/scraped/actions/runs/39444308004">39444308004</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d</code> (in the history of the built commit) |
+| Event commit | <code>a9a6011b587b5b4260c4111184a3af0b92fb3ed1</code> (in the history of the built commit) |
 
 ## Tools
 
 | | |
 |---|---|
-| epythet | 0.2.20 |
+| epythet | 0.2.21 |
 | Sphinx | 9.1.1 |
 | docutils | 0.22.4 |
 | Python | 3.12.15 |
@@ -55,14 +53,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/scraped/0.0.19/">0.0.19</a>, older than the documented version (0.0.20).
+Latest release: <a href="https://pypi.org/project/scraped/0.0.21/">0.0.21</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/scraped && cd scraped
-git checkout 4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d
-pip install "epythet==0.2.20"
+git checkout a9a6011b587b5b4260c4111184a3af0b92fb3ed1
+pip install "epythet==0.2.21"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

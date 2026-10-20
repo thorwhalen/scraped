@@ -1,36 +1,36 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-20T12:48:31Z",
+  "built_at": "2026-10-20T15:01:37Z",
   "package": {
     "name": "scraped",
-    "version": "0.0.20",
+    "version": "0.0.21",
     "display_name": "scraped",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d",
-    "short_commit": "4b9ec5d",
+    "commit": "a9a6011b587b5b4260c4111184a3af0b92fb3ed1",
+    "short_commit": "a9a6011",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/scraped",
-    "commit_url": "https://github.com/thorwhalen/scraped/commit/4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d",
+    "commit_url": "https://github.com/thorwhalen/scraped/commit/a9a6011b587b5b4260c4111184a3af0b92fb3ed1",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/scraped",
-    "sha": "4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d",
+    "sha": "a9a6011b587b5b4260c4111184a3af0b92fb3ed1",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "39424908384",
-    "run_url": "https://github.com/thorwhalen/scraped/actions/runs/39424908384",
+    "run_id": "39444308004",
+    "run_url": "https://github.com/thorwhalen/scraped/actions/runs/39444308004",
     "server_url": "https://github.com"
   },
   "tools": {
-    "epythet": "0.2.20",
+    "epythet": "0.2.21",
     "sphinx": "9.1.1",
     "docutils": "0.22.4",
     "python": "3.12.15"
@@ -60,16 +60,14 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.19",
-    "relation": "ahead",
+    "latest": "0.0.21",
+    "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/scraped && cd scraped\ngit checkout 4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d\npip install \"epythet==0.2.20\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/scraped && cd scraped\ngit checkout a9a6011b587b5b4260c4111184a3af0b92fb3ed1\npip install \"epythet==0.2.21\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": false,
-    "notes": [
-      "The documented version (0.0.20) is ahead of the latest release on PyPI (0.0.19): these docs describe unreleased code."
-    ]
+    "aligned": true,
+    "notes": []
   }
 }

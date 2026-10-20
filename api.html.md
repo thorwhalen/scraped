@@ -1,4 +1,4 @@
 # API reference
 
-| `scraped`   | Tools for scraping   |
-|-------------|----------------------|
+| `scraped`   | Tools for scraping.   |
+|-------------|-----------------------|
