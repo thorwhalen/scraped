@@ -47,7 +47,9 @@ __all__ = [
 
 #: Request headers a replay should not send because the transport sets them.
 #: HTTP/2 pseudo-headers (``:authority``) are always dropped too.
-DFLT_DROP_HEADERS = frozenset({"host", "content-length", "connection", "accept-encoding"})
+DFLT_DROP_HEADERS = frozenset(
+    {"host", "content-length", "connection", "accept-encoding"}
+)
 
 #: A header whose name matches this carries the recorded session's credentials,
 #: and a replay drops it unless ``keep_credentials``.
@@ -61,7 +63,10 @@ PAYLOAD_KINDS = ("structured", "text", "document", "asset")
 #: Content-type hints per kind, in the order they are tried: an SVG is an image
 #: before it is XML, and XHTML a document before it is XML.
 _CONTENT_TYPE_HINTS = (
-    ("asset", ("javascript", "ecmascript", "text/css", "image/", "font/", "audio/", "video/")),
+    (
+        "asset",
+        ("javascript", "ecmascript", "text/css", "image/", "font/", "audio/", "video/"),
+    ),
     ("document", ("text/html", "xhtml")),
     ("structured", ("json", "graphql", "+xml", "/xml", "x-ndjson")),
     ("text", ("text/plain", "text/csv")),
@@ -80,12 +85,18 @@ def _headers(pairs: Iterable[Mapping[str, Any]]) -> dict[str, str]:
     return out
 
 
-def _body(content: Mapping[str, Any], attachments: Mapping[str, bytes], url: str) -> bytes:
+def _body(
+    content: Mapping[str, Any], attachments: Mapping[str, bytes], url: str
+) -> bytes:
     """A response body from a HAR ``content``: inline text (maybe base64) or a zip attachment."""
     if "_file" in content:
         if content["_file"] in attachments:
             return attachments[content["_file"]]
-        _log.warning("HAR entry %s: attached body %r is not in the archive", url, content["_file"])
+        _log.warning(
+            "HAR entry %s: attached body %r is not in the archive",
+            url,
+            content["_file"],
+        )
     text = content.get("text")
     if text is None:
         return b""
@@ -106,12 +117,18 @@ def _post_body(post: Mapping[str, Any]) -> bytes | None:
     if not params:
         return None
     if "multipart" in str(post.get("mimeType", "")).lower():
-        _log.warning("multipart postData recorded as params only: its body is not rebuilt")
+        _log.warning(
+            "multipart postData recorded as params only: its body is not rebuilt"
+        )
         return None
-    return urlencode([(p.get("name", ""), p.get("value", "")) for p in params]).encode("utf-8")
+    return urlencode([(p.get("name", ""), p.get("value", "")) for p in params]).encode(
+        "utf-8"
+    )
 
 
-def _load(source: str | Path | Mapping[str, Any]) -> tuple[Mapping[str, Any], dict[str, bytes]]:
+def _load(
+    source: str | Path | Mapping[str, Any],
+) -> tuple[Mapping[str, Any], dict[str, bytes]]:
     if isinstance(source, Mapping):
         return source, {}
     path = Path(source).expanduser()
@@ -143,7 +160,9 @@ def har_captures(source: str | Path | Mapping[str, Any]) -> Iterator[Capture]:
         req, resp = entry.get("request") or {}, entry.get("response") or {}
         content = resp.get("content") or {}
         headers = _headers(resp.get("headers"))
-        if content.get("mimeType") and not any(k.lower() == "content-type" for k in headers):
+        if content.get("mimeType") and not any(
+            k.lower() == "content-type" for k in headers
+        ):
             headers["Content-Type"] = content["mimeType"]
         request = Request(
             url=str(req.get("url", "")),
@@ -236,13 +255,13 @@ def discover_api(
     [('https://example.com/api/item/7', 'structured'), ('https://example.com/item/7', 'document')]
     """
     fold = (lambda s: s) if case_sensitive else str.casefold
-    needles = list({fold(t): t for t in reversed([t for t in targets if t])}.items())[::-1]
+    needles = list({fold(t): t for t in reversed([t for t in targets if t])}.items())[
+        ::-1
+    ]
     if not needles:
         raise ValueError("discover_api needs at least one non-empty target string")
     captures = (
-        source
-        if not isinstance(source, (str, Path, Mapping))
-        else har_captures(source)
+        source if not isinstance(source, (str, Path, Mapping)) else har_captures(source)
     )
     found: list[ApiCandidate] = []
     for capture in captures:
@@ -254,7 +273,9 @@ def discover_api(
         haystack = fold(_searchable(capture))
         hits = {t: haystack.count(n) for n, t in needles if n in haystack}
         if len(hits) >= min_found:
-            found.append(ApiCandidate(capture, tuple(hits), sum(hits.values()), payload))
+            found.append(
+                ApiCandidate(capture, tuple(hits), sum(hits.values()), payload)
+            )
     order = {kind: i for i, kind in enumerate(PAYLOAD_KINDS)}
     found.sort(
         key=lambda c: (
@@ -292,7 +313,9 @@ def replay_request(
         and not k.startswith(":")
         and (keep_credentials or not CREDENTIAL_HEADER_RE.search(k))
     }
-    return Request(candidate.url, method=candidate.method, headers=headers, body=candidate.body)
+    return Request(
+        candidate.url, method=candidate.method, headers=headers, body=candidate.body
+    )
 
 
 def client_code(
