@@ -1,4 +1,0 @@
-scraped.acquire.url
-===================
-.. automodule:: scraped.acquire.url
-   :members:

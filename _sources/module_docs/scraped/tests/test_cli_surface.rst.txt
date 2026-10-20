@@ -1,4 +1,0 @@
-scraped.tests.test_cli_surface
-==============================
-.. automodule:: scraped.tests.test_cli_surface
-   :members:

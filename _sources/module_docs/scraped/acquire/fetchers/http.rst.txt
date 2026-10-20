@@ -1,4 +1,0 @@
-scraped.acquire.fetchers.http
-=============================
-.. automodule:: scraped.acquire.fetchers.http
-   :members:

@@ -1,4 +1,0 @@
-scraped.tools
-=============
-.. automodule:: scraped.tools
-   :members:

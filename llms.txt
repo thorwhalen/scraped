@@ -1,0 +1,18 @@
+# scraped
+
+> Tools for scraping
+
+
+## Pages
+
+- [scraped](index.html.md): Tools for scraping.
+- [API reference](api.html.md): | &#96;scraped&#96;   | Tools for scraping   |
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-20 11:08 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+
+## Optional
+
+- [scraped.md](scraped.md): Complete documentation in a single file.
+
+## Build
+
+- [build_info.json](build_info.json): build provenance (commit, version, tool versions, whether the docs match the package)
