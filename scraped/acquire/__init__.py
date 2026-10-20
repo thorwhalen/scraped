@@ -58,6 +58,7 @@ from .fetchers import (
     default_fetcher,
     storage_state_headers,
 )
+from .har import ApiCandidate, client_code, discover_api, har_captures, replay_request
 from .policy import Politeness, RobotsDisallowed, RobotsPolicy
 from .probe import SiteProfile, probe, robots_sitemaps
 from .signals import ChallengeEncountered, classify, detect_challenge
@@ -96,6 +97,12 @@ __all__ = [
     "CaptureStore",
     "capture_store",
     "cached",
+    # internal-API discovery (rung 3)
+    "har_captures",
+    "discover_api",
+    "ApiCandidate",
+    "replay_request",
+    "client_code",
     # diagnostics
     "ChallengeEncountered",
     "detect_challenge",
