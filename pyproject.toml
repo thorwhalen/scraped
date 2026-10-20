@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "scraped"
-version = "0.0.23"
+version = "0.0.24"
 description = "Tools for scraping"
 license = "MIT"
 readme = "README.md"
