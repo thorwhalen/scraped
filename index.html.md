@@ -95,6 +95,34 @@ path.** HAR and download paths are set at context creation and are not optional.
 Getting a payload *out* of an automated browser is its own expensive failure
 class — see [`misc/docs/browser-result-exfiltration.md`]().
 
+### Agent skills and the acquisition subagent
+
+`scraped` ships agent skills in `scraped/data/skills/`: a router, `scraped-acquire`,
+that hands each step to a focused sub-skill (`scraped-recon`, `scraped-http-rung`,
+`scraped-browser-rung`, `scraped-api-discovery`), and `scraped-acquirer`, a subagent
+that runs a whole job under numeric stop rules and **returns a report, never a
+payload**: artifacts stay in the capture store and file paths come back.
+
+```bash
+gh skill install thorwhalen/scraped scraped-acquire
+gh skill install thorwhalen/scraped scraped-acquirer
+```
+
+The Claude Code agent definition `.claude/agents/scraped-acquirer.md` is generated
+from that skill with [`coact`](https://github.com/thorwhalen/coact):
+`coact complete scraped/data/skills/scraped-acquirer --dest .claude/agents`.
+
+The contract is code, so a manager can check it:
+
+```python
+from scraped.acquire import AcquisitionBudget, AcquisitionReport, StopRules
+
+budget = AcquisitionBudget(StopRules(max_steps=12, max_failures=3, max_seconds=300))
+with budget.attempt("probe"):  # any exception counts as a failure, one counter
+    ...
+report = AcquisitionReport.from_budget(budget, artifacts=["runs/a.json"]).check()
+```
+
 ### Design docs
 
 [`misc/docs/`]() — [architecture]()

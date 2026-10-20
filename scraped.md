@@ -1,4 +1,4 @@
-> built 2026-10-20 12:45 UTC from 7ac714d (main) · scraped 0.0.19. Details: build_info.json
+> built 2026-10-20 12:48 UTC from 4b9ec5d (main) · scraped 0.0.20. Details: build_info.json
 
 # index.html.md
 
@@ -98,6 +98,34 @@ The rule this rung enforces: **the browser writes to disk; you read the file
 path.** HAR and download paths are set at context creation and are not optional.
 Getting a payload *out* of an automated browser is its own expensive failure
 class — see [`misc/docs/browser-result-exfiltration.md`]().
+
+### Agent skills and the acquisition subagent
+
+`scraped` ships agent skills in `scraped/data/skills/`: a router, `scraped-acquire`,
+that hands each step to a focused sub-skill (`scraped-recon`, `scraped-http-rung`,
+`scraped-browser-rung`, `scraped-api-discovery`), and `scraped-acquirer`, a subagent
+that runs a whole job under numeric stop rules and **returns a report, never a
+payload**: artifacts stay in the capture store and file paths come back.
+
+```bash
+gh skill install thorwhalen/scraped scraped-acquire
+gh skill install thorwhalen/scraped scraped-acquirer
+```
+
+The Claude Code agent definition `.claude/agents/scraped-acquirer.md` is generated
+from that skill with [`coact`](https://github.com/thorwhalen/coact):
+`coact complete scraped/data/skills/scraped-acquirer --dest .claude/agents`.
+
+The contract is code, so a manager can check it:
+
+```python
+from scraped.acquire import AcquisitionBudget, AcquisitionReport, StopRules
+
+budget = AcquisitionBudget(StopRules(max_steps=12, max_failures=3, max_seconds=300))
+with budget.attempt("probe"):  # any exception counts as a failure, one counter
+    ...
+report = AcquisitionReport.from_budget(budget, artifacts=["runs/a.json"]).check()
+```
 
 ### Design docs
 
@@ -224,18 +252,18 @@ And there’s more arguments:
 
 # About this build
 
-This documentation was built on **2026-10-20 12:45 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/7ac714d2373211cdefdb6cdd7fbe9b8dbf463dcc"><code>7ac714d</code></a> on branch <code>main</code>, for **scraped 0.0.19** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 12:48 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d"><code>4b9ec5d</code></a> on branch <code>main</code>, for **scraped 0.0.20** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.19) is behind the latest release on PyPI (0.0.20): `pip install scraped` gives newer code than these docs describe.
+- The documented version (0.0.20) is ahead of the latest release on PyPI (0.0.19): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                           |
 |---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/scraped/commit/7ac714d2373211cdefdb6cdd7fbe9b8dbf463dcc"><code>7ac714d2373211cdefdb6cdd7fbe9b8dbf463dcc</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/scraped/commit/4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d"><code>4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d</code></a> |
 | Branch              | <code>main</code>                                                                                                                                         |
 | Tags at this commit | none                                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                     |
@@ -246,9 +274,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/scraped</code>                                                            |
-| Run          | <a href="https://github.com/thorwhalen/scraped/actions/runs/39424495391">39424495391</a>   |
+| Run          | <a href="https://github.com/thorwhalen/scraped/actions/runs/39424908384">39424908384</a>   |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>7ac714d2373211cdefdb6cdd7fbe9b8dbf463dcc</code> (in the history of the built commit) |
+| Event commit | <code>4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -273,18 +301,114 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/scraped/0.0.20/">0.0.20</a>, newer than the documented version (0.0.19).
+Latest release: <a href="https://pypi.org/project/scraped/0.0.19/">0.0.19</a>, older than the documented version (0.0.20).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/scraped && cd scraped
-git checkout 7ac714d2373211cdefdb6cdd7fbe9b8dbf463dcc
+git checkout 4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d
 pip install "epythet==0.2.20"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 
 The same data, for machines: <a href="build_info.json"><code>build_info.json</code></a> (schema version 1).
+
+
+# ai-agents.html.md
+
+<!-- generated by epythet -->
+
+# For AI agents
+
+`scraped` ships artifacts for coding agents alongside its code. This page lists
+them, says where each lives in the repository, and points at the
+machine-readable copies of this documentation.
+
+## Skills
+
+Skills are folders holding a `SKILL.md` (the [Agent Skills](https://agentskills.io) format): a description that tells an agent when to use it and a body with the procedure. Install one into your agent with `gh skill` (any host: `--agent claude-code`, `copilot`, `cursor`, `codex`, `gemini`), or use the copy bundled in the wheel.
+
+### `scraped-acquire`
+
+Get the raw data out of a website faithfully with the `scraped` package: decide what the site will hand over, pick the cheapest payload and transport, capture bytes with provenance, and find the JSON API behind a page. Router skill: it picks the step and loads the focused sub-skill (scraped-recon, scraped-http-rung, scraped-browser-rung, scraped-api-discovery). Use for “scrape this site”, “get the listings from this page”, “what is this site built on and where is its data”, “find the API behind this page”, “the scraper gets 403”, “the page only renders in a browser”, “read **NEXT_DATA**”. NOT for turning a library’s documentation into markdown (contaix-acquire-docs, acquire-references) and NOT for downloading files whose URLs you already have (download-resources, fetch-resources).
+
+```bash
+gh skill install thorwhalen/scraped scraped-acquire --agent claude-code
+```
+
+Source: [`scraped/data/skills/scraped-acquire`](https://github.com/thorwhalen/scraped/tree/HEAD/scraped/data/skills/scraped-acquire) (bundled with the pip package).
+
+### `scraped-acquirer`
+
+Acquisition subagent for a multi-step web scraping job with the scraped package: recon, fetch, escalate transport only when needed, find the internal API, under numeric stop rules (steps, failures, wall clock). Returns a short report — a stopped_reason, claims each marked Validated YES/PARTIAL/NO, artifact file paths, a self-critique — never page text or payloads. Use when a manager needs “acquire the data from this site and tell me where it is”. NOT for library documentation (contaix-acquire-docs, acquire-references) and NOT for downloading known file URLs (download-resources, fetch-resources).
+
+```bash
+gh skill install thorwhalen/scraped scraped-acquirer --agent claude-code
+```
+
+Source: [`scraped/data/skills/scraped-acquirer`](https://github.com/thorwhalen/scraped/tree/HEAD/scraped/data/skills/scraped-acquirer) (bundled with the pip package).
+
+### `scraped-api-discovery`
+
+Find the internal JSON API behind a web page from a recorded HAR with scraped.acquire: discover_api ranks recorded requests by how many on-page strings their responses carry, replay_request strips credentials for an HTTP replay, client_code emits a runnable snippet, and graphql_operations / persisted_queries / pagination_shape read GraphQL persisted queries and the pagination of a call. Use for “find the API this page calls”, “which request returns the listings”, “replay this XHR”, “how does this endpoint paginate”. Loaded by the scraped-acquire router.
+
+```bash
+gh skill install thorwhalen/scraped scraped-api-discovery --agent claude-code
+```
+
+Source: [`scraped/data/skills/scraped-api-discovery`](https://github.com/thorwhalen/scraped/tree/HEAD/scraped/data/skills/scraped-api-discovery) (bundled with the pip package).
+
+### `scraped-browser-rung`
+
+Drive a real browser with scraped.acquire’s BrowserSession and BrowserFetcher (patchright) when plain HTTP is refused or the data only appears after JavaScript runs: HAR recording, JSON response capture, saved storage state to drop back to HTTP, artifacts written to disk. Use for “the page needs a browser”, “record a HAR”, “log in once and reuse the session”, “headful browser”. Loaded by the scraped-acquire router.
+
+```bash
+gh skill install thorwhalen/scraped scraped-browser-rung --agent claude-code
+```
+
+Source: [`scraped/data/skills/scraped-browser-rung`](https://github.com/thorwhalen/scraped/tree/HEAD/scraped/data/skills/scraped-browser-rung) (bundled with the pip package).
+
+### `scraped-http-rung`
+
+Fetch pages and JSON over HTTP with scraped.acquire: fetch, default_fetcher (impersonating TLS, per-host politeness, jittered retries, robots-aware, challenge detection), cached capture stores for free re-runs, Capture provenance, and reading embedded state blobs with scan_state_blobs. Use for “fetch this page”, “the plain request gets 403”, “cache the captures”, “reuse a browser session’s cookies over HTTP”. Loaded by the scraped-acquire router.
+
+```bash
+gh skill install thorwhalen/scraped scraped-http-rung --agent claude-code
+```
+
+Source: [`scraped/data/skills/scraped-http-rung`](https://github.com/thorwhalen/scraped/tree/HEAD/scraped/data/skills/scraped-http-rung) (bundled with the pip package).
+
+### `scraped-recon`
+
+Reconnoitre a URL before scraping it, with scraped.acquire.probe: robots verdict and crawl delay, sitemaps, whether the origin serves JSON, the site generator (next.js, nuxt, …), embedded state blobs, the best payload rung, and which bot-protection vendor guards it. Use as the first step of any scraping job, for “what will this site give me”, “is this site scrapable”, “what is it built with”, “is there a **NEXT_DATA** blob”. Loaded by the scraped-acquire router.
+
+```bash
+gh skill install thorwhalen/scraped scraped-recon --agent claude-code
+```
+
+Source: [`scraped/data/skills/scraped-recon`](https://github.com/thorwhalen/scraped/tree/HEAD/scraped/data/skills/scraped-recon) (bundled with the pip package).
+
+The bundled skills are also on disk after `pip install scraped`, under the package’s `data/skills/` directory; link them into an agent without network access with `skill link-skills <that directory>`.
+
+## Subagents
+
+Subagents are Markdown files with a frontmatter (`name`, `description`, `tools`) and a system prompt as the body. Copy one into your project’s `.claude/agents/` (or your agent host’s equivalent) to delegate the task it describes.
+
+### `scraped-acquirer`
+
+Acquisition subagent for a multi-step web scraping job with the scraped package: recon, fetch, escalate transport only when needed, find the internal API, under numeric stop rules (steps, failures, wall clock). Returns a short report — a stopped_reason, claims each marked Validated YES/PARTIAL/NO, artifact file paths, a self-critique — never page text or payloads. Use when a manager needs “acquire the data from this site and tell me where it is”. NOT for library documentation (contaix-acquire-docs, acquire-references) and NOT for downloading known file URLs (download-resources, fetch-resources).
+
+Source: [`.claude/agents/scraped-acquirer.md`](https://github.com/thorwhalen/scraped/tree/HEAD/.claude/agents/scraped-acquirer.md); tools: `Bash, Read, Write, Grep, Glob`.
+
+## Machine-readable documentation
+
+This site publishes the same documentation in forms that fit an agent’s context window:
+
+- [`llms.txt`](https://thorwhalen.github.io/scraped/llms.txt): an index of every page with a one-line description ([llms.txt](https://llmstxt.org) format)
+- [`scraped.md`](https://thorwhalen.github.io/scraped/scraped.md): the whole documentation as one Markdown file
+- `<page>.html.md`: a rendered Markdown twin of every page, advertised from each page’s `<head>` with `<link rel="alternate" type="text/markdown">`
+- [`objects.inv`](https://thorwhalen.github.io/scraped/objects.inv): the Sphinx inventory: a symbol-to-URL index (`sphobjinv convert plain objects.inv -`)
 
 
 # api.html.md

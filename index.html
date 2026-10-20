@@ -82,6 +82,7 @@
 </nav><nav class="table w-full min-w-full my-6 lg:my-8">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ai-agents.html">For AI agents</a></li>
 </ul>
 </nav>
 </div>
@@ -179,6 +180,30 @@ so deduplication, change detection, and free re-runs all fall out of one choice.
 path.</strong> HAR and download paths are set at context creation and are not optional.
 Getting a payload <em>out</em> of an automated browser is its own expensive failure
 class — see <a class="reference internal" href="#misc/docs/browser-result-exfiltration.md"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">misc/docs/browser-result-exfiltration.md</span></code></span></a>.</p>
+</section>
+<section id="agent-skills-and-the-acquisition-subagent">
+<h3>Agent skills and the acquisition subagent<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#agent-skills-and-the-acquisition-subagent" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#agent-skills-and-the-acquisition-subagent'">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">scraped</span></code> ships agent skills in <code class="docutils literal notranslate"><span class="pre">scraped/data/skills/</span></code>: a router, <code class="docutils literal notranslate"><span class="pre">scraped-acquire</span></code>,
+that hands each step to a focused sub-skill (<code class="docutils literal notranslate"><span class="pre">scraped-recon</span></code>, <code class="docutils literal notranslate"><span class="pre">scraped-http-rung</span></code>,
+<code class="docutils literal notranslate"><span class="pre">scraped-browser-rung</span></code>, <code class="docutils literal notranslate"><span class="pre">scraped-api-discovery</span></code>), and <code class="docutils literal notranslate"><span class="pre">scraped-acquirer</span></code>, a subagent
+that runs a whole job under numeric stop rules and <strong>returns a report, never a
+payload</strong>: artifacts stay in the capture store and file paths come back.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">gh<span class="w"> </span>skill<span class="w"> </span>install<span class="w"> </span>thorwhalen/scraped<span class="w"> </span>scraped-acquire
+</span><span id="line-2">gh<span class="w"> </span>skill<span class="w"> </span>install<span class="w"> </span>thorwhalen/scraped<span class="w"> </span>scraped-acquirer
+</span></code></pre></div>
+</div>
+<p>The Claude Code agent definition <code class="docutils literal notranslate"><span class="pre">.claude/agents/scraped-acquirer.md</span></code> is generated
+from that skill with <a class="reference external" href="https://github.com/thorwhalen/coact" rel="nofollow noopener"><code class="docutils literal notranslate"><span class="pre">coact</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>:
+<code class="docutils literal notranslate"><span class="pre">coact</span> <span class="pre">complete</span> <span class="pre">scraped/data/skills/scraped-acquirer</span> <span class="pre">--dest</span> <span class="pre">.claude/agents</span></code>.</p>
+<p>The contract is code, so a manager can check it:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">scraped.acquire</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionBudget</span><span class="p">,</span> <span class="n">AcquisitionReport</span><span class="p">,</span> <span class="n">StopRules</span>
+</span><span id="line-2">
+</span><span id="line-3"><span class="n">budget</span> <span class="o">=</span> <span class="n">AcquisitionBudget</span><span class="p">(</span><span class="n">StopRules</span><span class="p">(</span><span class="n">max_steps</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">max_failures</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_seconds</span><span class="o">=</span><span class="mi">300</span><span class="p">))</span>
+</span><span id="line-4"><span class="k">with</span> <span class="n">budget</span><span class="o">.</span><span class="n">attempt</span><span class="p">(</span><span class="s2">"probe"</span><span class="p">):</span>  <span class="c1"># any exception counts as a failure, one counter</span>
+</span><span id="line-5">    <span class="o">...</span>
+</span><span id="line-6"><span class="n">report</span> <span class="o">=</span> <span class="n">AcquisitionReport</span><span class="o">.</span><span class="n">from_budget</span><span class="p">(</span><span class="n">budget</span><span class="p">,</span> <span class="n">artifacts</span><span class="o">=</span><span class="p">[</span><span class="s2">"runs/a.json"</span><span class="p">])</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+</span></code></pre></div>
+</div>
 </section>
 <section id="design-docs">
 <h3>Design docs<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#design-docs" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#design-docs'">¶</a></h3>
@@ -282,7 +307,7 @@ through a <code class="docutils literal notranslate"><span class="pre">SCRAPED_D
 
 </section>
 </section>
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-20 12:45 UTC from <a href="https://github.com/thorwhalen/scraped/commit/7ac714d2373211cdefdb6cdd7fbe9b8dbf463dcc">7ac714d</a> (main) · scraped 0.0.19 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-20 12:48 UTC from <a href="https://github.com/thorwhalen/scraped/commit/4b9ec5de885781ab1c3b80a35a91f24cc0c7b17d">4b9ec5d</a> (main) · scraped 0.0.20 · <a href="about-this-build.html">about this build</a></p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
@@ -291,6 +316,7 @@ through a <code class="docutils literal notranslate"><span class="pre">SCRAPED_D
 <li><a :data-current="activeSection === '#the-one-idea-worth-internalizing'" class="reference internal" href="#the-one-idea-worth-internalizing">The one idea worth internalizing</a></li>
 <li><a :data-current="activeSection === '#what-you-get-without-asking-for-it'" class="reference internal" href="#what-you-get-without-asking-for-it">What you get without asking for it</a></li>
 <li><a :data-current="activeSection === '#browser-rung-optional'" class="reference internal" href="#browser-rung-optional">Browser rung (optional)</a></li>
+<li><a :data-current="activeSection === '#agent-skills-and-the-acquisition-subagent'" class="reference internal" href="#agent-skills-and-the-acquisition-subagent">Agent skills and the acquisition subagent</a></li>
 <li><a :data-current="activeSection === '#design-docs'" class="reference internal" href="#design-docs">Design docs</a></li>
 </ul>
 </li>
@@ -314,7 +340,7 @@ through a <code class="docutils literal notranslate"><span class="pre">SCRAPED_D
 </div>
 </footer>
 </div>
-<script src="_static/documentation_options.js?v=2fd7553c"></script>
+<script src="_static/documentation_options.js?v=056c92e6"></script>
 <script src="_static/doctools.js?v=fd6eb6e6"></script>
 <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="_static/clipboard.min.js?v=a7894cd8"></script>
