@@ -1,4 +1,4 @@
-> built 2026-10-20 11:48 UTC from ca892bc (main) · scraped 0.0.18. Details: build_info.json
+> built 2026-10-20 12:45 UTC from 7ac714d (main) · scraped 0.0.19. Details: build_info.json
 
 # index.html.md
 
@@ -224,18 +224,18 @@ And there’s more arguments:
 
 # About this build
 
-This documentation was built on **2026-10-20 11:48 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/ca892bc28847f1e2c38d65726a5f65ac08e240c5"><code>ca892bc</code></a> on branch <code>main</code>, for **scraped 0.0.18** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 12:45 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/7ac714d2373211cdefdb6cdd7fbe9b8dbf463dcc"><code>7ac714d</code></a> on branch <code>main</code>, for **scraped 0.0.19** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.18) is behind the latest release on PyPI (0.0.19): `pip install scraped` gives newer code than these docs describe.
+- The documented version (0.0.19) is behind the latest release on PyPI (0.0.20): `pip install scraped` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                           |
 |---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/scraped/commit/ca892bc28847f1e2c38d65726a5f65ac08e240c5"><code>ca892bc28847f1e2c38d65726a5f65ac08e240c5</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/scraped/commit/7ac714d2373211cdefdb6cdd7fbe9b8dbf463dcc"><code>7ac714d2373211cdefdb6cdd7fbe9b8dbf463dcc</code></a> |
 | Branch              | <code>main</code>                                                                                                                                         |
 | Tags at this commit | none                                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                     |
@@ -246,15 +246,15 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/scraped</code>                                                            |
-| Run          | <a href="https://github.com/thorwhalen/scraped/actions/runs/39417321649">39417321649</a>   |
+| Run          | <a href="https://github.com/thorwhalen/scraped/actions/runs/39424495391">39424495391</a>   |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>ca892bc28847f1e2c38d65726a5f65ac08e240c5</code> (in the history of the built commit) |
+| Event commit | <code>7ac714d2373211cdefdb6cdd7fbe9b8dbf463dcc</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.19  |
+| epythet  | 0.2.20  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
 | Python   | 3.12.15 |
@@ -273,14 +273,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/scraped/0.0.19/">0.0.19</a>, newer than the documented version (0.0.18).
+Latest release: <a href="https://pypi.org/project/scraped/0.0.20/">0.0.20</a>, newer than the documented version (0.0.19).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/scraped && cd scraped
-git checkout ca892bc28847f1e2c38d65726a5f65ac08e240c5
-pip install "epythet==0.2.19"
+git checkout 7ac714d2373211cdefdb6cdd7fbe9b8dbf463dcc
+pip install "epythet==0.2.20"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 
