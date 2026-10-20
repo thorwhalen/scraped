@@ -47,7 +47,9 @@ from __future__ import annotations
 import ipaddress
 import os
 import re
+import warnings
 from dataclasses import dataclass, fields, replace
+from functools import lru_cache
 from urllib.parse import urlsplit
 from datetime import date
 from pathlib import Path
@@ -61,22 +63,44 @@ SITE_PATTERNS_DIR_ENVVAR = "SCRAPED_SITE_PATTERNS_DIR"
 #: The app data subfolder holding them when the environment variable is unset.
 SITE_PATTERNS_SUBDIR = "site-patterns"
 
-#: Shapes of a credential in free text: a header or cookie, a ``key=value`` whose key
-#: names a secret and whose value is opaque, a JWT, a known key prefix, or a long
-#: opaque string mixing letters and digits. Errs on the side of routing to the local
-#: file: a false positive keeps a harmless fact private, a false negative publishes a
-#: secret.
+#: Before a credential-like key: up to four ``word_``/``word-``/``word.`` or camelCase
+#: prefixes (``x-api-key``, ``accessToken``), starting at a word start (so ``outside``
+#: is not ``sid``). Bounded, so matching stays linear on long runs.
+_KEY_PREFIX = r"(?<![a-z0-9])(?:[a-z0-9]{1,32}[_.-]|[a-z][a-z0-9]{0,31}(?=(?-i:[A-Z]))){0,4}"
+#: After it: an optional ``id``/``key``/``token`` suffix, a closing quote (JSON), ``=`` or ``:``.
+_KEY_TAIL = r"(?:[_.-]?(?:id|key|token))?[\"']?\s*[=:]\s*[\"']?"
+
+#: Shapes of a credential in free text: a header or cookie line, a secret-named key
+#: with a value (any value for a password, secret or key; an opaque one holding a
+#: digit for a token, session or auth key), credentials in a URL, a JWT, a known key
+#: prefix, or a long opaque string with at least four digits. Errs on the side of
+#: routing to the local file: a false positive keeps a harmless fact private, a false
+#: negative publishes a secret.
 SECRET_TEXT_PATTERNS = (
-    re.compile(r"(?i)\b(?:authorization|proxy-authorization|cookie|set-cookie)\s*:"),
-    re.compile(r"(?i)\b(?:bearer|basic)\s+(?=[^\s]*\d)[a-z0-9._~+/=-]{8,}"),
+    re.compile(r"(?i)(?<![a-z0-9-])(?:proxy-)?(?:authorization|cookie|set-cookie)\s*:"),
     re.compile(
-        r"(?i)[a-z0-9_-]*(?:token|secret|passw(?:or)?d|pwd|api[_-]?key|session|sid|auth)"
-        r"[a-z0-9_-]*\s*[=:]\s*[\"']?(?=[^\s\"']*\d)[a-z0-9._~+/%=-]{8,}"
+        r"(?i)\b(?:bearer|basic)\s+(?=[a-z0-9._~+/=-]{0,512}(?-i:[A-Z0-9]))"
+        r"[a-z0-9._~+/=-]{8,}"
     ),
+    re.compile(
+        r"(?i)" + _KEY_PREFIX + r"(?:pass(?:wor)?d|pass|pwd|secret|api[_-]?key"
+        r"|access[_-]?key|private[_-]?key|credentials?)" + _KEY_TAIL + r"[^\s\"',;]{4,}"
+    ),
+    re.compile(
+        r"(?i)" + _KEY_PREFIX + r"(?:token|session|sid|auth)" + _KEY_TAIL
+        + r"(?=[^\s\"',;]{0,512}\d)[^\s\"',;]{8,}"
+    ),
+    re.compile(r"(?i)\b[a-z][a-z0-9+.-]{0,15}://[^/\s:@]{1,64}:[^/\s@]{1,128}@"),
     re.compile(r"\beyJ[a-zA-Z0-9_-]{8,}\.[a-zA-Z0-9_-]{8,}"),
-    re.compile(r"\b(?:sk|pk|rk)[-_](?:live[-_]|test[-_])?[a-zA-Z0-9_-]{16,}"),
-    re.compile(r"\b(?:gh[pousr]_[a-zA-Z0-9]{20,}|AKIA[0-9A-Z]{16}|xox[abposr]-[a-zA-Z0-9-]{10,})"),
-    re.compile(r"\b(?=[a-zA-Z0-9_-]*\d)(?=[a-zA-Z0-9_-]*[a-zA-Z])[a-zA-Z0-9_-]{32,}\b"),
+    re.compile(
+        r"\b(?:(?:sk|pk|rk)[-_](?:live[-_]|test[-_])?[a-zA-Z0-9]{8,}|gh[pousr]_[a-zA-Z0-9]{20,}"
+        r"|glpat-[a-zA-Z0-9_-]{16,}|AIza[a-zA-Z0-9_-]{30,}|AKIA[0-9A-Z]{16}"
+        r"|xox[abposr]-[a-zA-Z0-9-]{10,})"
+    ),
+    re.compile(
+        r"(?<![a-zA-Z0-9_-])(?=(?:[a-zA-Z_-]*\d){4})"
+        r"(?![a-zA-Z0-9_]*-[a-zA-Z0-9_]*-[a-zA-Z0-9_]*-)[a-zA-Z0-9_-]{32,}"
+    ),
 )
 
 #: Host suffixes that name a private network, never a public site.
@@ -255,6 +279,18 @@ def default_paths() -> tuple[Path, Path]:
     return folder / SITE_PATTERNS_NAME, folder / LOCAL_SITE_PATTERNS_NAME
 
 
+@lru_cache(maxsize=1)
+def _warn_if_legacy_local(local: Path) -> None:
+    """Warn once when a local file still sits where scraped < 0.0.27 kept it."""
+    legacy = seed_path().with_name(LOCAL_SITE_PATTERNS_NAME)
+    if legacy.is_file() and not local.is_file():
+        warnings.warn(
+            f"{legacy} is no longer read; move it to {local} to keep its private "
+            "patterns (site-pattern files now default to a user data folder)",
+            stacklevel=3,
+        )
+
+
 def read_patterns(path: str | Path) -> dict[str, SitePattern]:
     """The patterns in one file, by host; empty when the file does not exist."""
     path = Path(path)
@@ -327,6 +363,8 @@ def recall(
         else None
     )
     public_entry = read_patterns(public).get(host)
+    if local is None:
+        _warn_if_legacy_local(dflt_local)
     local_entry = read_patterns(local or dflt_local).get(host)
     if local_entry is not None:
         local_entry = replace(local_entry, private=True)

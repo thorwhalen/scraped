@@ -1,6 +1,8 @@
 """Site-pattern memory (scraped#7): public/private split, merge, round trip. Offline."""
 
 from datetime import date
+from pathlib import Path
+import time
 
 import pytest
 
@@ -65,8 +67,13 @@ def test_the_default_files_live_outside_the_package(tmp_path, monkeypatch):
     assert remember(SitePattern("shop.example.com", transport="http")) == public
     assert not seed_path().read_text().count("shop.example.com")
     monkeypatch.delenv("SCRAPED_SITE_PATTERNS_DIR")
-    package_dir = seed_path().parents[3]
-    assert package_dir not in default_paths()[0].parents
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "xdg"))
+    import scraped
+
+    public, _ = default_paths()
+    assert Path(scraped.__file__).parent not in public.parents
+    assert tmp_path in public.parents and not public.parent.exists()
 
 
 def test_recall_layers_seed_then_public_then_local(tmp_path, files):
@@ -87,6 +94,12 @@ def test_recall_layers_seed_then_public_then_local(tmp_path, files):
     ("payload", "api (session_id=7f3a9c2e11)"),
     ("notes", "ghp_abcdefghijklmnopqrstuvwxyz0123"),
     ("notes", "id 3f9a2b7c8d1e4f5a6b7c8d9e0f1a2b3c"),
+    ("notes", "login via https://user:pw1234@host/x"),
+    ("notes", '{"api_key": "a1b2c3d4e5f6g7"}'),
+    ("notes", "password: hunter2"),
+    ("notes", "x-api-key: abcdefghijklmnop"),
+    ("notes", "accessToken=ab12cd34ef56"),
+    ("notes", "Basic dXNlcjpwYXNz"),
 ])
 def test_secret_looking_text_goes_to_the_local_file(files, field, text):
     pattern = SitePattern("shop.example.com", **{field: (text,) if field == "notes" else text})
@@ -99,7 +112,8 @@ def test_secret_looking_text_goes_to_the_local_file(files, field, text):
 @pytest.mark.parametrize("text", [
     "cursor (size=variables.first, cursor=variables.after)", "deep paging capped",
     "page via ?pageToken=", "basic pagination", "token pagination", "cookie banner blocks the DOM",
-    "10000 results", "state blob in __NEXT_DATA__",
+    "10000 results", "state blob in __NEXT_DATA__", "outside: 2024-10-01 snapshot", "author: 12345678",
+    "persisted-query-hash-sha256-in-extensions-field", "session: 30 minutes", "sid=123",
 ])
 def test_ordinary_notes_are_not_mistaken_for_secrets(text):
     assert not has_secret(text)
@@ -135,3 +149,24 @@ def test_internal_host_spellings_are_private(host):
     from scraped.acquire import is_private_host
 
     assert is_private_host(host)
+
+
+@pytest.mark.parametrize("unit", ["a", "a-", "a_", "aB", "x:", "a."])
+def test_the_detector_stays_fast_on_long_runs(unit):
+    text = unit * (50_000 // len(unit))
+    start = time.perf_counter()
+    has_secret(text)
+    assert time.perf_counter() - start < 1
+
+
+def test_a_local_file_left_beside_the_skill_is_flagged(tmp_path, monkeypatch):
+    from scraped.acquire import site_patterns
+
+    legacy = tmp_path / "references" / "site-patterns.local.md"
+    legacy.parent.mkdir()
+    legacy.write_text("")
+    monkeypatch.setattr(site_patterns, "seed_path", lambda: legacy.with_name("site-patterns.md"))
+    monkeypatch.setenv("SCRAPED_SITE_PATTERNS_DIR", str(tmp_path / "user"))
+    site_patterns._warn_if_legacy_local.cache_clear()
+    with pytest.warns(UserWarning, match="no longer read"):
+        recall("x.com", seed="")
