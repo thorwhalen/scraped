@@ -47,18 +47,56 @@ DFLT_DEEP_PAGE_CAP = 100
 
 #: Request parameter names, by paging style, lowercased.
 OFFSET_PARAMS = ("offset", "skip", "start", "from")
-LIMIT_PARAMS = ("limit", "take", "rows", "size", "count", "per_page", "perpage", "pagesize", "page_size", "first")
+LIMIT_PARAMS = (
+    "limit",
+    "take",
+    "rows",
+    "size",
+    "count",
+    "per_page",
+    "perpage",
+    "pagesize",
+    "page_size",
+    "first",
+)
 PAGE_PARAMS = ("page", "pagenumber", "page_number", "pageindex")
-CURSOR_PARAMS = ("after", "cursor", "pagetoken", "page_token", "next_token", "nexttoken", "continuation", "starting_after")
+CURSOR_PARAMS = (
+    "after",
+    "cursor",
+    "pagetoken",
+    "page_token",
+    "next_token",
+    "nexttoken",
+    "continuation",
+    "starting_after",
+)
 
 #: Response field names that carry the next cursor or the total, lowercased.
-NEXT_CURSOR_FIELDS = ("endcursor", "nextcursor", "next_cursor", "nextpagetoken", "next_page_token", "next_token", "continuation")
+NEXT_CURSOR_FIELDS = (
+    "endcursor",
+    "nextcursor",
+    "next_cursor",
+    "nextpagetoken",
+    "next_page_token",
+    "next_token",
+    "continuation",
+)
 #: In priority order: ``count`` is left out, as it is as often the size of the page returned.
-TOTAL_FIELDS = ("totalcount", "total_count", "totalresults", "total_results", "totalhits", "nbhits", "total")
+TOTAL_FIELDS = (
+    "totalcount",
+    "total_count",
+    "totalresults",
+    "total_results",
+    "totalhits",
+    "nbhits",
+    "total",
+)
 HAS_NEXT_FIELDS = ("hasnextpage", "has_next_page", "has_more", "hasmore")
 
 #: The text of a GraphQL document starts with an operation keyword or a selection set.
-_GRAPHQL_TEXT = re.compile(r"^\s*(query|mutation|subscription|fragment)\b|^\s*\{", re.IGNORECASE)
+_GRAPHQL_TEXT = re.compile(
+    r"^\s*(query|mutation|subscription|fragment)\b|^\s*\{", re.IGNORECASE
+)
 #: A date or time: a value like this in ``after``/``from`` is a filter, not a position.
 _DATE_LIKE = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
@@ -96,8 +134,14 @@ def _operation(payload: Mapping[str, Any]) -> GraphQLOperation | None:
     variables = payload.get("variables") or {}
     if isinstance(variables, str):
         variables = _json(variables) or {}
-    persisted = (extensions.get("persistedQuery") or {}) if isinstance(extensions, Mapping) else {}
-    persisted_hash = persisted.get("sha256Hash") if isinstance(persisted, Mapping) else None
+    persisted = (
+        (extensions.get("persistedQuery") or {})
+        if isinstance(extensions, Mapping)
+        else {}
+    )
+    persisted_hash = (
+        persisted.get("sha256Hash") if isinstance(persisted, Mapping) else None
+    )
     query = payload.get("query")
     if not (isinstance(query, str) and _GRAPHQL_TEXT.match(query)):
         query = None  # a search API's ``query=shoes`` is not a GraphQL document
@@ -107,7 +151,9 @@ def _operation(payload: Mapping[str, Any]) -> GraphQLOperation | None:
         operation_name=payload.get("operationName"),
         query=query if isinstance(query, str) and query.strip() else None,
         variables=variables if isinstance(variables, Mapping) else {},
-        persisted_hash=persisted_hash.lower() if isinstance(persisted_hash, str) else None,
+        persisted_hash=persisted_hash.lower()
+        if isinstance(persisted_hash, str)
+        else None,
     )
 
 
@@ -148,7 +194,11 @@ def persisted_queries(captures: Iterable[Capture]) -> dict[str, str]:
     found: dict[str, str] = {}
     for capture in captures:
         for op in graphql_operations(capture.request):
-            if op.query and op.persisted_hash and _sha256(op.query) == op.persisted_hash:
+            if (
+                op.query
+                and op.persisted_hash
+                and _sha256(op.query) == op.persisted_hash
+            ):
                 found[op.persisted_hash] = op.query
     return found
 
@@ -168,7 +218,10 @@ def persisted_query_misses(captures: Iterable[Capture]) -> list[Capture]:
                 return False
             extensions = error.get("extensions")
             code = extensions.get("code") if isinstance(extensions, Mapping) else None
-            return error.get("message") == "PersistedQueryNotFound" or code == "PERSISTED_QUERY_NOT_FOUND"
+            return (
+                error.get("message") == "PersistedQueryNotFound"
+                or code == "PERSISTED_QUERY_NOT_FOUND"
+            )
 
         if any(is_miss(e) for e in errors):
             misses.append(capture)
@@ -205,7 +258,10 @@ def _request_params(request: Request) -> dict[str, Any]:
     params: dict[str, Any] = dict(parse_qsl(urlsplit(request.url).query))
     body = _json(request.body)
     if isinstance(body, Mapping):
-        params.update({k: v for k, v in body.items() if not isinstance(v, (Mapping, list))})
+        params.update(
+            {k: v for k, v in body.items() if not isinstance(v, (Mapping, list))}
+        )
+
     def flatten(prefix: str, node: Mapping[str, Any], depth: int = 4) -> None:
         for k, v in node.items():
             if isinstance(v, Mapping) and depth > 0:
@@ -295,7 +351,9 @@ def pagination_shape(
     elif next_cursor is not None:
         kind = "cursor"  # the first page sends no cursor; the response hands one back
     elif size_key:
-        kind = "offset"  # a size with no position yet: the first page of an offset scheme
+        kind = (
+            "offset"  # a size with no position yet: the first page of an offset scheme
+        )
     else:
         kind = None
     pages = -(-total // page_size) if total is not None and page_size else None
