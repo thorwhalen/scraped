@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from typing import Any
@@ -52,7 +53,14 @@ CURSOR_PARAMS = ("after", "cursor", "pagetoken", "page_token", "next_token", "ne
 
 #: Response field names that carry the next cursor or the total, lowercased.
 NEXT_CURSOR_FIELDS = ("endcursor", "nextcursor", "next_cursor", "nextpagetoken", "next_page_token", "next_token", "continuation")
-TOTAL_FIELDS = ("total", "totalcount", "total_count", "totalresults", "total_results", "totalhits", "nbhits", "count")
+#: In priority order: ``count`` is left out, as it is as often the size of the page returned.
+TOTAL_FIELDS = ("totalcount", "total_count", "totalresults", "total_results", "totalhits", "nbhits", "total")
+HAS_NEXT_FIELDS = ("hasnextpage", "has_next_page", "has_more", "hasmore")
+
+#: The text of a GraphQL document starts with an operation keyword or a selection set.
+_GRAPHQL_TEXT = re.compile(r"^\s*(query|mutation|subscription|fragment)\b|^\s*\{", re.IGNORECASE)
+#: A date or time: a value like this in ``after``/``from`` is a filter, not a position.
+_DATE_LIKE = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
 
 # --------------------------------------------------------------------------- #
@@ -75,7 +83,7 @@ def _json(text: str | bytes | None) -> Any:
         return None
     try:
         return json.loads(text)
-    except (ValueError, UnicodeDecodeError):
+    except (ValueError, UnicodeDecodeError, RecursionError):
         return None
 
 
@@ -91,13 +99,15 @@ def _operation(payload: Mapping[str, Any]) -> GraphQLOperation | None:
     persisted = (extensions.get("persistedQuery") or {}) if isinstance(extensions, Mapping) else {}
     persisted_hash = persisted.get("sha256Hash") if isinstance(persisted, Mapping) else None
     query = payload.get("query")
-    if query is None and persisted_hash is None:
+    if not (isinstance(query, str) and _GRAPHQL_TEXT.match(query)):
+        query = None  # a search API's ``query=shoes`` is not a GraphQL document
+    if query is None and not isinstance(persisted_hash, str):
         return None
     return GraphQLOperation(
         operation_name=payload.get("operationName"),
         query=query if isinstance(query, str) and query.strip() else None,
         variables=variables if isinstance(variables, Mapping) else {},
-        persisted_hash=persisted_hash,
+        persisted_hash=persisted_hash.lower() if isinstance(persisted_hash, str) else None,
     )
 
 
@@ -109,10 +119,12 @@ def graphql_operations(request: Request) -> list[GraphQLOperation]:
     ['Items']
     """
     payload = _json(request.body)
-    if payload is None and request.method == "GET":
-        payload = dict(parse_qsl(urlsplit(request.url).query))
     payloads = payload if isinstance(payload, list) else [payload]
-    return [op for p in payloads if isinstance(p, Mapping) and (op := _operation(p))]
+    ops = [op for p in payloads if isinstance(p, Mapping) and (op := _operation(p))]
+    if not ops:  # a GET, or a POST with the hash in the URL
+        op = _operation(dict(parse_qsl(urlsplit(request.url).query)))
+        ops = [op] if op else []
+    return ops
 
 
 def _sha256(text: str) -> str:
@@ -148,16 +160,17 @@ def persisted_query_misses(captures: Iterable[Capture]) -> list[Capture]:
         payload = _json(capture.body)
         errors = []
         for part in payload if isinstance(payload, list) else [payload]:
-            if isinstance(part, Mapping):
-                errors += part.get("errors") or []
-        if any(
-            isinstance(e, Mapping)
-            and (
-                e.get("message") == "PersistedQueryNotFound"
-                or (e.get("extensions") or {}).get("code") == "PERSISTED_QUERY_NOT_FOUND"
-            )
-            for e in errors
-        ):
+            if isinstance(part, Mapping) and isinstance(part.get("errors"), list):
+                errors += part["errors"]
+
+        def is_miss(error: Any) -> bool:
+            if not isinstance(error, Mapping):
+                return False
+            extensions = error.get("extensions")
+            code = extensions.get("code") if isinstance(extensions, Mapping) else None
+            return error.get("message") == "PersistedQueryNotFound" or code == "PERSISTED_QUERY_NOT_FOUND"
+
+        if any(is_miss(e) for e in errors):
             misses.append(capture)
     return misses
 
@@ -193,31 +206,55 @@ def _request_params(request: Request) -> dict[str, Any]:
     body = _json(request.body)
     if isinstance(body, Mapping):
         params.update({k: v for k, v in body.items() if not isinstance(v, (Mapping, list))})
+    def flatten(prefix: str, node: Mapping[str, Any], depth: int = 4) -> None:
+        for k, v in node.items():
+            if isinstance(v, Mapping) and depth > 0:
+                flatten(f"{prefix}.{k}", v, depth - 1)
+            elif not isinstance(v, list):
+                params[f"{prefix}.{k}"] = v
+
     for op in graphql_operations(request):
-        params.update({f"variables.{k}": v for k, v in op.variables.items()})
+        flatten("variables", op.variables)
     return params
 
 
-def _find(params: Mapping[str, Any], names: tuple[str, ...]) -> str | None:
-    for key in params:
-        if key.rsplit(".", 1)[-1].lower() in names:
-            return key
+def _find(
+    params: Mapping[str, Any], names: tuple[str, ...], *, numeric: bool = False
+) -> str | None:
+    """The first parameter named one of ``names``, skipping date-like values (and non-numbers if ``numeric``)."""
+    for key, value in params.items():
+        if key.rsplit(".", 1)[-1].lower() not in names:
+            continue
+        if value is None and not numeric:
+            return key  # a first page sends a null cursor: the parameter is still the cursor
+        if isinstance(value, str) and _DATE_LIKE.match(value):
+            continue  # ``after=2020-01-01`` filters by date
+        if numeric and _int(value) is None:
+            continue  # ``size=M`` is a clothing size
+        return key
     return None
 
 
 def _walk(node: Any, names: tuple[str, ...], *, depth: int = 6) -> Any:
-    """The first value under a key in ``names`` (lowercased), breadth first, ``depth`` levels down."""
+    """The value under the highest-priority key in ``names`` at the shallowest level that has one.
+
+    Breadth first through mappings only, ``depth`` levels down: a total or a cursor
+    sits in the response's envelope, never inside a list of items.
+    """
     level = [node]
     for _ in range(depth):
-        nested = []
+        nested, here = [], {}
         for item in level:
             if isinstance(item, Mapping):
                 for key, value in item.items():
-                    if str(key).lower() in names and not isinstance(value, (Mapping, list)):
-                        return value
-                    nested.append(value)
-            elif isinstance(item, list):
-                nested.extend(item[:1])  # list items share a shape: look at one
+                    name = str(key).lower()
+                    if name in names and not isinstance(value, (Mapping, list)):
+                        here.setdefault(name, value)
+                    elif isinstance(value, Mapping):
+                        nested.append(value)
+        for name in names:
+            if name in here:
+                return here[name]
         level = nested
     return None
 
@@ -225,7 +262,7 @@ def _walk(node: Any, names: tuple[str, ...], *, depth: int = 6) -> Any:
 def _int(value: Any) -> int | None:
     try:
         number = int(value)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return None
     return number if number >= 0 and not isinstance(value, bool) else None
 
@@ -244,14 +281,16 @@ def pagination_shape(
     body = _json(capture.body)
     total = _int(_walk(body, TOTAL_FIELDS)) if body is not None else None
     next_cursor = _walk(body, NEXT_CURSOR_FIELDS) if body is not None else None
-    size_key = _find(params, LIMIT_PARAMS)
+    if body is not None and _walk(body, HAS_NEXT_FIELDS) is False:
+        next_cursor = None  # the last page still names its end cursor
+    size_key = _find(params, LIMIT_PARAMS, numeric=True)
     page_size = _int(params[size_key]) if size_key else None
     named = {"size": size_key} if size_key else {}
     if cursor_key := _find(params, CURSOR_PARAMS):
         kind, named = "cursor", {**named, "cursor": cursor_key}
-    elif offset_key := _find(params, OFFSET_PARAMS):
+    elif offset_key := _find(params, OFFSET_PARAMS, numeric=True):
         kind, named = "offset", {**named, "offset": offset_key}
-    elif page_key := _find(params, PAGE_PARAMS):
+    elif page_key := _find(params, PAGE_PARAMS, numeric=True):
         kind, named = "page", {**named, "page": page_key}
     elif next_cursor is not None:
         kind = "cursor"  # the first page sends no cursor; the response hands one back

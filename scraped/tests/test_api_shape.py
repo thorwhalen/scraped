@@ -82,3 +82,50 @@ def test_a_custom_cap():
     capture = Capture.from_body(Request("https://example.com/api?offset=0&limit=50"), b'{"total": 600}')
     assert not pagination_shape(capture).deep_paging_capped
     assert pagination_shape(capture, deep_page_cap=10).deep_paging_capped
+
+
+def _shape(url, body):
+    return pagination_shape(Capture.from_body(Request(url), body if isinstance(body, bytes) else json.dumps(body).encode()))
+
+
+def test_the_real_total_wins_over_a_page_count_and_item_fields():
+    shape = _shape("https://example.com/api?offset=0&limit=20", {"count": 20, "total": 12000})
+    assert (shape.total, shape.pages_needed, shape.deep_paging_capped) == (12000, 600, True)
+    assert _shape("https://example.com/api?offset=0&limit=2", {"items": [{"total": 9999}]}).total is None
+    assert _shape("https://example.com/api?offset=0&limit=2", [{"total": 9999}]).total is None
+
+
+def test_odd_bodies_do_not_crash():
+    assert _shape("https://example.com/api?limit=5", b'{"total": Infinity}').total is None
+    deep = b"[" * 100000
+    assert _shape("https://example.com/api", deep).kind is None
+    assert graphql_operations(Request(GQL_URL, "POST", body=deep)) == []
+    for body in ({"errors": 5}, {"errors": [{"extensions": [1]}]}, {"errors": "x"}):
+        assert persisted_query_misses([Capture.from_body(Request(GQL_URL), json.dumps(body).encode())]) == []
+
+
+def test_date_filters_and_sizes_are_not_paging():
+    assert _shape("https://example.com/api?after=2020-01-01&size=M", {}).kind is None
+    assert _shape("https://example.com/api?from=2020-01-01&color=red", {}).kind is None
+
+
+def test_a_search_query_is_not_graphql():
+    assert graphql_operations(Request("https://example.com/s?query=shoes&limit=10")) == []
+    assert graphql_operations(Request("https://example.com/s", "POST", body=b'{"query": "shoes"}')) == []
+
+
+def test_apq_variants():
+    from urllib.parse import urlencode
+
+    ext = json.dumps({"persistedQuery": {"version": 1, "sha256Hash": HASH.upper()}})
+    [op] = graphql_operations(Request(f"{GQL_URL}?{urlencode({'extensions': ext})}", "POST", body=b""))
+    assert op.persisted_hash == HASH
+    nested = _apq(QUERY)
+    nested["variables"] = {"input": {"first": 25, "after": "YWJj"}}
+    shape = pagination_shape(_post(nested))
+    assert shape.kind == "cursor" and shape.page_size == 25
+
+
+def test_the_last_page_has_no_next_cursor():
+    body = {"data": {"listings": {"pageInfo": {"endCursor": "abc", "hasNextPage": False}}}}
+    assert pagination_shape(_post(_apq(QUERY), json.dumps(body).encode())).next_cursor is None
