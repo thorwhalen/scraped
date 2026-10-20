@@ -46,8 +46,16 @@ LOCAL_SITE_PATTERNS_NAME = "site-patterns.local.md"
 
 #: Host suffixes that name a private network, never a public site.
 PRIVATE_HOST_SUFFIXES = (
-    ".local", ".internal", ".intranet", ".private", ".lan", ".corp", ".home.arpa",
-    ".localhost", ".test", ".invalid",
+    ".local",
+    ".internal",
+    ".intranet",
+    ".private",
+    ".lan",
+    ".corp",
+    ".home.arpa",
+    ".localhost",
+    ".test",
+    ".invalid",
 )
 #: A public top-level label: letters, or an IDNA ``xn--`` label. Anything else is not a public site.
 _PUBLIC_TLD_RE = re.compile(r"^(?:[a-z]{2,63}|xn--[a-z0-9-]+)$")
@@ -71,14 +79,18 @@ class SitePattern:
 
     host: str
     generator: str = ""
-    transport: str = ""  # the transport rung that worked: http, impersonating http, browser...
+    transport: str = (
+        ""  # the transport rung that worked: http, impersonating http, browser...
+    )
     payload: str = ""  # the payload rung that carried the data: api, state blob, dom...
     pagination: str = ""  # e.g. "cursor (size=variables.first, cursor=variables.after)"
     cap: str = ""  # a known paging or result cap, e.g. "10000 results"
     seen: str = ""  # ISO date of the run that last confirmed it
     notes: tuple[str, ...] = ()
     authenticated: bool = False  # needed a login: always private
-    private: bool = False  # came from (or belongs in) the local file: never written public
+    private: bool = (
+        False  # came from (or belongs in) the local file: never written public
+    )
 
     def __post_init__(self):
         object.__setattr__(self, "host", normalize_host(self.host))
@@ -86,7 +98,9 @@ class SitePattern:
             values = getattr(self, name)
             for value in values if name == "notes" else (values,):
                 if _CONTROL_RE.search(value):
-                    raise ValueError(f"{name} of {self.host} holds a line break or control character")
+                    raise ValueError(
+                        f"{name} of {self.host} holds a line break or control character"
+                    )
 
     def merged(self, newer: "SitePattern") -> "SitePattern":
         """This pattern updated by ``newer``: its set fields win, notes accumulate."""
@@ -132,7 +146,11 @@ def is_private_host(host: str) -> bool:
         address = ipaddress.ip_address(name)
     except ValueError:
         tld = name.rsplit(".", 1)[-1]
-        return "." not in name or name.endswith(PRIVATE_HOST_SUFFIXES) or not _PUBLIC_TLD_RE.match(tld)
+        return (
+            "." not in name
+            or name.endswith(PRIVATE_HOST_SUFFIXES)
+            or not _PUBLIC_TLD_RE.match(tld)
+        )
     return not address.is_global
 
 
@@ -143,7 +161,13 @@ def is_private(pattern: SitePattern) -> bool:
 
 def default_paths() -> tuple[Path, Path]:
     """``(public, local)``: the files that ship beside the ``scraped-acquire`` skill."""
-    folder = Path(__file__).resolve().parent.parent / "data" / "skills" / "scraped-acquire" / "references"
+    folder = (
+        Path(__file__).resolve().parent.parent
+        / "data"
+        / "skills"
+        / "scraped-acquire"
+        / "references"
+    )
     return folder / SITE_PATTERNS_NAME, folder / LOCAL_SITE_PATTERNS_NAME
 
 
@@ -156,7 +180,9 @@ def read_patterns(path: str | Path) -> dict[str, SitePattern]:
     current: Optional[dict] = None
     for line in path.read_text(encoding="utf-8").splitlines():
         if section := _SECTION_RE.match(line):
-            current = found.setdefault(section["host"], {"host": section["host"], "notes": []})
+            current = found.setdefault(
+                section["host"], {"host": section["host"], "notes": []}
+            )
         elif current is not None and (item := _FIELD_RE.match(line)):
             key, value = item["key"], item["value"].strip()
             if key == "note":
@@ -165,7 +191,10 @@ def read_patterns(path: str | Path) -> dict[str, SitePattern]:
                 current["authenticated"] = value.lower() == "yes"
             elif key in _TEXT_FIELDS:
                 current[key] = value
-    return {host: SitePattern(**{**kw, "notes": tuple(kw["notes"])}) for host, kw in found.items()}
+    return {
+        host: SitePattern(**{**kw, "notes": tuple(kw["notes"])})
+        for host, kw in found.items()
+    }
 
 
 _TEXT_FIELDS = ("generator", "transport", "payload", "pagination", "cap", "seen")
@@ -173,7 +202,9 @@ _TEXT_FIELDS = ("generator", "transport", "payload", "pagination", "cap", "seen"
 
 def _render(pattern: SitePattern) -> str:
     lines = [f"## {pattern.host}", ""]
-    lines += [f"- {k}: {getattr(pattern, k)}" for k in _TEXT_FIELDS if getattr(pattern, k)]
+    lines += [
+        f"- {k}: {getattr(pattern, k)}" for k in _TEXT_FIELDS if getattr(pattern, k)
+    ]
     if pattern.authenticated:
         lines.append("- authenticated: yes")
     lines += [f"- note: {note}" for note in pattern.notes]
@@ -231,7 +262,11 @@ def remember(
             f"{pattern.host} is private (authenticated or an internal host); "
             "it can only be remembered in the local file"
         )
-    target = Path((local or dflt_local) if (private or is_private(pattern)) else (public or dflt_public))
+    target = Path(
+        (local or dflt_local)
+        if (private or is_private(pattern))
+        else (public or dflt_public)
+    )
     if not pattern.seen:
         pattern = replace(pattern, seen=(today or date.today()).isoformat())
     patterns = read_patterns(target)

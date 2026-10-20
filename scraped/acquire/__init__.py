@@ -79,7 +79,13 @@ from .report import (
     report_json_schema,
 )
 from .probe import SiteProfile, probe, robots_sitemaps
-from .site_patterns import SitePattern, is_private_host, pattern_from_run, recall, remember
+from .site_patterns import (
+    SitePattern,
+    is_private_host,
+    pattern_from_run,
+    recall,
+    remember,
+)
 from .signals import ChallengeEncountered, classify, detect_challenge
 from .url import canonicalize_url
 
