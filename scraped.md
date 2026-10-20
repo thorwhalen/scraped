@@ -1,4 +1,4 @@
-> built 2026-10-20 20:27 UTC from 7855dbb (main) · scraped 0.0.26. Details: build_info.json
+> built 2026-10-20 20:31 UTC from d7c5509 (main) · scraped 0.0.27. Details: build_info.json
 
 # index.html.md
 
@@ -252,7 +252,7 @@ And there’s more arguments:
 
 # About this build
 
-This documentation was built on **2026-10-20 20:27 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/7855dbbb7136d473dc6e34136f6f90fd33cb8b59"><code>7855dbb</code></a> on branch <code>main</code>, for **scraped 0.0.26** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 20:31 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/d7c5509664069418c43f17f3aea1386b3cc3cee4"><code>d7c5509</code></a> on branch <code>main</code>, for **scraped 0.0.27** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -261,7 +261,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                           |
 |---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/scraped/commit/7855dbbb7136d473dc6e34136f6f90fd33cb8b59"><code>7855dbbb7136d473dc6e34136f6f90fd33cb8b59</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/scraped/commit/d7c5509664069418c43f17f3aea1386b3cc3cee4"><code>d7c5509664069418c43f17f3aea1386b3cc3cee4</code></a> |
 | Branch              | <code>main</code>                                                                                                                                         |
 | Tags at this commit | none                                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                     |
@@ -272,9 +272,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/scraped</code>                                                            |
-| Run          | <a href="https://github.com/thorwhalen/scraped/actions/runs/39491723304">39491723304</a>   |
+| Run          | <a href="https://github.com/thorwhalen/scraped/actions/runs/39492270146">39492270146</a>   |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>7855dbbb7136d473dc6e34136f6f90fd33cb8b59</code> (in the history of the built commit) |
+| Event commit | <code>d7c5509664069418c43f17f3aea1386b3cc3cee4</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -299,13 +299,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/scraped/0.0.26/">0.0.26</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/scraped/0.0.27/">0.0.27</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/scraped && cd scraped
-git checkout 7855dbbb7136d473dc6e34136f6f90fd33cb8b59
+git checkout d7c5509664069418c43f17f3aea1386b3cc3cee4
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
