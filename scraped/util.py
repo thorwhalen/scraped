@@ -244,12 +244,14 @@ from bs4 import BeautifulSoup  # noqa: F401 (kept importable from here)
 from scraped.html_markdown import (  # noqa: F401 (re-exported)
     _CODE_FENCE_RE,
     _outside_code_fences,
+    DFLT_HTML_PARSER,
     HTML_TO_MARKDOWN_DEFAULTS,
     NON_CONTENT_TAGS,
     _collapse_blank_runs,
     _convert_html,
     _make_converter,
     _resolve_markdownify_options,
+    _strip_excluded,
     html_to_markdown_str,
 )
 
@@ -299,6 +301,10 @@ def html_to_markdown(
     content_filt=is_html_content,
     markdown_contents_aggregator: Callable = "\n\n".join,
     prefixes=None,
+    clean: bool = True,
+    ignore_images: bool = False,
+    include_links: bool = True,
+    parser: str = DFLT_HTML_PARSER,
     **markdownify_options,
 ):
     """
@@ -317,6 +323,11 @@ def html_to_markdown(
     :param markdown_contents_aggregator: A function to aggregate the Markdown strings.
     :param prefixes: A list of prefixes to be woven with to each Markdown string
         (there must be the same number of prefixes as HTML files).
+    :param clean: Run the cleaning passes of :func:`html_to_markdown_str` on each
+        document (default ``True``); ``False`` converts each soup as parsed.
+    :param ignore_images: Drop images (default ``False``: kept).
+    :param include_links: Keep hyperlinks (``False`` keeps the link text only).
+    :param parser: The BeautifulSoup parser (:data:`DFLT_HTML_PARSER`, or ``"lxml"``).
     :param markdownify_options: Options overriding
         :data:`HTML_TO_MARKDOWN_DEFAULTS`, passed to ``markdownify``'s
         ``MarkdownConverter``. Unknown option names raise ``TypeError`` -- in
@@ -345,7 +356,12 @@ def html_to_markdown(
             f"not {type(htmls).__name__}"
         )
 
-    converter = _make_converter(**_resolve_markdownify_options(markdownify_options))
+    options = _strip_excluded(
+        _resolve_markdownify_options(markdownify_options),
+        ignore_images=ignore_images,
+        include_links=include_links,
+    )
+    converter = _make_converter(**options)
 
     # Convert HTML contents to Markdown
     def _markdown_contents(html_contents):
@@ -353,7 +369,13 @@ def html_to_markdown(
             try:
                 if isinstance(html_content, bytes):
                     html_content = html_content.decode()
-                yield _convert_html(converter, html_content)
+                yield _convert_html(
+                    converter,
+                    html_content,
+                    clean=clean,
+                    include_links=include_links,
+                    parser=parser,
+                )
             except UnicodeDecodeError:
                 print(f"Failed to decode HTML content: {html_content[:30]=}")
                 # TODO: Give more control to the user to decide what to do in this case

@@ -178,3 +178,24 @@ def test_the_light_converter_does_not_import_the_crawler_stack():
     )
     out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True)
     assert out.stdout.strip() == "[]"
+
+
+def test_converter_options_are_at_parity_with_html_to_markdown_str():
+    from scraped import html_to_markdown_str
+
+    pages = [
+        SAMPLE_HTML,
+        '<h2>Usage<a class="headerlink" href="#usage">¶</a></h2>'
+        '<p>see <a href="u">c</a> <img src="i.png" alt="pic"></p>',
+    ]
+    option_sets = [
+        dict(clean=False),
+        dict(include_links=False),
+        dict(ignore_images=True),
+        dict(parser="lxml", ignore_images=True, include_links=False),
+    ]
+    for opts in option_sets:
+        expected = [html_to_markdown_str(page, **opts) for page in pages]
+        assert html_to_markdown(pages, markdown_contents_aggregator=list, **opts) == (
+            expected
+        ), opts
