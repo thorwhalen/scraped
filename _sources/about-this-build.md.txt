@@ -5,19 +5,19 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-10-26 09:26 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/08d25ce68f33c9d7946bfa297212c99b375ff033"><code>08d25ce</code></a> on branch <code>main</code>, for **scraped 0.0.28** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 09:32 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/e21aa271f8dc91288d2b6865c681e57ede5ade5e"><code>e21aa27</code></a> on branch <code>main</code>, for **scraped 0.0.29** (from <code>pyproject.toml</code>).
 
 :::{warning}
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.28) is behind the latest release on PyPI (0.0.29): `pip install scraped` gives newer code than these docs describe.
+- The documented version (0.0.29) is behind the latest release on PyPI (0.0.30): `pip install scraped` gives newer code than these docs describe.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/thorwhalen/scraped/commit/08d25ce68f33c9d7946bfa297212c99b375ff033"><code>08d25ce68f33c9d7946bfa297212c99b375ff033</code></a> |
+| Commit | <a href="https://github.com/thorwhalen/scraped/commit/e21aa271f8dc91288d2b6865c681e57ede5ade5e"><code>e21aa271f8dc91288d2b6865c681e57ede5ade5e</code></a> |
 | Branch | <code>main</code> |
 | Tags at this commit | none |
 | Working tree | clean |
@@ -28,9 +28,9 @@ The documentation and the package may be misaligned:
 | | |
 |---|---|
 | Repository | <code>thorwhalen/scraped</code> |
-| Run | <a href="https://github.com/thorwhalen/scraped/actions/runs/40299320990">40299320990</a> |
+| Run | <a href="https://github.com/thorwhalen/scraped/actions/runs/40299929448">40299929448</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>08d25ce68f33c9d7946bfa297212c99b375ff033</code> (in the history of the built commit) |
+| Event commit | <code>e21aa271f8dc91288d2b6865c681e57ede5ade5e</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -55,13 +55,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/scraped/0.0.29/">0.0.29</a>, newer than the documented version (0.0.28).
+Latest release: <a href="https://pypi.org/project/scraped/0.0.30/">0.0.30</a>, newer than the documented version (0.0.29).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/scraped && cd scraped
-git checkout 08d25ce68f33c9d7946bfa297212c99b375ff033
+git checkout e21aa271f8dc91288d2b6865c681e57ede5ade5e
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
