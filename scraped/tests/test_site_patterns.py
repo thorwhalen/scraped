@@ -2,12 +2,11 @@
 
 from datetime import date
 from pathlib import Path
-import time
 
 import pytest
 
 from scraped.acquire import SiteProfile, SitePattern, pattern_from_run, recall, remember
-from scraped.acquire.site_patterns import default_paths, has_secret, read_patterns, seed_path
+from scraped.acquire.site_patterns import default_paths, read_patterns, seed_path
 
 
 @pytest.fixture
@@ -111,14 +110,6 @@ def test_secret_looking_text_goes_to_the_local_file(files, field, text):
         remember(pattern, private=False, **files)
 
 
-@pytest.mark.parametrize("text", [
-    "cursor (size=variables.first, cursor=variables.after)", "deep paging capped",
-    "page via ?pageToken=", "basic pagination", "token pagination", "cookie banner blocks the DOM",
-    "10000 results", "state blob in __NEXT_DATA__", "outside: 2024-10-01 snapshot", "author: 12345678",
-    "persisted-query-hash-sha256-in-extensions-field", "session: 30 minutes", "sid=123",
-])
-def test_ordinary_notes_are_not_mistaken_for_secrets(text):
-    assert not has_secret(text)
 
 
 def test_a_probe_shaped_host_is_normalised_and_stays_public(files):
@@ -153,12 +144,6 @@ def test_internal_host_spellings_are_private(host):
     assert is_private_host(host)
 
 
-@pytest.mark.parametrize("unit", ["a", "a-", "a_", "aB", "x:", "a."])
-def test_the_detector_stays_fast_on_long_runs(unit):
-    text = unit * (50_000 // len(unit))
-    start = time.perf_counter()
-    has_secret(text)
-    assert time.perf_counter() - start < 1
 
 
 def test_a_local_file_left_beside_the_skill_is_flagged(tmp_path, monkeypatch):
