@@ -100,10 +100,13 @@
 <section id="scraped">
 <h1>scraped<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#scraped">¶</a></h1>
 <p>Tools for scraping.</p>
-<p>To install:	<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">scraped</span></code></p>
+<p>To install:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">pip</span> <span class="n">install</span> <span class="n">scraped</span>
+</span></code></pre></div>
+</div>
 <hr class="docutils"/>
 <section id="scraped-acquire-get-the-bytes-down-faithfully">
-<h2><code class="docutils literal notranslate"><span class="pre">scraped.acquire</span></code> — get the bytes down, faithfully<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#scraped-acquire-get-the-bytes-down-faithfully" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#scraped-acquire-get-the-bytes-down-faithfully'">¶</a></h2>
+<span id="scrapedacquire--get-the-bytes-down-faithfully"></span><h2><code class="docutils literal notranslate"><span class="pre">scraped.acquire</span></code> — get the bytes down, faithfully<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#scraped-acquire-get-the-bytes-down-faithfully" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#scraped-acquire-get-the-bytes-down-faithfully'">¶</a></h2>
 <p>Acquisition is one of three separable concerns in any information-extraction job:
 <strong>acquire</strong> the raw bytes, <strong>extract</strong> the target fields, <strong>format</strong> the result.
 This package owns the first and gives the other two a seam to hook into.</p>
@@ -156,6 +159,7 @@ retried, because the answer will not change and repeating it confirms automation
 <li><p><strong>Provenance on every capture</strong> — WARC-isomorphic, with the body content-addressed
 so deduplication, change detection, and free re-runs all fall out of one choice.</p></li>
 </ul>
+
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">scraped.acquire</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_fetcher</span><span class="p">,</span> <span class="n">cached</span><span class="p">,</span> <span class="n">capture_store</span><span class="p">,</span> <span class="n">Request</span>
 </span><span id="line-2">
 </span><span id="line-3"><span class="n">fetcher</span> <span class="o">=</span> <span class="n">cached</span><span class="p">(</span><span class="n">default_fetcher</span><span class="p">(),</span> <span class="n">capture_store</span><span class="p">(</span><span class="s2">"~/.cache/my-job"</span><span class="p">))</span>
@@ -168,6 +172,7 @@ so deduplication, change detection, and free re-runs all fall out of one choice.
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">pip<span class="w"> </span>install<span class="w"> </span><span class="s1">'scraped[browser]'</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>patchright<span class="w"> </span>install<span class="w"> </span>chromium
 </span></code></pre></div>
 </div>
+
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">scraped.acquire</span><span class="w"> </span><span class="kn">import</span> <span class="n">BrowserSession</span><span class="p">,</span> <span class="n">BrowserFetcher</span><span class="p">,</span> <span class="n">Request</span>
 </span><span id="line-2">
 </span><span id="line-3"><span class="k">with</span> <span class="n">BrowserSession</span><span class="p">(</span><span class="n">artifact_dir</span><span class="o">=</span><span class="s2">"~/runs/job"</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
@@ -244,7 +249,7 @@ you if you ask for it (by specifying a <code class="docutils literal notranslate
 <p>You’ll find more useful functions in the code, but the three I mention here are
 the “top” ones I use most often.</p>
 <section id="markdown-of-site">
-<h2>markdown_of_site<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#markdown-of-site" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#markdown-of-site'">¶</a></h2>
+<span id="markdown_of_site"></span><h2>markdown_of_site<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#markdown-of-site" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#markdown-of-site'">¶</a></h2>
 <p>Download a site and convert it to markdown.</p>
 <p>This can be quite useful when you want to perform some NLP analysis on a site,
 feed some information to an AI model, or simply want to read the site offline.
@@ -281,7 +286,7 @@ string, which you can then analyze directly, and/or store as you wish.</p>
 </div>
 </section>
 <section id="download-site">
-<h2>download_site<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#download-site" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#download-site'">¶</a></h2>
+<span id="download_site"></span><h2>download_site<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#download-site" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#download-site'">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">download_site</span><span class="p">(</span><span class="s2">"http://www.example.com"</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
@@ -307,7 +312,7 @@ through a <code class="docutils literal notranslate"><span class="pre">SCRAPED_D
 
 </section>
 </section>
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-26 09:32 UTC from <a href="https://github.com/thorwhalen/scraped/commit/e21aa271f8dc91288d2b6865c681e57ede5ade5e">e21aa27</a> (main) · scraped 0.0.29 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 22:20 UTC from <a href="https://github.com/thorwhalen/scraped/commit/8d4ad7ba3b324ec493e8b64b22423c2229ae8f6f">8d4ad7b</a> (main) · scraped 0.0.30 · <a href="about-this-build.html">about this build</a></p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
@@ -340,7 +345,7 @@ through a <code class="docutils literal notranslate"><span class="pre">SCRAPED_D
 </div>
 </footer>
 </div>
-<script src="_static/documentation_options.js?v=828725f0"></script>
+<script src="_static/documentation_options.js?v=61a342a2"></script>
 <script src="_static/doctools.js?v=fd6eb6e6"></script>
 <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="_static/clipboard.min.js?v=a7894cd8"></script>

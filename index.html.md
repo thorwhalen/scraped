@@ -4,7 +4,11 @@
 
 Tools for scraping.
 
-To install:	`pip install scraped`
+To install:
+
+```default
+pip install scraped
+```
 
 ---
 
@@ -68,6 +72,7 @@ markup changed — because the blob *is* the data rather than a rendering of it.
 - **Provenance on every capture** — WARC-isomorphic, with the body content-addressed
   so deduplication, change detection, and free re-runs all fall out of one choice.
 
+<!-- wads-docs: skip placeholder url; would write a cache under ~/.cache -->
 ```python
 from scraped.acquire import default_fetcher, cached, capture_store, Request
 
@@ -81,6 +86,7 @@ capture = fetcher(Request(url))  # second run costs no network at all
 pip install 'scraped[browser]' && patchright install chromium
 ```
 
+<!-- wads-docs: skip placeholder url; needs the browser extra and a Chromium install -->
 ```python
 from scraped.acquire import BrowserSession, BrowserFetcher, Request
 
