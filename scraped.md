@@ -1,4 +1,4 @@
-> built 2026-11-22 22:20 UTC from 8d4ad7b (main) · scraped 0.0.30. Details: build_info.json
+> built 2026-11-23 02:56 UTC from bf5ebd0 (main) · scraped 0.0.30. Details: build_info.json
 
 # index.html.md
 
@@ -6,21 +6,15 @@
 
 # scraped
 
-Tools for scraping.
+Tools for scraping: probe what a site will hand over, fetch it faithfully and politely (impersonating transport, robots-aware, challenges raised not saved), and turn a site into markdown.
 
-To install:
-
-```default
+```bash
 pip install scraped
 ```
 
----
-
 ## `scraped.acquire` — get the bytes down, faithfully
 
-Acquisition is one of three separable concerns in any information-extraction job:
-**acquire** the raw bytes, **extract** the target fields, **format** the result.
-This package owns the first and gives the other two a seam to hook into.
+Acquisition is one of three separable concerns in any information-extraction job: **acquire** the raw bytes, **extract** the target fields, **format** the result. This package owns the first and gives the other two a seam to hook into.
 
 ```python
 from scraped.acquire import probe, fetch, scan_state_blobs
@@ -52,29 +46,17 @@ payload:    api > internal api > state blob > sitemap > dom > text > vision
 transport:  plain http > impersonating http > +session > browser > headful
 ```
 
-Any payload rung is reachable from any transport rung. The highest-value cell on
-the grid — *drive a real browser, then read the page’s embedded state blob* — is
-the one a single cheap-to-expensive ladder hides, because it makes browser
-automation look like the bottom rather than an orthogonal cost.
+Any payload rung is reachable from any transport rung. The highest-value cell on the grid — *drive a real browser, then read the page’s embedded state blob* — is the one a single cheap-to-expensive ladder hides, because it makes browser automation look like the bottom rather than an orthogonal cost.
 
-This matters concretely. Scraping the DOM of a lazily-rendered listing returned
-35/32/29 rows from pages that each held 35. Reading the same pages’
-`__NEXT_DATA__` returned all of them, on every page, and kept working when the
-markup changed — because the blob *is* the data rather than a rendering of it.
+This matters concretely. Scraping the DOM of a lazily-rendered listing returned 35/32/29 rows from pages that each held 35. Reading the same pages’ `__NEXT_DATA__` returned all of them, on every page, and kept working when the markup changed — because the blob *is* the data rather than a rendering of it.
 
 ### What you get without asking for it
 
-- **Impersonating transport by default.** A plain client gets `403` from origins
-  that fingerprint TLS; the marginal cost of not being one is a single argument.
-- **Robots compliance on by default** via `default_fetcher()` (and therefore
-  `fetch`/`probe`), with overrides recorded in the capture, so “were we allowed to
-  take this” is a queryable fact. Constructing `HttpFetcher()` directly opts out —
-  pass `robots=RobotsPolicy(...)` if you build your own.
-- **Per-host politeness and full-jitter retries** — and a challenge is *never*
-  retried, because the answer will not change and repeating it confirms automation.
+- **Impersonating transport by default.** A plain client gets `403` from origins that fingerprint TLS; the marginal cost of not being one is a single argument.
+- **Robots compliance on by default** via `default_fetcher()` (and therefore `fetch`/`probe`), with overrides recorded in the capture, so “were we allowed to take this” is a queryable fact. Constructing `HttpFetcher()` directly opts out — pass `robots=RobotsPolicy(...)` if you build your own.
+- **Per-host politeness and full-jitter retries** — and a challenge is *never* retried, because the answer will not change and repeating it confirms automation.
 - **Challenges detected and raised**, never silently saved as if they were data.
-- **Provenance on every capture** — WARC-isomorphic, with the body content-addressed
-  so deduplication, change detection, and free re-runs all fall out of one choice.
+- **Provenance on every capture** — WARC-isomorphic, with the body content-addressed so deduplication, change detection, and free re-runs all fall out of one choice.
 
 <!-- wads-docs: skip placeholder url; would write a cache under ~/.cache -->
 ```python
@@ -100,27 +82,18 @@ with BrowserSession(artifact_dir="~/runs/job") as session:
     print(session.artifacts().har_path)  # every byte, on disk
 ```
 
-The rule this rung enforces: **the browser writes to disk; you read the file
-path.** HAR and download paths are set at context creation and are not optional.
-Getting a payload *out* of an automated browser is its own expensive failure
-class — see [`misc/docs/browser-result-exfiltration.md`]().
+The rule this rung enforces: **the browser writes to disk; you read the file path.** HAR and download paths are set at context creation and are not optional. Getting a payload *out* of an automated browser is its own expensive failure class — see [`misc/docs/browser-result-exfiltration.md`]().
 
 ### Agent skills and the acquisition subagent
 
-`scraped` ships agent skills in `scraped/data/skills/`: a router, `scraped-acquire`,
-that hands each step to a focused sub-skill (`scraped-recon`, `scraped-http-rung`,
-`scraped-browser-rung`, `scraped-api-discovery`), and `scraped-acquirer`, a subagent
-that runs a whole job under numeric stop rules and **returns a report, never a
-payload**: artifacts stay in the capture store and file paths come back.
+`scraped` ships agent skills in `scraped/data/skills/`: a router, `scraped-acquire`, that hands each step to a focused sub-skill (`scraped-recon`, `scraped-http-rung`, `scraped-browser-rung`, `scraped-api-discovery`), and `scraped-acquirer`, a subagent that runs a whole job under numeric stop rules and **returns a report, never a payload**: artifacts stay in the capture store and file paths come back.
 
 ```bash
 gh skill install thorwhalen/scraped scraped-acquire
 gh skill install thorwhalen/scraped scraped-acquirer
 ```
 
-The Claude Code agent definition `.claude/agents/scraped-acquirer.md` is generated
-from that skill with [`coact`](https://github.com/thorwhalen/coact):
-`coact complete scraped/data/skills/scraped-acquirer --dest .claude/agents`.
+The Claude Code agent definition `.claude/agents/scraped-acquirer.md` is generated from that skill with [`coact`](https://github.com/thorwhalen/coact): `coact complete scraped/data/skills/scraped-acquirer --dest .claude/agents`.
 
 The contract is code, so a manager can check it:
 
@@ -135,18 +108,13 @@ report = AcquisitionReport.from_budget(budget, artifacts=["runs/a.json"]).check(
 
 ### Design docs
 
-[`misc/docs/`]() — [architecture]()
-(terminology, the two-axis model, the escalation ladder and its diagnostic signal
-table), [tooling survey]() (what to use,
-what is abandoned, and why), and
-[browser exfiltration]().
+[`misc/docs/`]() — [architecture]() (terminology, the two-axis model, the escalation ladder and its diagnostic signal table), [tooling survey]() (what to use, what is abandoned, and why), and [browser exfiltration]().
 
 ---
 
 # Showcase of main functionalities
 
-Note that when pip installed, `scraped` comes with a command line tool of that name.
-Run this in your terminal:
+Note that when pip installed, `scraped` comes with a command line tool of that name. Run this in your terminal:
 
 ```bash
 scraped -h
@@ -166,29 +134,21 @@ These tools are written in python, so you can use them by importing
 from scraped import markdown_of_site, download_site, scrape_multiple_sites
 ```
 
-`download_site` downloads one (by default, `depth=1`) or several (if you specify
-a larger `depth`) pages of a target url, saving them in files of a folder of
-your (optional) choice.
+`download_site` downloads one (by default, `depth=1`) or several (if you specify a larger `depth`) pages of a target url, saving them in files of a folder of your (optional) choice.
 
 `scrape_multiple_sites` can be used to download several sites.
 
-`markdown_of_site` uses `download_site` (by default, saving to a temporary folder),
-then aggregates all the pages into a single markdown string, which it can save for
-you if you ask for it (by specifying a `save_filepath`)
+`markdown_of_site` uses `download_site` (by default, saving to a temporary folder), then aggregates all the pages into a single markdown string, which it can save for you if you ask for it (by specifying a `save_filepath`)
 
 Below you’ll find more details on these functionalities.
 
-You’ll find more useful functions in the code, but the three I mention here are
-the “top” ones I use most often.
+You’ll find more useful functions in the code, but the three I mention here are the “top” ones I use most often.
 
 ## markdown_of_site
 
 Download a site and convert it to markdown.
 
-This can be quite useful when you want to perform some NLP analysis on a site,
-feed some information to an AI model, or simply want to read the site offline.
-Markdown offers a happy medium between readability and simplicity, and is
-supported by many tools and platforms.
+This can be quite useful when you want to perform some NLP analysis on a site, feed some information to an AI model, or simply want to read the site offline. Markdown offers a happy medium between readability and simplicity, and is supported by many tools and platforms.
 
 Args:
 
@@ -213,8 +173,7 @@ Returns:
 '~/dol_documentation.md'
 ```
 
-If you don’t specify a `save_filepath`, the function will return the Markdown
-string, which you can then analyze directly, and/or store as you wish.
+If you don’t specify a `save_filepath`, the function will return the Markdown string, which you can then analyze directly, and/or store as you wish.
 
 ```python
 >>> markdown_string = markdown_of_site("https://i2mint.github.io/dol/")
@@ -228,9 +187,7 @@ str of length 626439
 download_site("http://www.example.com")
 ```
 
-will just download the page the url points to, storing it in the default rootdir,
-which, for example, on unix/mac, is `~/.config/scraped/data`, but can be configured
-through a `SCRAPED_DFLT_ROOTDIR` environment variable.
+will just download the page the url points to, storing it in the default rootdir, which, for example, on unix/mac, is `~/.config/scraped/data`, but can be configured through a `SCRAPED_DFLT_ROOTDIR` environment variable.
 
 The `depth` argument will enable you to download more content starting from the url:
 
@@ -258,16 +215,18 @@ And there’s more arguments:
 
 # About this build
 
-This documentation was built on **2026-11-22 22:20 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/8d4ad7ba3b324ec493e8b64b22423c2229ae8f6f"><code>8d4ad7b</code></a> on branch <code>main</code>, for **scraped 0.0.30** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-23 02:56 UTC** from commit <a href="https://github.com/thorwhalen/scraped/commit/bf5ebd066e6533a569ce94042646e93424223f80"><code>bf5ebd0</code></a> on branch <code>main</code>, for **scraped 0.0.30** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.30) is behind the latest release on PyPI (0.0.31): `pip install scraped` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                           |
 |---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/scraped/commit/8d4ad7ba3b324ec493e8b64b22423c2229ae8f6f"><code>8d4ad7ba3b324ec493e8b64b22423c2229ae8f6f</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/scraped/commit/bf5ebd066e6533a569ce94042646e93424223f80"><code>bf5ebd066e6533a569ce94042646e93424223f80</code></a> |
 | Branch              | <code>main</code>                                                                                                                                         |
 | Tags at this commit | none                                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                     |
@@ -278,9 +237,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/scraped</code>                                                            |
-| Run          | <a href="https://github.com/thorwhalen/scraped/actions/runs/45076920788">45076920788</a>   |
+| Run          | <a href="https://github.com/thorwhalen/scraped/actions/runs/45102762585">45102762585</a>   |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>8d4ad7ba3b324ec493e8b64b22423c2229ae8f6f</code> (in the history of the built commit) |
+| Event commit | <code>bf5ebd066e6533a569ce94042646e93424223f80</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -305,13 +264,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/scraped/0.0.30/">0.0.30</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/scraped/0.0.31/">0.0.31</a>, newer than the documented version (0.0.30).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/scraped && cd scraped
-git checkout 8d4ad7ba3b324ec493e8b64b22423c2229ae8f6f
+git checkout bf5ebd066e6533a569ce94042646e93424223f80
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

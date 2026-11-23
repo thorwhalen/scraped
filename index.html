@@ -99,17 +99,13 @@
 
 <section id="scraped">
 <h1>scraped<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#scraped">¶</a></h1>
-<p>Tools for scraping.</p>
-<p>To install:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">pip</span> <span class="n">install</span> <span class="n">scraped</span>
+<p>Tools for scraping: probe what a site will hand over, fetch it faithfully and politely (impersonating transport, robots-aware, challenges raised not saved), and turn a site into markdown.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">pip<span class="w"> </span>install<span class="w"> </span>scraped
 </span></code></pre></div>
 </div>
-<hr class="docutils"/>
 <section id="scraped-acquire-get-the-bytes-down-faithfully">
 <span id="scrapedacquire--get-the-bytes-down-faithfully"></span><h2><code class="docutils literal notranslate"><span class="pre">scraped.acquire</span></code> — get the bytes down, faithfully<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#scraped-acquire-get-the-bytes-down-faithfully" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#scraped-acquire-get-the-bytes-down-faithfully'">¶</a></h2>
-<p>Acquisition is one of three separable concerns in any information-extraction job:
-<strong>acquire</strong> the raw bytes, <strong>extract</strong> the target fields, <strong>format</strong> the result.
-This package owns the first and gives the other two a seam to hook into.</p>
+<p>Acquisition is one of three separable concerns in any information-extraction job: <strong>acquire</strong> the raw bytes, <strong>extract</strong> the target fields, <strong>format</strong> the result. This package owns the first and gives the other two a seam to hook into.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">scraped.acquire</span><span class="w"> </span><span class="kn">import</span> <span class="n">probe</span><span class="p">,</span> <span class="n">fetch</span><span class="p">,</span> <span class="n">scan_state_blobs</span>
 </span><span id="line-2">
 </span><span id="line-3"><span class="nb">print</span><span class="p">(</span><span class="n">probe</span><span class="p">(</span><span class="s2">"https://example.com"</span><span class="p">)</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>  <span class="c1"># what will this site hand over?</span>
@@ -135,29 +131,17 @@ This package owns the first and gives the other two a seam to hook into.</p>
 </span><span id="line-2"><span class="n">transport</span><span class="p">:</span>  <span class="n">plain</span> <span class="n">http</span> <span class="o">&gt;</span> <span class="n">impersonating</span> <span class="n">http</span> <span class="o">&gt;</span> <span class="o">+</span><span class="n">session</span> <span class="o">&gt;</span> <span class="n">browser</span> <span class="o">&gt;</span> <span class="n">headful</span>
 </span></code></pre></div>
 </div>
-<p>Any payload rung is reachable from any transport rung. The highest-value cell on
-the grid — <em>drive a real browser, then read the page’s embedded state blob</em> — is
-the one a single cheap-to-expensive ladder hides, because it makes browser
-automation look like the bottom rather than an orthogonal cost.</p>
-<p>This matters concretely. Scraping the DOM of a lazily-rendered listing returned
-35/32/29 rows from pages that each held 35. Reading the same pages’
-<code class="docutils literal notranslate"><span class="pre">__NEXT_DATA__</span></code> returned all of them, on every page, and kept working when the
-markup changed — because the blob <em>is</em> the data rather than a rendering of it.</p>
+<p>Any payload rung is reachable from any transport rung. The highest-value cell on the grid — <em>drive a real browser, then read the page’s embedded state blob</em> — is the one a single cheap-to-expensive ladder hides, because it makes browser automation look like the bottom rather than an orthogonal cost.</p>
+<p>This matters concretely. Scraping the DOM of a lazily-rendered listing returned 35/32/29 rows from pages that each held 35. Reading the same pages’ <code class="docutils literal notranslate"><span class="pre">__NEXT_DATA__</span></code> returned all of them, on every page, and kept working when the markup changed — because the blob <em>is</em> the data rather than a rendering of it.</p>
 </section>
 <section id="what-you-get-without-asking-for-it">
 <h3>What you get without asking for it<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#what-you-get-without-asking-for-it" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#what-you-get-without-asking-for-it'">¶</a></h3>
 <ul class="simple">
-<li><p><strong>Impersonating transport by default.</strong> A plain client gets <code class="docutils literal notranslate"><span class="pre">403</span></code> from origins
-that fingerprint TLS; the marginal cost of not being one is a single argument.</p></li>
-<li><p><strong>Robots compliance on by default</strong> via <code class="docutils literal notranslate"><span class="pre">default_fetcher()</span></code> (and therefore
-<code class="docutils literal notranslate"><span class="pre">fetch</span></code>/<code class="docutils literal notranslate"><span class="pre">probe</span></code>), with overrides recorded in the capture, so “were we allowed to
-take this” is a queryable fact. Constructing <code class="docutils literal notranslate"><span class="pre">HttpFetcher()</span></code> directly opts out —
-pass <code class="docutils literal notranslate"><span class="pre">robots=RobotsPolicy(...)</span></code> if you build your own.</p></li>
-<li><p><strong>Per-host politeness and full-jitter retries</strong> — and a challenge is <em>never</em>
-retried, because the answer will not change and repeating it confirms automation.</p></li>
+<li><p><strong>Impersonating transport by default.</strong> A plain client gets <code class="docutils literal notranslate"><span class="pre">403</span></code> from origins that fingerprint TLS; the marginal cost of not being one is a single argument.</p></li>
+<li><p><strong>Robots compliance on by default</strong> via <code class="docutils literal notranslate"><span class="pre">default_fetcher()</span></code> (and therefore <code class="docutils literal notranslate"><span class="pre">fetch</span></code>/<code class="docutils literal notranslate"><span class="pre">probe</span></code>), with overrides recorded in the capture, so “were we allowed to take this” is a queryable fact. Constructing <code class="docutils literal notranslate"><span class="pre">HttpFetcher()</span></code> directly opts out — pass <code class="docutils literal notranslate"><span class="pre">robots=RobotsPolicy(...)</span></code> if you build your own.</p></li>
+<li><p><strong>Per-host politeness and full-jitter retries</strong> — and a challenge is <em>never</em> retried, because the answer will not change and repeating it confirms automation.</p></li>
 <li><p><strong>Challenges detected and raised</strong>, never silently saved as if they were data.</p></li>
-<li><p><strong>Provenance on every capture</strong> — WARC-isomorphic, with the body content-addressed
-so deduplication, change detection, and free re-runs all fall out of one choice.</p></li>
+<li><p><strong>Provenance on every capture</strong> — WARC-isomorphic, with the body content-addressed so deduplication, change detection, and free re-runs all fall out of one choice.</p></li>
 </ul>
 
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">scraped.acquire</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_fetcher</span><span class="p">,</span> <span class="n">cached</span><span class="p">,</span> <span class="n">capture_store</span><span class="p">,</span> <span class="n">Request</span>
@@ -181,25 +165,16 @@ so deduplication, change detection, and free re-runs all fall out of one choice.
 </span><span id="line-6">    <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">artifacts</span><span class="p">()</span><span class="o">.</span><span class="n">har_path</span><span class="p">)</span>  <span class="c1"># every byte, on disk</span>
 </span></code></pre></div>
 </div>
-<p>The rule this rung enforces: <strong>the browser writes to disk; you read the file
-path.</strong> HAR and download paths are set at context creation and are not optional.
-Getting a payload <em>out</em> of an automated browser is its own expensive failure
-class — see <a class="reference internal" href="#misc/docs/browser-result-exfiltration.md"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">misc/docs/browser-result-exfiltration.md</span></code></span></a>.</p>
+<p>The rule this rung enforces: <strong>the browser writes to disk; you read the file path.</strong> HAR and download paths are set at context creation and are not optional. Getting a payload <em>out</em> of an automated browser is its own expensive failure class — see <a class="reference internal" href="#misc/docs/browser-result-exfiltration.md"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">misc/docs/browser-result-exfiltration.md</span></code></span></a>.</p>
 </section>
 <section id="agent-skills-and-the-acquisition-subagent">
 <h3>Agent skills and the acquisition subagent<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#agent-skills-and-the-acquisition-subagent" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#agent-skills-and-the-acquisition-subagent'">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">scraped</span></code> ships agent skills in <code class="docutils literal notranslate"><span class="pre">scraped/data/skills/</span></code>: a router, <code class="docutils literal notranslate"><span class="pre">scraped-acquire</span></code>,
-that hands each step to a focused sub-skill (<code class="docutils literal notranslate"><span class="pre">scraped-recon</span></code>, <code class="docutils literal notranslate"><span class="pre">scraped-http-rung</span></code>,
-<code class="docutils literal notranslate"><span class="pre">scraped-browser-rung</span></code>, <code class="docutils literal notranslate"><span class="pre">scraped-api-discovery</span></code>), and <code class="docutils literal notranslate"><span class="pre">scraped-acquirer</span></code>, a subagent
-that runs a whole job under numeric stop rules and <strong>returns a report, never a
-payload</strong>: artifacts stay in the capture store and file paths come back.</p>
+<p><code class="docutils literal notranslate"><span class="pre">scraped</span></code> ships agent skills in <code class="docutils literal notranslate"><span class="pre">scraped/data/skills/</span></code>: a router, <code class="docutils literal notranslate"><span class="pre">scraped-acquire</span></code>, that hands each step to a focused sub-skill (<code class="docutils literal notranslate"><span class="pre">scraped-recon</span></code>, <code class="docutils literal notranslate"><span class="pre">scraped-http-rung</span></code>, <code class="docutils literal notranslate"><span class="pre">scraped-browser-rung</span></code>, <code class="docutils literal notranslate"><span class="pre">scraped-api-discovery</span></code>), and <code class="docutils literal notranslate"><span class="pre">scraped-acquirer</span></code>, a subagent that runs a whole job under numeric stop rules and <strong>returns a report, never a payload</strong>: artifacts stay in the capture store and file paths come back.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">gh<span class="w"> </span>skill<span class="w"> </span>install<span class="w"> </span>thorwhalen/scraped<span class="w"> </span>scraped-acquire
 </span><span id="line-2">gh<span class="w"> </span>skill<span class="w"> </span>install<span class="w"> </span>thorwhalen/scraped<span class="w"> </span>scraped-acquirer
 </span></code></pre></div>
 </div>
-<p>The Claude Code agent definition <code class="docutils literal notranslate"><span class="pre">.claude/agents/scraped-acquirer.md</span></code> is generated
-from that skill with <a class="reference external" href="https://github.com/thorwhalen/coact" rel="nofollow noopener"><code class="docutils literal notranslate"><span class="pre">coact</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>:
-<code class="docutils literal notranslate"><span class="pre">coact</span> <span class="pre">complete</span> <span class="pre">scraped/data/skills/scraped-acquirer</span> <span class="pre">--dest</span> <span class="pre">.claude/agents</span></code>.</p>
+<p>The Claude Code agent definition <code class="docutils literal notranslate"><span class="pre">.claude/agents/scraped-acquirer.md</span></code> is generated from that skill with <a class="reference external" href="https://github.com/thorwhalen/coact" rel="nofollow noopener"><code class="docutils literal notranslate"><span class="pre">coact</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>: <code class="docutils literal notranslate"><span class="pre">coact</span> <span class="pre">complete</span> <span class="pre">scraped/data/skills/scraped-acquirer</span> <span class="pre">--dest</span> <span class="pre">.claude/agents</span></code>.</p>
 <p>The contract is code, so a manager can check it:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">scraped.acquire</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionBudget</span><span class="p">,</span> <span class="n">AcquisitionReport</span><span class="p">,</span> <span class="n">StopRules</span>
 </span><span id="line-2">
@@ -212,19 +187,14 @@ from that skill with <a class="reference external" href="https://github.com/thor
 </section>
 <section id="design-docs">
 <h3>Design docs<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#design-docs" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#design-docs'">¶</a></h3>
-<p><a class="reference internal" href="#misc/docs/"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">misc/docs/</span></code></span></a> — <a class="reference internal" href="#misc/docs/acquisition-architecture.md"><span class="xref myst">architecture</span></a>
-(terminology, the two-axis model, the escalation ladder and its diagnostic signal
-table), <a class="reference internal" href="#misc/docs/acquisition-tooling-survey.md"><span class="xref myst">tooling survey</span></a> (what to use,
-what is abandoned, and why), and
-<a class="reference internal" href="#misc/docs/browser-result-exfiltration.md"><span class="xref myst">browser exfiltration</span></a>.</p>
+<p><a class="reference internal" href="#misc/docs/"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">misc/docs/</span></code></span></a> — <a class="reference internal" href="#misc/docs/acquisition-architecture.md"><span class="xref myst">architecture</span></a> (terminology, the two-axis model, the escalation ladder and its diagnostic signal table), <a class="reference internal" href="#misc/docs/acquisition-tooling-survey.md"><span class="xref myst">tooling survey</span></a> (what to use, what is abandoned, and why), and <a class="reference internal" href="#misc/docs/browser-result-exfiltration.md"><span class="xref myst">browser exfiltration</span></a>.</p>
 </section>
 </section>
 </section>
 <hr class="docutils"/>
 <section id="showcase-of-main-functionalities">
 <h1>Showcase of main functionalities<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#showcase-of-main-functionalities">¶</a></h1>
-<p>Note that when pip installed, <code class="docutils literal notranslate"><span class="pre">scraped</span></code> comes with a command line tool of that name.
-Run this in your terminal:</p>
+<p>Note that when pip installed, <code class="docutils literal notranslate"><span class="pre">scraped</span></code> comes with a command line tool of that name. Run this in your terminal:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">scraped<span class="w"> </span>-h
 </span></code></pre></div>
 </div>
@@ -238,23 +208,15 @@ Run this in your terminal:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">scraped</span><span class="w"> </span><span class="kn">import</span> <span class="n">markdown_of_site</span><span class="p">,</span> <span class="n">download_site</span><span class="p">,</span> <span class="n">scrape_multiple_sites</span>
 </span></code></pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">download_site</span></code> downloads one (by default, <code class="docutils literal notranslate"><span class="pre">depth=1</span></code>) or several (if you specify
-a larger <code class="docutils literal notranslate"><span class="pre">depth</span></code>) pages of a target url, saving them in files of a folder of
-your (optional) choice.</p>
+<p><code class="docutils literal notranslate"><span class="pre">download_site</span></code> downloads one (by default, <code class="docutils literal notranslate"><span class="pre">depth=1</span></code>) or several (if you specify a larger <code class="docutils literal notranslate"><span class="pre">depth</span></code>) pages of a target url, saving them in files of a folder of your (optional) choice.</p>
 <p><code class="docutils literal notranslate"><span class="pre">scrape_multiple_sites</span></code> can be used to download several sites.</p>
-<p><code class="docutils literal notranslate"><span class="pre">markdown_of_site</span></code> uses <code class="docutils literal notranslate"><span class="pre">download_site</span></code> (by default, saving to a temporary folder),
-then aggregates all the pages into a single markdown string, which it can save for
-you if you ask for it (by specifying a <code class="docutils literal notranslate"><span class="pre">save_filepath</span></code>)</p>
+<p><code class="docutils literal notranslate"><span class="pre">markdown_of_site</span></code> uses <code class="docutils literal notranslate"><span class="pre">download_site</span></code> (by default, saving to a temporary folder), then aggregates all the pages into a single markdown string, which it can save for you if you ask for it (by specifying a <code class="docutils literal notranslate"><span class="pre">save_filepath</span></code>)</p>
 <p>Below you’ll find more details on these functionalities.</p>
-<p>You’ll find more useful functions in the code, but the three I mention here are
-the “top” ones I use most often.</p>
+<p>You’ll find more useful functions in the code, but the three I mention here are the “top” ones I use most often.</p>
 <section id="markdown-of-site">
 <span id="markdown_of_site"></span><h2>markdown_of_site<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#markdown-of-site" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#markdown-of-site'">¶</a></h2>
 <p>Download a site and convert it to markdown.</p>
-<p>This can be quite useful when you want to perform some NLP analysis on a site,
-feed some information to an AI model, or simply want to read the site offline.
-Markdown offers a happy medium between readability and simplicity, and is
-supported by many tools and platforms.</p>
+<p>This can be quite useful when you want to perform some NLP analysis on a site, feed some information to an AI model, or simply want to read the site offline. Markdown offers a happy medium between readability and simplicity, and is supported by many tools and platforms.</p>
 <p>Args:</p>
 <ul class="simple">
 <li><p>url: The URL of the site to download.</p></li>
@@ -277,8 +239,7 @@ supported by many tools and platforms.</p>
 </span><span id="line-6"><span class="go">'~/dol_documentation.md'</span>
 </span></code></pre></div>
 </div>
-<p>If you don’t specify a <code class="docutils literal notranslate"><span class="pre">save_filepath</span></code>, the function will return the Markdown
-string, which you can then analyze directly, and/or store as you wish.</p>
+<p>If you don’t specify a <code class="docutils literal notranslate"><span class="pre">save_filepath</span></code>, the function will return the Markdown string, which you can then analyze directly, and/or store as you wish.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">markdown_string</span> <span class="o">=</span> <span class="n">markdown_of_site</span><span class="p">(</span><span class="s2">"https://i2mint.github.io/dol/"</span><span class="p">)</span>
 </span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">markdown_string</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> of length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">markdown_string</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-3"><span class="go">str of length 626439</span>
@@ -290,9 +251,7 @@ string, which you can then analyze directly, and/or store as you wish.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">download_site</span><span class="p">(</span><span class="s2">"http://www.example.com"</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
-<p>will just download the page the url points to, storing it in the default rootdir,
-which, for example, on unix/mac, is <code class="docutils literal notranslate"><span class="pre">~/.config/scraped/data</span></code>, but can be configured
-through a <code class="docutils literal notranslate"><span class="pre">SCRAPED_DFLT_ROOTDIR</span></code> environment variable.</p>
+<p>will just download the page the url points to, storing it in the default rootdir, which, for example, on unix/mac, is <code class="docutils literal notranslate"><span class="pre">~/.config/scraped/data</span></code>, but can be configured through a <code class="docutils literal notranslate"><span class="pre">SCRAPED_DFLT_ROOTDIR</span></code> environment variable.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">depth</span></code> argument will enable you to download more content starting from the url:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">download_site</span><span class="p">(</span><span class="s2">"http://www.example.com"</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </span></code></pre></div>
@@ -312,7 +271,7 @@ through a <code class="docutils literal notranslate"><span class="pre">SCRAPED_D
 
 </section>
 </section>
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 22:20 UTC from <a href="https://github.com/thorwhalen/scraped/commit/8d4ad7ba3b324ec493e8b64b22423c2229ae8f6f">8d4ad7b</a> (main) · scraped 0.0.30 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-23 02:56 UTC from <a href="https://github.com/thorwhalen/scraped/commit/bf5ebd066e6533a569ce94042646e93424223f80">bf5ebd0</a> (main) · scraped 0.0.30 · <a href="about-this-build.html">about this build</a></p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
